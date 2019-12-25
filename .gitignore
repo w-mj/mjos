@@ -1,1 +1,7 @@
 *.img
+*.vhd
+*.efi
+*.o
+*.so
+.vscode
+OVMF.fd
