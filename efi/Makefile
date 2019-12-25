@@ -43,6 +43,10 @@ build:
 	ld $(O_NAME) $(LIB_DIR)/crt0-efi-x86_64.o  -nostdlib  -znocombreloc -T $(LIB_DIR)/elf_x86_64_efi.lds -shared -Bsymbolic -L $(LIB_DIR) -l:libgnuefi.a -l:libefi.a -o $(SO_NAME)
 	objcopy $(OBJCPY_FLAGS) --target=efi-app-x86_64 $(SO_NAME) $(EFI_NAME)
 
+install:
+	mkdir -p ../build/boot/efi && cp $(EFI_NAME) ../build/boot/efi/$(EFI_NAME)
+
+
 clean:
 	-rm -f *.so *.o *.efi
 

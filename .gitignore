@@ -4,4 +4,5 @@
 *.o
 *.so
 .vscode
+build/
 OVMF.fd
