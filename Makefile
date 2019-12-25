@@ -6,4 +6,7 @@ $(TOPTARGETS): $(SUBDIRS)
 $(SUBDIRS):
 	$(MAKE) -C $@ $(MAKECMDGOALS)
 
+clean: 
+	rm -rf build/
+
 .PHONY: $(TOPTARGETS) $(SUBDIRS)

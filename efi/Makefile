@@ -30,7 +30,6 @@ LIB_DIR=/usr/lib
 # 	mformat -i /tmp/part.img -h 32 -t 32 -n 64 -c 1
 # 	mcopy -i /tmp/part.img $(EFI_NAME) ::
 # 	dd if=/tmp/part.img of=$(IMG_NAME) bs=512 count=91669 seek=2048 conv=notrunc
-all: build
 
 GCC_FLAGS=-c -fno-stack-protector -Wall -fpic -fshort-wchar -mno-red-zone 
 LD_FLAGS=-nostdlib -znocombreloc
