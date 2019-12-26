@@ -1,17 +1,8 @@
 #include <efi.h>
 #include <efilib.h>
- 
-//EFI_STATUS
-//EFIAPI
-//efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable)
-//{
-//    InitializeLib(ImageHandle, SystemTable);
-//    Print(L"Hello, world!\n");
-//    return EFI_SUCCESS;
-//}
-//
-//
+
 EFI_STATUS UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE *SystemTable) {
+	Print(L"aaaa\n");
 	EFI_STATUS Status;
 	UINTN Index;
 	EFI_INPUT_KEY Key;
@@ -20,6 +11,18 @@ EFI_STATUS UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE *SystemTable)
 	Status = SystemTable->ConIn->ReadKeyStroke(SystemTable->ConIn, &Key);
 	StrBuffer[0] = Key.UnicodeChar;
 	StrBuffer[1] = '\n';
+	Print(StrBuffer);
 	SystemTable->ConOut->OutputString(SystemTable->ConOut, StrBuffer);
 	return Status;
+} 
+
+EFI_STATUS
+EFIAPI
+efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable)
+{
+    InitializeLib(ImageHandle, SystemTable);
+    Print(L"Hello, world!\n");
+    return UefiMain(ImageHandle, SystemTable);
 }
+
+

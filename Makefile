@@ -1,4 +1,4 @@
-TOPTARGETS := all clean install
+TOPTARGETS := all clean install build
 
 # SUBDIRS := $(wildcard */.)
 SUBDIRS := efi
