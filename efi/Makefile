@@ -40,7 +40,7 @@ $(EFI_NAME): $(O_NAME)
 	gcc -c $< $(GCC_FLAGS) $(INC_FLAG) -DEFI_FUNCTION_WRAPPER -o $@
 
 install:
-	mkdir -p ../build/boot/efi && cp $(EFI_NAME) ../build/boot/efi/$(EFI_NAME)
+	mkdir -p ../build/boot && cp $(EFI_NAME) ../build/boot/$(EFI_NAME)
 
 
 clean:

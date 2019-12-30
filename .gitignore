@@ -6,3 +6,7 @@
 .vscode
 build/
 OVMF.fd
+compile_commands.json
+.ccls
+.depend
+cscope.*

@@ -1,9 +1,14 @@
 #include <efi.h>
 #include <efilib.h>
 
+int funca() {
+	return 0;
+}
+
 EFI_STATUS UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE *SystemTable) {
 	Print(L"aaaa\n");
 	EFI_STATUS Status;
+	int t = funca();
 	UINTN Index;
 	EFI_INPUT_KEY Key;
 	CHAR16 StrBuffer[3] = {0};

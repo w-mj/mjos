@@ -17,7 +17,7 @@ else
     mformat -i /tmp/part.img -h 32 -t 32 -n 64 -c 1.sh
 fi
 
-mcopy -i /tmp/part.img -o build/boot/efi/helloefi.efi ::
+mcopy -i /tmp/part.img -o build/boot/helloefi.efi ::
 dd if=/tmp/part.img of=boot.img bs=512 count=91669 seek=2048 conv=notrunc
 
 
