@@ -1,7 +1,7 @@
 TOPTARGETS := all clean install build
 
 # SUBDIRS := $(wildcard */.)
-SUBDIRS := efi
+SUBDIRS := boot
 $(TOPTARGETS): $(SUBDIRS)
 $(SUBDIRS):
 	$(MAKE) -C $@ $(MAKECMDGOALS)

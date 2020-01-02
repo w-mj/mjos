@@ -10,6 +10,8 @@ EFI_NAME=$(addsuffix .efi, $(NAME))
 
 EFI_HEADERS=/usr/include/efi/
 EFI_HEADERS_X86_64=$(addsuffix x86_64/, $(EFI_HEADERS))
+UEFI_HEADERS=/home/wmj/edk2/MdePkg/Include/
+UEFI_HEADERS_X64=/home/wmj/edk2/MdePkg/Include/X64/
 LIB_DIR=/usr/lib
 
 all: build
@@ -17,7 +19,7 @@ all: build
 GCC_FLAGS=-fno-stack-protector -Wall -fpic -fshort-wchar -mno-red-zone 
 LD_FLAGS=-nostdlib -znocombreloc
 
-INC_PATH=$(EFI_HEADERS) $(EFI_HEADERS_X86_64)
+INC_PATH=$(EFI_HEADERS) $(EFI_HEADERS_X86_64) $(UEFI_HEADERS) $(UEFI_HEADERS_X64)
 INC_FLAG=$(addprefix -I, $(INC_PATH))
 
 OBJCPY_FLAG=text sdata data dynamic rel rela reloc
