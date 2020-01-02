@@ -1,0 +1,19 @@
+# boot.inf 是ed2k工程的描述文件
+
+[Defines]
+  INF_VERSION        = 0x00010005
+  BASE_NAME          = boot
+  FILE_GUID          = bf76b562-0a62-4f80-8d60-a2add6546532
+  MODULE_TYPE        = UEFI_APPLICATION
+  VERSION_STRING     = 1.0
+  ENTRY_POING        = UefiMain
+
+[Sources]
+  boot.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  UefiLib

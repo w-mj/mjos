@@ -1,0 +1,7 @@
+# dec 文件描述了该模块被其他模块调用时的导出信息
+
+[Defines]
+  DEC_SPECIFICATION    = 0x00010005
+  PACKAGE_NAME         = boot
+  PACKAGE_GUID         = 90f1f67d-567a-4727-9cf8-095fc151bd2d
+  PACKAGE_VERSION      = 1.0

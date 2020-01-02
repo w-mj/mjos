@@ -1,7 +1,7 @@
 
 # IMG_NAME=boot.vhd
 # DISK_NAME=DISK.vhd
-NAME=helloefi
+NAME=boot
 
 C_NAME=$(addsuffix .c, $(NAME))
 O_NAME=$(addsuffix .o, $(NAME))
