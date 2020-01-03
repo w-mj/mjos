@@ -1,8 +1,11 @@
 #include <Uefi.h>
-#include <Library/UefiLib.h>
+//#include <Library/PcdLib.h>
+//#include <Library/UefiLib.h>
+//#include <Library/UefiApplicationEntryPoint.h>
 
-EFI_STATUS UefiMain(IN EFI_HANDLE imageHandle, IN EFI_SYSTEM_TABLE *systemTable) {
-	// systemTable->ConOut->OutputString(systemTable->ConOut, L"Hello World!\n");
-	Print(L"Hello World Print\n");
+EFI_STATUS
+EFIAPI
+UefiMain (IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE *st) {
+	st->ConOut->OutputString(st->ConOut, L"I am SB\n");
 	return EFI_SUCCESS;
 }
