@@ -8,6 +8,7 @@
 *.so
 .vscode
 build/
+out/
 OVMF.fd
 compile_commands.json
 .ccls
