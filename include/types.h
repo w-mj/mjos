@@ -1,4 +1,4 @@
-#progma once
+#pragma once
 
 
 typedef signed char _i8;
