@@ -60,7 +60,7 @@ _start:
     orl     $1 << 31, %eax
     movl    %eax, %cr0
 
-    // 段地址为8
+    // 段地址为1
     lgdt    gdtr64
     jmp     $8, $entry64
 

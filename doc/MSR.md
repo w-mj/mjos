@@ -1,8 +1,12 @@
 #### MSR寄存器
 
-MSR寄存器是用于控制CPU状态的寄存器
+MSR寄存器是用于控制CPU状态的寄存器，cpu中可以有许多不同的MSR寄存器。
 
-可以通过rdmsr讲msr寄存器中的内容复制到eax中，通过wrmsr将eax中的内容复制到msr中。
+rdmsr   MSR[ecx] -> eax
+
+wrmsr  MSR[ecx] <- eax
+
+ecx = 0xc0000080的MSR称作EFER
 
 | Bit(s) | Label | Description                    |
 | ------ | ----- | ------------------------------ |
