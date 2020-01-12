@@ -30,36 +30,37 @@ mb_header:
 .balign 8, 0
 _start:
     // disable interrupts and save GRUB parameters
-    cli
-    movl    %eax, (mb_eax)
-    movl    %ebx, (mb_ebx)
+    cli  // 关中断
+    //movl    %eax, (mb_eax)
+    //movl    %ebx, (mb_ebx)
 
-    // disable paging for safety
+    // 关分页
     movl    %cr0, %eax
     andl    $0x7fffffff, %eax
     movl    %eax, %cr0
 
-    // load initial page table
+    // 读入临时页表
     movl    $ABSOLUTE(pml4), %edi
     movl    %edi, %cr3
 
-    // enable PAE paging (required by 64-bit mode)
+    // 打开PAE模式
     movl    %cr4, %eax
     orl     $1 << 5, %eax
     movl    %eax, %cr4
 
-    // set LME in EFER
+    // 启动长模式
+    // 启动长模式后可以获得真64位数据寄存器以及一些额外的寄存器。
     movl    $0xc0000080, %ecx
     rdmsr
     orl     $1 <<  8, %eax
     wrmsr
 
-    // enable paging, then we're in compatibility (sub)mode
+    // 开启分页
     movl    %cr0, %eax
     orl     $1 << 31, %eax
     movl    %eax, %cr0
 
-    // switch to true 64-bit mode
+    // 段地址为8
     lgdt    gdtr64
     jmp     $8, $entry64
 
@@ -82,6 +83,7 @@ entry64:
     movw    %ax, %ss
 
     // clear FS.base and GS.base
+	// FS和GS是两个段寄存器，在64bit模式下，其高32位存放在MSR中
     xorq    %rax, %rax
     movl    $0xc0000100, %ecx
     wrmsr
@@ -110,6 +112,11 @@ gdt64:
     .byte   0x92        //         Present, DPL=0, writable
     .byte   0xc0        //         attr and limit [16:19]
     .byte   0           //         base  [24:31]
+/* gdt中定义了3个段，每个段描述符8字节，0号段为dummy descriptor
+ * gdtr64 的前2字节是段表长度，有3个段因此长度为3*8-1
+ * 段号的前3位是描述属性，第4位开始是段序号
+ * jmp $8, $entry64中的$8指定的是1号段，即code0
+*/
 
 gdtr64:
     .word   3 * 8 - 1
@@ -137,8 +144,8 @@ higher_half:
     popfq
 
     // begin executing C code in higher-half
-    movl    (mb_eax), %eax
-    movl    (mb_ebx), %edi
+    // movl    (mb_eax), %eax
+    // movl    (mb_ebx), %edi
 	jmp kernel_main
 
 die64_high:
