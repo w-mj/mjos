@@ -7,13 +7,14 @@ OUTDIR  :=  $(CURDIR)/out
 ISODIR  :=  $(OUTDIR)/iso
 
 CC      :=  $(ARCH)-elf-gcc
+CPP     :=  $(ARCH)-elf-g++
 AR      :=  $(ARCH)-elf-ar
 OBJCOPY :=  $(ARCH)-elf-objcopy
 
 BINFILE :=  $(OUTDIR)/kernel/kernel.bin  # must be same with kernel/Makefile
 ISOFILE :=  $(OUTDIR)/$(NAME).iso
 
-PARAMS  :=  DEBUG=$(DEBUG) ARCH=$(ARCH) CC=$(CC) AR=$(AR) OBJCOPY=$(OBJCOPY)
+PARAMS  :=  DEBUG=$(DEBUG) ARCH=$(ARCH) CC=$(CC) CPP=$(CPP) AR=$(AR) OBJCOPY=$(OBJCOPY)
 
 build:
 	$(MAKE) -C kernel $(PARAMS) OUTDIR=$(OUTDIR)/kernel build
