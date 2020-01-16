@@ -41,13 +41,22 @@ void console_putentryat(char c, _u8 color, _u16 x, _u16 y) {
 }
 
 void console_putchar(char c) {
-	console_putentryat(c, console_color, console_column, console_row);
-	// TODO: scroll up
-	if (++console_column == VGA_WIDTH) {
+	if (c == '\r') {
 		console_column = 0;
-		if (++console_row == VGA_HEIGHT) {
-			console_row = 0;
-		}
+	} else if (c == '\n') {
+		console_row += 1;
+	} else if (c < 32 || c > 126) {
+		// 跳过不可显示字符
+	} else {
+		console_putentryat(c, console_color, console_column, console_row);
+		console_column++;
+	}
+	if (console_column == VGA_WIDTH) {
+		console_row++;
+		console_column = 0;
+	}
+	if (console_row == VGA_HEIGHT) {
+		// 滚屏
 	}
 }
 

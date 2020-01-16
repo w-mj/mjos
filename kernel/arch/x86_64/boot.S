@@ -33,6 +33,7 @@ _start:
     cli  // 关中断
     //movl    %eax, (mb_eax)
     //movl    %ebx, (mb_ebx)
+	cld  // 正向
 
     // 关分页
     movl    %cr0, %eax
@@ -75,6 +76,7 @@ die32:
 
 entry64:
     // first initialize all segment registers
+	// 10 000b 全部指向索引为2的段，即data0 
     movw    $0x10, %ax
     movw    %ax, %ds
     movw    %ax, %es
