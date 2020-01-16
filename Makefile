@@ -22,6 +22,7 @@ build:
 clean:
 	$(MAKE) -C kernel $(PARAMS) OUTDIR=$(OUTDIR)/kernel clean
 	rm -rf $(ISOFILE)
+	rm -f $(ISODIR)/boot/$(NAME).bin
 
 iso: build
 	rm -rf $(ISODIR)

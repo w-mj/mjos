@@ -10,7 +10,10 @@ SRCLIST :=  $(foreach d,$(SUBDIRS),$(shell find $(d) -type f -name '*.S' -o -nam
 OBJLIST :=  $(patsubst %,$(OUTDIR)/%.o,$(SRCLIST))
 DEPLIST :=  $(patsubst %.c.o,%.c.d,$(filter %.c.o,$(OBJLIST)))
 
-CFLAGS  :=  -c -std=c11 -Iinclude -DKERNEL -DARCH=$(ARCH)
+INCLIST := include arch/$(ARCH)/include
+INCFLAG := $(addprefix -I, $(INCLIST))
+
+CFLAGS  :=  -c -std=c11 $(INCFLAG) -DKERNEL -DARCH=$(ARCH)
 CFLAGS  +=  -Wall -Wextra -Werror=implicit -Wno-cast-function-type
 CFLAGS  +=  -ffreestanding -ffunction-sections -fdata-sections
 
@@ -23,6 +26,7 @@ endif
 DEPGEN   =  -MT $@ -MMD -MP -MF $(basename $@).t
 LFLAGS  :=  -nostdlib -lgcc -T arch/$(ARCH)/linker.ld -Wl,-Map=$(MAPFILE),--gc-sections
 
+# 以下三行为x86_64专用
 CFLAGS  +=  -mcmodel=kernel -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -mno-3dnow -mno-fma
 CFLAGS  +=  -fno-pie
 LFLAGS  +=  -z max-page-size=0x1000
@@ -38,25 +42,25 @@ clean:
 	rm -f $(SYMFILE)
 
 $(ELFFILE): $(OBJLIST)
-	mkdir -p $(@D)
+	@ mkdir -p $(@D)
 	$(CC) $(LFLAGS) -o $@ $^
 
 $(BINFILE): $(ELFFILE)
-	mkdir -p $(@D)
+	@ mkdir -p $(@D)
 	$(OBJCOPY) --strip-debug $< $@
 
 $(SYMFILE): $(ELFFILE)
-	mkdir -p $(@D)
+	@ mkdir -p $(@D)
 	$(OBJCOPY) --only-keep-debug $< $@
 
 $(OUTDIR)/%.S.o: %.S
-	mkdir -p $(@D)
+	@ mkdir -p $(@D)
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(OUTDIR)/%.c.o: %.c $(OUTDIR)/%.c.d
-	mkdir -p $(@D)
+	@ mkdir -p $(@D)
 	$(CC) $(CFLAGS) $(DEPGEN) -o $@ $<
-	mv -f $(basename $@).t $(basename $@).d
+	@ mv -f $(basename $@).t $(basename $@).d
 
 
 $(DEPLIST): ;
