@@ -14,4 +14,3 @@ typedef _u8 _c;
 typedef _c* _s;
 typedef void* _p;
 
-
