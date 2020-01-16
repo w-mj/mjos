@@ -4,7 +4,6 @@
 //                  rdi       rsi       rdx
 GLOBAL(memcpy)
 	pushq %rcx
-	xorq  %rcx, %rcx
 	movq %rdx, %rcx
 	pushq %rcx
 	shrq  $3, %rcx

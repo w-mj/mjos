@@ -46,8 +46,8 @@ static void scroll() {
 	for (_u8 y = 0; y < VGA_HEIGHT - 1; y++) {
 		// 后一行复制到前一行
 		memcpy(
-		    console_buffer + y * row_size,
-		    console_buffer + (y + 1) * row_size,
+		    console_buffer + y * VGA_WIDTH,
+		    console_buffer + (y + 1) * VGA_WIDTH,
 		    row_size);
 	}
 	console_color = vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
