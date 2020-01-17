@@ -16,3 +16,12 @@ typedef char _c;
 typedef _c* _s;
 typedef void* _p;
 
+
+#define def_type(x)  \
+	typedef _i##x i##x; \ 
+	typedef _u##x u##x;
+
+def_type(8)
+def_type(16)
+def_type(32)
+def_type(64)
