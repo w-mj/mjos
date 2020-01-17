@@ -19,9 +19,26 @@
 #define _lshf(a, n) ((a) >> (n))
 #define _Lclr(a, n) ((a) & (~(_BITS_MASK(n))))
 #define _Hclr(a, n) _rshf(_lshf(a, n), n)
-#define _LNclr(a, n) ((a & (_BITS_MASK(n))))
+#define _LNclr(a, n) (((a) & (_BITS_MASK(n))))
 
 #define _Inext(pI, i) ((pI) + (i))->_next
 
 #define nullptr NULL
 #define null NULL
+
+
+#define ASM(...)                __asm__ volatile(__VA_ARGS__)
+#define TYPE(x)                 __typeof__(x)
+
+#define CLZ32(x)                __builtin_clz(x)
+#define CTZ32(x)                __builtin_ctz(x)
+#define CLZ64(x)                __builtin_clzll(x)
+#define CTZ64(x)                __builtin_ctzll(x)
+#define CLZL(x)                 __builtin_clzl(x)
+#define CTZL(x)                 __builtin_ctzl(x)
+#define MAX(x, y)               (((x) > (y)) ? (x) : (y))
+#define MIN(x, y)               (((x) < (y)) ? (x) : (y))
+
+#define ROUND_UP(x, align)      (((usize) (x) + ((align)-1)) & ~((align)-1))
+#define ROUND_DOWN(x, align)    ( (usize) (x)                & ~((align)-1))
+#define IS_ALIGNED(x, align)    (((usize) (x) & ((align)-1)) == 0)

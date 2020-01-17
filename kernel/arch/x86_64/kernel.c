@@ -2,6 +2,7 @@
 #include <types.h>
 #include <console.h>
 #include <copy.h>
+#include <delog.h>
  
 __INIT __NORETURN void kernel_main(void) 
 {
@@ -25,5 +26,7 @@ __INIT __NORETURN void kernel_main(void)
 		s1[0] = a + '0';
 		console_writez(s1);
 	}
+	_si(1);
+	_sa(s1, 100);
 	while(1);
 }
