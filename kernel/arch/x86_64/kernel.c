@@ -28,5 +28,8 @@ __INIT __NORETURN void kernel_main(void)
 	}
 	_si(1);
 	_sa(s1, 100);
+	logi("This is %s", "info");
+	logw("This is warring %d", 1);
+	loge("This is error %d", 1);
 	while(1);
 }

@@ -2,24 +2,27 @@
 
 #include <types.h>
 #include <stdarg.h>
+
 #define _POS_INFOBITS (_I)1
 #define _NPOS_INFOBITS (~_POS_INFOBITS)
 #define mkstr(symbol) #symbol
 enum {
-    _INIT_INFO_DELOG = 0,
-    _LOG_INFO_DELOG = 2,
-    _DBG_INFO_DELOG = 4,
-    _MAX_INFO_DELOG,
+	_INIT_INFO_DELOG = 0,
+	_LOG_INFO_DELOG = 2,
+	_DBG_INFO_DELOG = 4,
+	_MAX_INFO_DELOG,
 };
 #define _pos_delog(type, ...) _wmj_delog((type)|_POS_INFOBITS, __FILE__, __LINE__, __func__, __VA_ARGS__)
 #define _Npos_delog(type, ...) _wmj_delog((type)&_NPOS_INFOBITS, __VA_ARGS__)
 // #define init_delog() do{_Npos_delog(_INIT_INFO_DELOG, 0);} while(0)
 #define init_delog(dbgname, logname) do{_Npos_delog(_INIT_INFO_DELOG, dbgname, logname);}while(0)
-#if DELOG_MODE < 2
-#define _debug_info(expstr, m, ...) _pos_delog(_DBG_INFO_DELOG, m, expstr, __VA_ARGS__)
+
+#ifdef DEBUG
+	#define _debug_info(expstr, m, ...) _pos_delog(_DBG_INFO_DELOG, m, expstr, __VA_ARGS__)
 #else
-#define _debug_info(expstr, m, ...) do{}while(0)
+	#define _debug_info(expstr, m, ...) do{}while(0)
 #endif
+
 #define _log_info(...) _Npos_delog(_LOG_INFO_DELOG, __VA_ARGS__)
 #define _reg() _log_info("[%s] run!", __func__)
 
@@ -48,4 +51,26 @@ void _wmj_delog(_I type, ...);
  * 将p所指位置连续len个字节的单元的值取出，以16进制放在str中，size为str的最大长度
  */
 _I print_bin(_s str, _I size, _u8 *p, _I len);
+
+#include <console.h>
+#define logi(...) do { \
+	_u8 c = console_getcolor(); \
+	console_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK)); \
+	_log_info("[INFO] "__VA_ARGS__); \
+	console_setcolor(c); \
+} while(0)
+
+#define logw(...) do { \
+	_u8 c = console_getcolor(); \
+	console_setcolor(vga_entry_color(VGA_COLOR_LIGHT_BLUE, VGA_COLOR_BLACK)); \
+	_log_info("[WARRING] "__VA_ARGS__); \
+	console_setcolor(c); \
+} while(0)
+
+#define loge(...) do { \
+	_u8 c = console_getcolor(); \
+	console_setcolor(vga_entry_color(VGA_COLOR_RED, VGA_COLOR_BLACK)); \
+	_log_info("[ERROR] "__VA_ARGS__); \
+	console_setcolor(c); \
+} while(0)
 

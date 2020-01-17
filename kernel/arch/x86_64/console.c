@@ -2,13 +2,7 @@
 #include <types.h>
 #include <copy.h>
 
-static inline _u8 vga_entry_color(enum Color fg, enum Color bg) {
-	return fg | bg << 4;
-}
 
-static inline _u16 vga_entry(unsigned char uc, _u8 color) {
-	return (_u16) uc | (_u16) color << 8;
-}
 
 static const _u16 VGA_WIDTH = 80;
 static const _u16 VGA_HEIGHT = 25;
@@ -34,6 +28,10 @@ void console_initialize(void) {
 
 void console_setcolor(_u8 color) {
 	console_color = color;
+}
+
+_u8 console_getcolor() {
+	return console_color;
 }
 
 void console_putentryat(char c, _u8 color, _u16 x, _u16 y) {
