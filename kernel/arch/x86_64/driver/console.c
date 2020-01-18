@@ -1,7 +1,7 @@
 #include <console.h>
 #include <types.h>
 #include <copy.h>
-
+#include <delog.h>
 
 
 static const _u16 VGA_WIDTH = 80;
@@ -24,6 +24,7 @@ void console_initialize(void) {
 			console_buffer[index] = ch;
 		}
 	}
+	logi("initialize console");
 }
 
 void console_setcolor(_u8 color) {

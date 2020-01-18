@@ -18,7 +18,7 @@ typedef void* _p;
 
 
 #define def_type(x)  \
-	typedef _i##x i##x; \ 
+	typedef _i##x i##x; \
 	typedef _u##x u##x;
 
 def_type(8)

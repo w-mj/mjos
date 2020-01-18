@@ -1,5 +1,6 @@
 #include <delog.h>
 #include <console.h>
+#include <serial.h>
 #include <base.h>
 #include <vsnprintf.h>
 #include <ctype.h>
@@ -80,9 +81,20 @@ _s_init_delog_END:
     return;
 }
 
+static void out_char(char c) {
+	if (c == '\n')
+		out_char('\r');
+	console_putchar(c);
+	serial_putchar(c);
+}
+
 static void out_info() {
-	console_writez((char*)ms_buf);
-	console_writez("\r\n");
+	char *t = ms_buf;
+	while (*t != 0) {
+		out_char(*t);
+		t++;
+	}
+	out_char('\n');
     return;
 }
 
