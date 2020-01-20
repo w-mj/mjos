@@ -6,9 +6,22 @@ SYMFILE :=  $(OUTDIR)/kernel.sym
 
 
 SUBDIRS :=  arch/$(ARCH) misc
-SRCLIST :=  $(foreach d,$(SUBDIRS),$(shell find $(d) -type f -name '*.S' -o -name '*.c'))
-OBJLIST :=  $(patsubst %,$(OUTDIR)/%.o,$(SRCLIST))
-DEPLIST :=  $(patsubst %.c.o,%.c.d,$(filter %.c.o,$(OBJLIST)))
+ifneq ($(wildcard arch/$(ARCH)/bit32),)
+$(info "detected 32bits code")
+	SRCLIST32 := $(shell find arch/$(ARCH)/bit32 $(d) -type f -name '*.S' -o -name '*.c')
+endif
+ifneq ($(wildcard arch/$(ARCH)/bit16),)	
+$(info "detected 16bits code")
+	SRCLIST16 := $(shell find arch/$(ARCH)/bit16 $(d) -type f -name '*.S' -o -name '*.c')
+endif
+SRCLIST64 := $(foreach d,$(SUBDIRS),$(shell find $(d) -type f -name '*.S' -o -name '*.c'))
+SRCLIST64 := $(filter-out $(SRCLIST32), $(SRCLIST64))
+SRCLIST64 := $(filter-out $(SRCLIST16), $(SRCLIST64))
+OBJLIST64 := $(patsubst %,$(OUTDIR)/%.o,$(SRCLIST64))
+OBJLIST32 := $(patsubst %,$(OUTDIR)/%.o,$(SRCLIST32)) 
+OBJLIST16 := $(patsubst %,$(OUTDIR)/%.o,$(SRCLIST16)) 
+OBJLIST   := $(OBJLIST16) $(OBJLIST32) $(OBJLIST64)
+DEPLIST   := $(patsubst %.c.o,%.c.d,$(filter %.c.o,$(OBJLIST)))
 
 INCLIST := include arch/$(ARCH)/include
 INCFLAG := $(addprefix -I, $(INCLIST))
@@ -26,10 +39,7 @@ endif
 DEPGEN   =  -MT $@ -MMD -MP -MF $(basename $@).t
 LFLAGS  :=  -nostdlib -lgcc -T arch/$(ARCH)/linker.ld -Wl,-Map=$(MAPFILE),--gc-sections
 
-# 以下三行为x86_64专用
-CFLAGS  +=  -mcmodel=kernel -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -mno-3dnow -mno-fma
-CFLAGS  +=  -fno-pie
-LFLAGS  +=  -z max-page-size=0x1000
+include arch/$(ARCH)/Makefile.config
 
 build:  $(BINFILE) $(SYMFILE)
 
