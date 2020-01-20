@@ -37,8 +37,6 @@ static inline u64 inq(u16 port) {
 	return v;
 }
 
-typedef unsigned int addr_t;
-
 static inline u8 rdfs8(addr_t addr) {
 	u8 v;
 	asm volatile("movb %%fs:%1,%0" : "=q" (v) : "m" (*(u8 *)addr));

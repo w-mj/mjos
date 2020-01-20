@@ -15,6 +15,7 @@ typedef _i32 ptrdiff_t;
 typedef char _c;
 typedef _c* _s;
 typedef void* _p;
+typedef unsigned long addr_t;
 
 
 #define def_type(x)  \
