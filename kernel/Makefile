@@ -1,4 +1,4 @@
-
+# this makefile is for x86_64 only
 ELFFILE :=  $(OUTDIR)/kernel.elf
 BINFILE :=  $(OUTDIR)/kernel.bin
 MAPFILE :=  $(OUTDIR)/kernel.map
@@ -6,28 +6,25 @@ SYMFILE :=  $(OUTDIR)/kernel.sym
 
 
 SUBDIRS :=  arch/$(ARCH) misc
-ifneq ($(wildcard arch/$(ARCH)/bit32),)
-$(info "detected 32bits code")
-	SRCLIST32 := $(shell find arch/$(ARCH)/bit32 $(d) -type f -name '*.S' -o -name '*.c')
+ifneq ($(wildcard arch/$(ARCH)/ia32),)
+$(info "detected 32 bits code")
+	SRCLIST32 := $(shell find arch/$(ARCH)/ia32 $(d) -type f -name '*.S' -o -name '*.c')
 endif
-ifneq ($(wildcard arch/$(ARCH)/bit16),)	
-$(info "detected 16bits code")
-	SRCLIST16 := $(shell find arch/$(ARCH)/bit16 $(d) -type f -name '*.S' -o -name '*.c')
+ifneq ($(wildcard arch/$(ARCH)/realmode),)	
+$(info "detected 16 bits code")
+	SRCLIST16 := $(shell find arch/$(ARCH)/realmode $(d) -type f -name '*.S' -o -name '*.c')
 endif
-SRCLIST64 := $(foreach d,$(SUBDIRS),$(shell find $(d) -type f -name '*.S' -o -name '*.c'))
-SRCLIST64 := $(filter-out $(SRCLIST32), $(SRCLIST64))
+SRCLIST := $(foreach d,$(SUBDIRS),$(shell find $(d) -type f -name '*.S' -o -name '*.c'))
+SRCLIST64 := $(filter-out $(SRCLIST32), $(SRCLIST))
 SRCLIST64 := $(filter-out $(SRCLIST16), $(SRCLIST64))
-OBJLIST64 := $(patsubst %,$(OUTDIR)/%.o,$(SRCLIST64))
-OBJLIST32 := $(patsubst %,$(OUTDIR)/%.o,$(SRCLIST32)) 
-OBJLIST16 := $(patsubst %,$(OUTDIR)/%.o,$(SRCLIST16)) 
-OBJLIST   := $(OBJLIST16) $(OBJLIST32) $(OBJLIST64)
+OBJLIST := $(patsubst %,$(OUTDIR)/%.o,$(SRCLIST))
 DEPLIST   := $(patsubst %.c.o,%.c.d,$(filter %.c.o,$(OBJLIST)))
 
 INCLIST := include arch/$(ARCH)/include
 INCFLAG := $(addprefix -I, $(INCLIST))
 
 CFLAGS  :=  -c -std=c11 $(INCFLAG) -DKERNEL -DARCH=$(ARCH)
-CFLAGS  +=  -Wall -Wextra -Werror=implicit -Wno-cast-function-type
+CFLAGS  +=  -Wall -Wextra -Werror=implicit 
 CFLAGS  +=  -ffreestanding -ffunction-sections -fdata-sections
 
 ifeq ($(DEBUG), 1)
@@ -40,7 +37,9 @@ DEPGEN   =  -MT $@ -MMD -MP -MF $(basename $@).t
 LFLAGS  :=  -nostdlib -lgcc -T arch/$(ARCH)/linker.ld -Wl,-Map=$(MAPFILE),--gc-sections
 
 include arch/$(ARCH)/Makefile.config
-
+$(foreach n, $(SRCLIST16), $(eval $(n).o_D := $(CFLAGS16)))
+$(foreach n, $(SRCLIST32), $(eval $(n).o_D := $(CFLAGS32)))
+$(foreach n, $(SRCLIST64), $(eval $(n).o_D := $(CFLAGS64)))
 build:  $(BINFILE) $(SYMFILE)
 
 clean:
@@ -65,11 +64,11 @@ $(SYMFILE): $(ELFFILE)
 
 $(OUTDIR)/%.S.o: %.S
 	@ mkdir -p $(@D)
-	$(CC) $(CFLAGS) -o $@ $<
+	$(CC) $(CFLAGS) $($*.S.o_D) -o $@ $<
 
 $(OUTDIR)/%.c.o: %.c $(OUTDIR)/%.c.d
 	@ mkdir -p $(@D)
-	$(CC) $(CFLAGS) $(DEPGEN) -o $@ $<
+	$(CC) $(CFLAGS) $($*.c.o_D) $(DEPGEN) -o $@ $<
 	@ mv -f $(basename $@).t $(basename $@).d
 
 

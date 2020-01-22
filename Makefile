@@ -10,17 +10,23 @@ CC      :=  $(ARCH)-elf-gcc
 CPP     :=  $(ARCH)-elf-g++
 AR      :=  $(ARCH)-elf-ar
 OBJCOPY :=  $(ARCH)-elf-objcopy
+export CC
+export CPP
+export AR
+export OBJCOPY
+export DEBUG
+export ARCH
 
 BINFILE :=  $(OUTDIR)/kernel/kernel.bin  # must be same with kernel/Makefile
 ISOFILE :=  $(OUTDIR)/$(NAME).iso
 
-PARAMS  :=  DEBUG=$(DEBUG) ARCH=$(ARCH) CC=$(CC) CPP=$(CPP) AR=$(AR) OBJCOPY=$(OBJCOPY)
+# PARAMS  :=  DEBUG=$(DEBUG) ARCH=$(ARCH) CC=$(CC) CPP=$(CPP) AR=$(AR) OBJCOPY=$(OBJCOPY)
 
 build:
-	$(MAKE) -C kernel $(PARAMS) OUTDIR=$(OUTDIR)/kernel build
+	$(MAKE) -C kernel OUTDIR=$(OUTDIR)/kernel build
 
 clean:
-	$(MAKE) -C kernel $(PARAMS) OUTDIR=$(OUTDIR)/kernel clean
+	$(MAKE) -C kernel OUTDIR=$(OUTDIR)/kernel clean
 	rm -rf $(ISOFILE)
 	rm -f $(ISODIR)/boot/$(NAME).bin
 
