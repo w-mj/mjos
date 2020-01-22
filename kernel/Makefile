@@ -1,5 +1,5 @@
 
-subdirs := misc
+subdirs := misc arch
 binfile := kernel.bin
 elffile := kernel.elf
 mapfile := kernel.map
@@ -23,6 +23,8 @@ clean: $(subdirs)
 
 $(subdirs): FORCE
 	$(MAKE) -C $@ $(MAKECMDGOALS)
+
+$(subobjs): $(subdirs)
 
 $(binfile): $(elffile)
 	$(OBJCOPY) --strip-debug $< $@

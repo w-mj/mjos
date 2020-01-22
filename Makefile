@@ -12,7 +12,6 @@ AR      :=  $(ARCH)-elf-ar
 OBJCOPY :=  $(ARCH)-elf-objcopy
 LD      :=  $(ARCH)-elf-ld
 NM      :=  $(ARCH)-elf-nm
-
 BINFILE :=  kernel/kernel.bin  # must be same with kernel/Makefile
 ISOFILE :=  $(OUTDIR)/$(NAME).iso
 

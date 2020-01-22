@@ -8,6 +8,12 @@
 *.out
 *.bin
 *.so
+*.elf
+*.sym
+*.bin
+*.iso
+*.map
+iso/
 .vscode
 build/
 out/
