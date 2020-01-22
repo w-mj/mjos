@@ -1,78 +1,36 @@
-# this makefile is for x86_64 only
-ELFFILE :=  $(OUTDIR)/kernel.elf
-BINFILE :=  $(OUTDIR)/kernel.bin
-MAPFILE :=  $(OUTDIR)/kernel.map
-SYMFILE :=  $(OUTDIR)/kernel.sym
 
+subdirs := misc
+binfile := kernel.bin
+elffile := kernel.elf
+mapfile := kernel.map
+symfile := kernel.sym
 
-SUBDIRS :=  arch/$(ARCH) misc
-ifneq ($(wildcard arch/$(ARCH)/ia32),)
-$(info "detected 32 bits code")
-	SRCLIST32 := $(shell find arch/$(ARCH)/ia32 $(d) -type f -name '*.S' -o -name '*.c')
-endif
-ifneq ($(wildcard arch/$(ARCH)/realmode),)	
-$(info "detected 16 bits code")
-	SRCLIST16 := $(shell find arch/$(ARCH)/realmode $(d) -type f -name '*.S' -o -name '*.c')
-endif
-SRCLIST := $(foreach d,$(SUBDIRS),$(shell find $(d) -type f -name '*.S' -o -name '*.c'))
-SRCLIST64 := $(filter-out $(SRCLIST32), $(SRCLIST))
-SRCLIST64 := $(filter-out $(SRCLIST16), $(SRCLIST64))
-OBJLIST := $(patsubst %,$(OUTDIR)/%.o,$(SRCLIST))
-DEPLIST   := $(patsubst %.c.o,%.c.d,$(filter %.c.o,$(OBJLIST)))
+subobjs := $(foreach d, $(subdirs), $(addsuffix .o, $(d)/$(d)))
+objlist := $(subobjs)
 
-INCLIST := include arch/$(ARCH)/include
-INCFLAG := $(addprefix -I, $(INCLIST))
+INCLIST := $(CURDIR)/include $(CURDIR)/arch/$(ARCH)/include
+LFLAGS  := -nostdlib -lgcc -T arch/$(ARCH)/linker.ld -Wl,-Map=$(mapfile),--gc-sections
+-include arch/$(ARCH)/Makefile.config
+export 
 
-CFLAGS  :=  -c -std=c11 $(INCFLAG) -DKERNEL -DARCH=$(ARCH)
-CFLAGS  +=  -Wall -Wextra -Werror=implicit 
-CFLAGS  +=  -ffreestanding -ffunction-sections -fdata-sections
+build: $(subdirs) $(binfile) $(symfile)
 
-ifeq ($(DEBUG), 1)
-	CFLAGS  +=  -g -DDEBUG
-else
-	CFLAGS  +=  -g -DNDEBUG
-endif
+clean: $(subdirs)
+	rm -f $(binfile)
+	rm -f $(elffile)
+	rm -f $(mapfile)
+	rm -f $(symfile)
 
-DEPGEN   =  -MT $@ -MMD -MP -MF $(basename $@).t
-LFLAGS  :=  -nostdlib -lgcc -T arch/$(ARCH)/linker.ld -Wl,-Map=$(MAPFILE),--gc-sections
+$(subdirs): FORCE
+	$(MAKE) -C $@ $(MAKECMDGOALS)
 
-include arch/$(ARCH)/Makefile.config
-$(foreach n, $(SRCLIST16), $(eval $(n).o_D := $(CFLAGS16)))
-$(foreach n, $(SRCLIST32), $(eval $(n).o_D := $(CFLAGS32)))
-$(foreach n, $(SRCLIST64), $(eval $(n).o_D := $(CFLAGS64)))
-build:  $(BINFILE) $(SYMFILE)
-
-clean:
-	rm -f $(OBJLIST)
-	rm -f $(DEPLIST)
-	rm -f $(ELFFILE)
-	rm -f $(BINFILE)
-	rm -f $(MAPFILE)
-	rm -f $(SYMFILE)
-
-$(ELFFILE): $(OBJLIST)
-	@ mkdir -p $(@D)
-	$(CC) $(LFLAGS) -o $@ $^
-
-$(BINFILE): $(ELFFILE)
-	@ mkdir -p $(@D)
+$(binfile): $(elffile)
 	$(OBJCOPY) --strip-debug $< $@
 
-$(SYMFILE): $(ELFFILE)
-	@ mkdir -p $(@D)
+$(elffile): $(subobjs)
+	$(CC) $(LFLAGS) -o $@ $^
+
+$(symfile): $(elffile)
 	$(OBJCOPY) --only-keep-debug $< $@
 
-$(OUTDIR)/%.S.o: %.S
-	@ mkdir -p $(@D)
-	$(CC) $(CFLAGS) $($*.S.o_D) -o $@ $<
-
-$(OUTDIR)/%.c.o: %.c $(OUTDIR)/%.c.d
-	@ mkdir -p $(@D)
-	$(CC) $(CFLAGS) $($*.c.o_D) $(DEPGEN) -o $@ $<
-	@ mv -f $(basename $@).t $(basename $@).d
-
-
-$(DEPLIST): ;
-.PRECIOUS: $(DEPLIST)
-
--include $(DEPLIST)
+FORCE:

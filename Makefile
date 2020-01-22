@@ -3,30 +3,30 @@ DEBUG ?= 1
 
 NAME = myos
 
-OUTDIR  :=  $(CURDIR)/out
+OUTDIR  :=  $(CURDIR)
 ISODIR  :=  $(OUTDIR)/iso
 
 CC      :=  $(ARCH)-elf-gcc
 CPP     :=  $(ARCH)-elf-g++
 AR      :=  $(ARCH)-elf-ar
 OBJCOPY :=  $(ARCH)-elf-objcopy
-export CC
-export CPP
-export AR
-export OBJCOPY
-export DEBUG
-export ARCH
+LD      :=  $(ARCH)-elf-ld
+NM      :=  $(ARCH)-elf-nm
 
-BINFILE :=  $(OUTDIR)/kernel/kernel.bin  # must be same with kernel/Makefile
+BINFILE :=  kernel/kernel.bin  # must be same with kernel/Makefile
 ISOFILE :=  $(OUTDIR)/$(NAME).iso
 
+CFLAGS  :=  -c -std=c11 $(INCFLAG) -DKERNEL -DARCH=$(ARCH)
+CFLAGS  +=  -Wall -Wextra -Werror=implicit 
+CFLAGS  +=  -ffreestanding -ffunction-sections -fdata-sections
+export
 # PARAMS  :=  DEBUG=$(DEBUG) ARCH=$(ARCH) CC=$(CC) CPP=$(CPP) AR=$(AR) OBJCOPY=$(OBJCOPY)
 
 build:
-	$(MAKE) -C kernel OUTDIR=$(OUTDIR)/kernel build
+	$(MAKE) -C kernel  build
 
 clean:
-	$(MAKE) -C kernel OUTDIR=$(OUTDIR)/kernel clean
+	$(MAKE) -C kernel  clean
 	rm -rf $(ISOFILE)
 	rm -f $(ISODIR)/boot/$(NAME).bin
 

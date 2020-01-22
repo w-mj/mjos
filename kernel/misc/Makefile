@@ -1,16 +1,26 @@
 
-SRCLIST := delog.c string.c vsnprintf.c
-INCLIST := ../include/
+srclist := delog.c string.c vsnprintf.c
+target  := misc.o 
 
-OBJLIST := $(patsubst %, %(OUTDIR)/%.o, $(SRCLIST))
-DEPLIST := $(patsubst %.c.o, %.c.d, %(filter %.c.o, %(OBJLIST)))
+objlist := $(addsuffix .o, $(srclist))
+deplist := $(addsuffix .d, $(srclist))
+
+clean:
+	rm -f $(objlist)
+	rm -f $(deplist)
+	rm -f $(target)
+
+build: $(target)
+
 INCFLAG := $(addprefix -I, $(INCLIST))
-CFLAGS  :=  -c -std=c11 $(INCFLAG) -DKERNEL -DARCH=$(ARCH)
-CFLAGS  +=  -Wall -Wextra -Werror=implicit -Wno-cast-function-type
-CFLAGS  +=  -ffreestanding -ffunction-sections -fdata-sections
-ifeq ($(DEBUG), 1)
-	CFLAGS  +=  -g -DDEBUG
-else
-	CFLAGS  +=  -g -DNDEBUG
-endif
+DEPGEN   =  -MT $@ -MMD -MP -MF $(basename $@).t
+$(target): $(objlist)
+	$(LD) -relocatable $(objlist) -o $(target)
 
+%.o: % %.d
+	$(CC) $(CFLAGS) $(INCFLAG) $(DEPGEN) -o $@ $<
+	@ mv -f $(basename $@).t $(basename $@).d
+
+$(deplist): ;
+
+include $(deplist)
