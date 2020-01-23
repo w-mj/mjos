@@ -18,6 +18,8 @@ ISOFILE :=  $(OUTDIR)/$(NAME).iso
 CFLAGS  :=  -c -std=c11 $(INCFLAG) -DKERNEL -DARCH=$(ARCH)
 CFLAGS  +=  -Wall -Wextra -Werror=implicit 
 CFLAGS  +=  -ffreestanding -ffunction-sections -fdata-sections
+
+TEMPLATEFILE := $(CURDIR)/Makefile.template
 export
 # PARAMS  :=  DEBUG=$(DEBUG) ARCH=$(ARCH) CC=$(CC) CPP=$(CPP) AR=$(AR) OBJCOPY=$(OBJCOPY)
 
