@@ -6,11 +6,10 @@
 #define KERNEL_LMA  0x0000000001000000
 #define KERNEL_VMA  0xffffffff81000000
 #define ABSOLUTE(x) ((x) - KERNEL_VMA + KERNEL_LMA)
-
-.global _start
-.type _start, @function
-.extern kernel_main
-.type kernel_main, @function
+#include <linkage.h>
+GLOBAL_FUNC(_start)
+EXTERN_FUNC(kernel_main)  // 六十四位内核程序入口
+EXTERN_FUNC(init16)  // 十六位实模式C语言程序入口
 
 //------------------------------------------------------------------------------
 // first piece of code to run, 32-bit protected mode, paging disabled
@@ -29,6 +28,7 @@ mb_header:
 
 .balign 8, 0
 _start:
+	call init16
     // disable interrupts and save GRUB parameters
     cli  // 关中断
     //movl    %eax, (mb_eax)

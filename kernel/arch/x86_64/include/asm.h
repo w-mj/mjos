@@ -110,4 +110,26 @@ static inline int memcmp_gs(const void *s1, addr_t s2, size_t len) {
 	return diff;
 }
 
+static inline u16 ds(void) {
+	u16 seg;
+	asm("movw %%ds,%0" : "=rm" (seg));
+	return seg;
+}
 
+static inline void set_fs(u16 seg) {
+	asm volatile("movw %0,%%fs" : : "rm" (seg));
+}
+static inline u16 fs(void) {
+	u16 seg;
+	asm volatile("movw %%fs,%0" : "=rm" (seg));
+	return seg;
+}
+
+static inline void set_gs(u16 seg) {
+	asm volatile("movw %0,%%gs" : : "rm" (seg));
+}
+static inline u16 gs(void) {
+	u16 seg;
+	asm volatile("movw %%gs,%0" : "=rm" (seg));
+	return seg;
+}

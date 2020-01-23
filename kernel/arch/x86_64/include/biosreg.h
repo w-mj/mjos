@@ -41,5 +41,6 @@ struct biosregs {
 		};
 	};
 };
-void intcall(u8 int_no, const struct biosregs *ireg, struct biosregs *oreg);
 
+void intcall(u8 int_no, const struct biosregs *ireg, struct biosregs *oreg);
+void initregs(struct biosregs *reg);
