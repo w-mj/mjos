@@ -1,4 +1,4 @@
-srclist := init.c biosreg.c bioscall.S
+srclist := init.c biosreg.c bioscall.S copy16.S
 target  := realmode.o
 subdirs := 
 

@@ -1,6 +1,6 @@
 #include <console.h>
 #include <types.h>
-#include <copy.h>
+#include <string.h>
 #include <delog.h>
 
 

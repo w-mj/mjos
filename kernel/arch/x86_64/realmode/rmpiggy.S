@@ -7,9 +7,10 @@
 	.section ".init.data","aw"
 
 	.balign 4096   /* PAGE SIZE */
-
+GLOBAL_FUNC(init16)
+init16:
 GLOBAL(real_mode_blob)
-	.incbin	"arch/x86/realmode/realmode.bin"
+	.incbin	"realmode.bin"
 END(real_mode_blob)
 GLOBAL(real_mode_blob_end);
 

@@ -1,7 +1,6 @@
 #include <attribute.h>
 #include <types.h>
 #include <console.h>
-#include <copy.h>
 #include <serial.h>
 #include <delog.h>
  

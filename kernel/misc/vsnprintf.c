@@ -1,6 +1,5 @@
 #include <vsnprintf.h>
 #include <string.h>
-#include <copy.h>
 #include <base.h>
 #include <ctype.h>
 
