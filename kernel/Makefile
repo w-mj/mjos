@@ -10,8 +10,9 @@ objlist := $(subobjs)
 
 INCLIST := $(CURDIR)/include $(CURDIR)/arch/$(ARCH)/include
 LFLAGS  := -nostdlib -lgcc -T arch/$(ARCH)/linker.ld -Wl,-Map=$(mapfile),--gc-sections
--include arch/$(ARCH)/Makefile.config
-export 
+include arch/$(ARCH)/Makefile.config
+
+export INCLIST CFLAGS
 
 build: $(subdirs) $(binfile) $(symfile)
 
