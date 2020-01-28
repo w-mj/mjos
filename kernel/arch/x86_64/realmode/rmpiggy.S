@@ -5,11 +5,11 @@
  */
 #include <linkage.h>
 	.section ".init.data","aw"
-
 	.balign 4096   /* PAGE SIZE */
+	.set init16, pa_init16
 GLOBAL_FUNC(init16)
-init16:
 GLOBAL(real_mode_blob)
+init16:
 	.incbin	"realmode.bin"
 END(real_mode_blob)
 GLOBAL(real_mode_blob_end);

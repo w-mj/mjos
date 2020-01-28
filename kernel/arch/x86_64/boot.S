@@ -28,7 +28,7 @@ mb_header:
 
 .balign 8, 0
 _start:
-	// movw $boot_stack_top, %sp
+	movw $0xffffffff, %sp
 	call init16
     // disable interrupts and save GRUB parameters
     cli  // 关中断
@@ -194,3 +194,9 @@ boot_stack:
     .skip   0x4000
 boot_stack_top:
 
+// .section .bss
+// .code
+// .balign 0x1000
+// e_stack:
+// 	.skip 0x4000
+// e_stack_top:

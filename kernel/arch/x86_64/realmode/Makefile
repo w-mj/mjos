@@ -8,7 +8,7 @@ deplist := $(addsuffix .d, $(srclist))
 INCFLAG := $(addprefix -I, $(INCLIST))
 
 DEPGEN   =  -MT $@ -MMD -MP -MF $(basename $@).t
-toclean += $(target) $(deplist) $(objlist) pasyms.h realmode.lds
+toclean += $(target) $(deplist) $(objlist) pasyms.h realmode.lds realmode.elf realmode.bin
 
 RMCFLAGS := -nostdinc -m16 -g -Os -Wall -Wstrict-prototypes -march=i386 
 RMCFLAGS += -mregparm=3 -fno-strict-aliasing -fomit-frame-pointer -fno-pic 
