@@ -13,6 +13,7 @@
 *.bin
 *.iso
 *.map
+dump.txt
 iso/
 .vscode
 build/

@@ -48,3 +48,8 @@ iso: build
 run: iso
 	qemu-system-x86_64 -accel kvm -smp 4 -m 64 \
 	    -cdrom $(ISOFILE) -vga vmware -serial stdio -gdb tcp::4444 -boot order=d
+
+debug: iso
+	qemu-system-x86_64 -accel kvm -smp 4 -m 64 -S \
+	    -cdrom $(ISOFILE) -vga vmware -serial stdio -gdb tcp::4444 -boot order=d
+
