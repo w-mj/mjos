@@ -5,7 +5,7 @@ KERNEL_VMA = 0xffffffff81000000;
 
 PHDRS {
     boot        PT_LOAD;
-    trampoline  PT_LOAD;
+/*    trampoline  PT_LOAD; */
     init        PT_LOAD;
     kernel      PT_LOAD;
 }
@@ -16,14 +16,15 @@ SECTIONS {
     .boot KERNEL_LMA : AT(ADDR(.boot)) {
         *(.boot)
     } :boot =0x90
-
+/*
     _trampoline_addr = ALIGN(16) + KERNEL_VMA - KERNEL_LMA;
     .trampoline 0x7c000 : AT(_trampoline_addr - KERNEL_VMA + KERNEL_LMA) {
         KEEP(*(.trampoline))
     } :trampoline =0x90
     _trampoline_end = _trampoline_addr + SIZEOF(.trampoline);
     . = _trampoline_end;
-
+*/
+	. = ALIGN(16) + KERNEL_VMA - KERNEL_LMA;
     .percpu ALIGN(16) : AT(ADDR(.percpu) - KERNEL_VMA + KERNEL_LMA) {
         _percpu_addr = .;
         *(.percpu)
