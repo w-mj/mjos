@@ -23,8 +23,8 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx)
 	if (rax != 0x2BADB002)  {
 		loge("RAX = %x", rax);
 	} else {
-		logi("mem_lower: %d", ((struct GRUBBootParams*)rbx) -> mem_lower);
-		logi("mem_upper: %d", ((struct GRUBBootParams*)rbx) -> mem_upper);
+		logi("mem_lower: %d", ((multiboot_info_t*)rbx) -> mem_lower);
+		logi("mem_upper: %d", ((multiboot_info_t*)rbx) -> mem_upper);
 	}
 	test_types();
 	if (bootParameters.memoryListLength > 0) {

@@ -10,11 +10,4 @@ struct BootParameters {
 
 extern struct BootParameters bootParameters;
 
-
-struct GRUBBootParams {
-	u32 flags;
-	u32 mem_lower;
-	u32 mem_upper;
-	u32 boot_device;
-
-};
+#include <multiboot.h>
