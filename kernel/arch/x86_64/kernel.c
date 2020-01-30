@@ -14,15 +14,19 @@ void test_types(void) {
 	TESTTYPE(32);
 	TESTTYPE(64);
 }
+
+multiboot_info_t* multiboot_info = NULL;
  
 __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) 
 {
 	console_initialize();
 	serial_initialize();
 	logi("System init finish");
+	assert(rax == 0x2BADB002);
 	if (rax != 0x2BADB002)  {
 		loge("RAX = %x", rax);
 	} else {
+		multiboot_info = (multiboot_info_t*)rbx;
 		logi("mem_lower: %d", ((multiboot_info_t*)rbx) -> mem_lower);
 		logi("mem_upper: %d", ((multiboot_info_t*)rbx) -> mem_upper);
 	}

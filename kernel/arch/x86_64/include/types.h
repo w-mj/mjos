@@ -1,6 +1,5 @@
 #pragma once
 
-
 typedef signed char _i8;
 typedef unsigned char _u8;
 typedef signed short _i16;
@@ -26,3 +25,5 @@ def_type(8)
 def_type(16)
 def_type(32)
 def_type(64)
+
+#define NULL 0

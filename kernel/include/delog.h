@@ -74,3 +74,9 @@ _I print_bin(_s str, _I size, _u8 *p, _I len);
 	console_setcolor(c); \
 } while(0)
 
+#define assert(x) do {\
+	if (!(x)) { \
+		loge("ASSERT FAIL [%s]:<%d>:(%s) %s", __FILE__, __LINE__, __func__, #x); \
+		while (1) ; \
+	} \
+} while(0)
