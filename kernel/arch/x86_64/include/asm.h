@@ -133,3 +133,7 @@ static inline u16 gs(void) {
 	asm volatile("movw %%gs,%0" : "=rm" (seg));
 	return seg;
 }
+
+static inline void die(void) {
+	asm volatile("hlt");
+}
