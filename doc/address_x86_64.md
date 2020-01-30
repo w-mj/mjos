@@ -1,5 +1,7 @@
 ![](./figure/x86_64_paging.svg)
 
+![](./figure/x86_page_item_format.png)
+
 每个页表项的格式如下表：
 
 | Bit(s) | Name                  | Meaning                                                      |

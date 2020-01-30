@@ -174,21 +174,21 @@ die64_high:
 // init data section, temporary page table and kernel stack
 
 .section .init.data, "aw"
-
+/*
 .balign 0x1000
 pml4:
     .quad   ABSOLUTE(pdp0) + 7          // pml4[0]   -> pdp0
     .skip   255 * 8
-    .quad   ABSOLUTE(pdp0) + 7          // pml4[256] -> pdp0
-    .skip   254 * 8
+    // .quad   ABSOLUTE(pdp0) + 7          // pml4[256] -> pdp0
+    .skip   255 * 8
     .quad   ABSOLUTE(pdp1) + 7          // pml4[511] -> pdp1
 
 .balign 0x1000
 pdp0:
     .quad   ABSOLUTE(pd + 0x0000) + 7   // pdp0[0]   -> pd0
-    .quad   ABSOLUTE(pd + 0x1000) + 7   // pdp0[1]   -> pd1
-    .quad   ABSOLUTE(pd + 0x2000) + 7   // pdp0[2]   -> pd2
-    .quad   ABSOLUTE(pd + 0x3000) + 7   // pdp0[3]   -> pd3
+    //.quad   ABSOLUTE(pd + 0x1000) + 7   // pdp0[1]   -> pd1
+    //.quad   ABSOLUTE(pd + 0x2000) + 7   // pdp0[2]   -> pd2
+    //.quad   ABSOLUTE(pd + 0x3000) + 7   // pdp0[3]   -> pd3
 
 .balign 0x1000
 pdp1:
@@ -203,6 +203,41 @@ index = 0
     .quad   (index << 21) + 0x87        // 2MB page, US, RW
     index = index + 1
 .endr
+*/
+
+.balign 0x1000
+pml4:
+	.quad ABSOLUTE(pml3) + 7
+	.skip 510 * 8
+	.quad ABSOLUTE(pml3) + 7
+
+.balign 0x1000
+pml3:
+	.quad ABSOLUTE(pml2) + 7
+	.quad ABSOLUTE(pml2) + 7
+	.quad ABSOLUTE(pml2) + 7
+	.skip 507 * 8
+	.quad ABSOLUTE(pml2) + 7
+	.quad ABSOLUTE(pml2) + 7
+
+.balign 0x1000
+pml2:
+index = 0
+.rept 512
+	.quad ABSOLUTE(pml1 + (index << 12)) + 7
+	index = index + 1
+.endr
+
+.balign 0x1000
+pml1:
+index = 0
+.rept 512 * 512
+	.quad (index << 12) + 7
+	index = index + 1
+.endr
+
+
+
 
 .balign 0x1000
 boot_stack:
