@@ -10,7 +10,6 @@
 GLOBAL_FUNC(_start)
 EXTERN_FUNC(kernel_main)  // 六十四位内核程序入口
 EXTERN_FUNC(init16)  // 十六位实模式C语言程序入口
-.extern bootParameters
 
 //------------------------------------------------------------------------------
 // first piece of code to run, 32-bit protected mode, paging disabled
@@ -39,20 +38,6 @@ _start:
     movl    %cr0, %eax
     andl    $0x7fffffff, %eax
     movl    %eax, %cr0
-	// 读入内存信息
-	jmp memoryover
-	xorl    %ebx, %ebx
-	movl    $ABSOLUTE(bootParameters) + 4, %edi
-nextmemory:
-	movl    $0x0000E820, %eax
-	movl    $0x534D4150, %edx
-	movl    $24,  %ecx
-	int     $0x15
-	addl    %ecx, %edi
-	test    %ebx,  %ebx
-	jnz     nextmemory
-	movl    %edi, (ABSOLUTE(bootParameters))
-memoryover:
 
     // 读入临时页表
     movl    $ABSOLUTE(pml4), %edi

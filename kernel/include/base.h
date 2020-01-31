@@ -42,3 +42,13 @@
 #define ROUND_UP(x, align)      (((usize) (x) + ((align)-1)) & ~((align)-1))
 #define ROUND_DOWN(x, align)    ( (usize) (x)                & ~((align)-1))
 #define IS_ALIGNED(x, align)    (((usize) (x) & ((align)-1)) == 0)
+
+/* 通过结构体中某个成员的地址找到结构体的地址
+ * ptr: 结构体某个成员的地址
+ * type: 结构体的类型
+ * member: 这个成员在结构体中的名称
+ */
+#define container_of(ptr, type, member) ({                      \
+        const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
+        (type *)( (char *)__mptr - offsetof(type,member) );})
+#define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
