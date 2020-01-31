@@ -23,6 +23,6 @@ void *early_kmalloc(size_t size) {
 	heap_ptr += size;
 	while (heap_ptr >= heap_end)
 		heap_end += PAGESIZE;
-	// logi("early kmelloc %d, heap_ptr: %x heap_end: %x", size, heap_ptr, heap_end);
+	logi("early kmelloc %d, start: %x heap_ptr: %x heap_end: %x", size, ptr, heap_ptr, heap_end);
 	return ptr;
 }

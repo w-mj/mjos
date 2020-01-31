@@ -12,7 +12,6 @@ typedef struct {
 	int count;  // 引用计数
 	void *address;  // 起始地址
 	enum PageStatus state;  // 状态
-	ListEntry list_head;  // 下一个页框
 } FrameEntry;
 
 void init_page(void *mmp_addr, u64 mmap_length);
