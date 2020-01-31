@@ -189,7 +189,8 @@ index = 0
     index = index + 1
 .endr
 */
-
+.global pml4
+.global pm_end
 .balign 0x1000
 pml4:
 	.quad ABSOLUTE(pml3) + 7
@@ -220,7 +221,7 @@ index = 0
 	.quad (index << 12) + 7
 	index = index + 1
 .endr
-
+pm_end:
 
 
 

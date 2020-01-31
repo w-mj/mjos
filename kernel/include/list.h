@@ -29,3 +29,10 @@ static inline void __list_add(ListEntry *n,
 static inline void list_add(ListEntry *n, ListEntry *head) {
 	__list_add(n, head, head->next);
 }
+
+static inline void list_remove(ListEntry *n) {
+	n->next->prev = n->prev;
+	n->prev->next = n->next;
+	n->prev = n;
+	n->next = n;
+}
