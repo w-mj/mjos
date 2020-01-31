@@ -5,6 +5,7 @@
 #include <serial.h>
 #include <delog.h>
 #include <boot.h>
+#include <memory.h>
 
 #define TESTTYPE(x) assert((x) / 8 == sizeof(u##x))
 void test_types(void) {
@@ -99,6 +100,7 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	logi("kernel code end: 0x%x%08x", kernel_code_end >> 32, kernel_code_end & 0xffffffff);
 	print_sys_info();
 	// logi("0x%x%8x", ((u64)(&a)) >> 32, ((u64)(&a)) & 0xffffffff);
+	init_page((void*)(u64)multiboot_info->mmap_addr, multiboot_info->mmap_length);
 	die();
 	while (1);
 }

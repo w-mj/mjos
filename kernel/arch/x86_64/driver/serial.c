@@ -42,6 +42,7 @@ static void early_serial_init(int port, int baud) {
 
 
 #define BASE_BAUD (1843200/16)
+/*
 static unsigned int probe_baud(int port) {
 	unsigned char lcr, dll, dlh;
 	unsigned int quot;
@@ -53,7 +54,7 @@ static unsigned int probe_baud(int port) {
 	quot = (dlh << 8) | dll;
 	return BASE_BAUD / quot;
 }
-
+*/
 void serial_initialize(void) {
 	early_serial_init(DEFAULT_SERIAL_PORT, DEFAULT_BAUD);
 	logi("initialize serial.");
