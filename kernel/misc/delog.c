@@ -105,7 +105,7 @@ static void print_debug(va_list params) {
     _s exp;
     _s str;
     _I I;
-    _i32 i;
+    _i32 i, h;
     // double d;
     _getva_S(fmt, params);
     _getva_S(exp, params);
@@ -129,6 +129,11 @@ _print_debug_CON:
             _getva_I(I, params);
             fmt_str(ms_msg, msgsize, "0x%x", I);
             break;
+		case 'L':
+			_getva_I32(i, params);
+			_getva_I32(h, params);
+			fmt_str(ms_msg, msgsize, "0x%x%08x", i, h);
+			break;
         case 'f':
             // _getva_double(d, params);
             // fmt_str(ms_msg, msgsize, "%1f", d);

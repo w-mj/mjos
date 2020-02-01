@@ -32,6 +32,7 @@ enum {
 #define _sI(exp) _debug_info(mkstr(exp), "I", exp)
 // 以十六进制打印一个整数
 #define _sx(exp) _debug_info(mkstr(exp), "x", (_u32)exp)
+#define _sL(exp) _debug_info(mkstr(exp), "L", (_u32)((_u64)(exp) >> 32), (_u32)((_u64)(exp) & 0xffffffff))
 // 打印一个浮点数
 // #define _sf(exp) _debug_info(mkstr(exp), "f", (double)exp)
 // 打印一个字符串
