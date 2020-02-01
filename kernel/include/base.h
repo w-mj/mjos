@@ -20,8 +20,8 @@
 #define _Lclr(a, n) ((a) & (~(_BITS_MASK(n))))
 #define _Hclr(a, n) _rshf(_lshf(a, n), n)
 #define _LNclr(a, n) (((a) & (_BITS_MASK(n))))
-#define h32(a)  _lshf(a, 32)
-#define l32(a)  ((a) & 0xffffffff)
+#define h32(a)  _lshf((u64)(a), 32)
+#define l32(a)  ((u64)(a) & 0xffffffff)
 
 #define _Inext(pI, i) ((pI) + (i))->_next
 

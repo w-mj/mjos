@@ -1,5 +1,5 @@
 
-srclist := early_kmelloc.c page.c
+srclist := early_kmalloc.c page.c
 target  := memory.o
 subdirs := 
 

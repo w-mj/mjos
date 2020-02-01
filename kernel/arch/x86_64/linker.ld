@@ -1,7 +1,7 @@
 ENTRY(_start)
 
 KERNEL_LMA = 0x0000000001000000;  /* 16M, 低于16M为DMA空间 */
-KERNEL_VMA = 0xffffffff81000000;
+KERNEL_VMA = 0xffffffff81000000;  /* 到全F共有2G内核空间 */
 
 PHDRS {
     boot        PT_LOAD;
