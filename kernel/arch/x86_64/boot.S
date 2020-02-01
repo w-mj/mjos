@@ -194,7 +194,8 @@ index = 0
 .balign 0x1000
 pml4:
 	.quad ABSOLUTE(pml3) + 7
-	.skip 510 * 8
+	.quad 0xdeedbeff
+	.skip 509 * 8
 	.quad ABSOLUTE(pml3) + 7
 
 .balign 0x1000

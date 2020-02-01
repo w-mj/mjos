@@ -73,8 +73,11 @@ void init_page(void *mmap_addr, u64 mmap_length) {
 }
 
 static inline void load_page_addr(PageTable *pts[5], int pmloffset[5], u64 addr) {
+	_sL(addr);
+	_sL(pts[4]);
 	for (int i = 4; i > 1; i--) {
 		pmloffset[i] = PMLOFFSET(addr, i);
+		// _sx(pmloffset[i]);
 		pts[i - 1] = (PageTable*)PTENTRYADDR(pts[i][pmloffset[i]]);
 	}
 	pmloffset[1] = PMLOFFSET(addr, 1);
@@ -88,6 +91,8 @@ static void release_early_page() {
 	int pmloffset[5];
 	pts[4] = (PageTable*)kernel_pml4;
 	u64 addr = (u64)(-1);
+	u64 need_release = (addr - heap_end) / PAGESIZE + 1;
+	_si(need_release);
 	load_page_addr(pts, pmloffset, addr);
 	int level = 1;
 	while (addr >= heap_end) {
@@ -98,15 +103,22 @@ static void release_early_page() {
 			pts[level][pmloffset[level]] = 0;
 			pts_removes[level]++;
 		}
+		/*
+		if(level > 1) {
+			_si(level);
+			repet(4) {_si(_+1);_si(pmloffset[_+1]);}
+			repet(4) _si(pts[_+1]);
+		}*/
 		pmloffset[level]--;
 		while (level > 1) {
 			pts[level - 1] = (PageTable*)PTENTRYADDR(pts[level][pmloffset[level]]);
-			pmloffset[level - 1] = 512;
+			// die();
+			pmloffset[level - 1] = 511;
 			level--;
 		}
 		addr -= PAGESIZE;
 	}
-	for (int i = 1; i < 4; i++)
+	for (int i = 1; i <= 4; i++)
 		logi("release kernel pml%d %d", i, pts_removes[i]);
 }
 
@@ -114,6 +126,7 @@ static void rebuild_kernel_page() {
 	logi("rebuild kernel page");
 	logi("0x%x%08x", h32(heap_end), l32(heap_end));
 	u64 real_heap_end = ABSOLUTE(heap_end);
+	_sL(&pml4);
 	logi("0x%x%08x", h32((u64)&pml4), l32((u64)&pml4));
 	int cnt = 0;
 	int pcnt = 0;
@@ -123,7 +136,8 @@ static void rebuild_kernel_page() {
 	for (int i = 0; i < mem_frame_cnt; i++) {
 		void *addr = mem_pool[i].address;
 		// 将内核代码占用的页框标记为已占用
-		if (addr >= &KERNEL_LMA && addr < (void *)real_heap_end) {
+		if ((u64)addr >= (u64)&KERNEL_LMA && addr < (void *)real_heap_end) {
+
 			if (addr >= early_pms && addr < early_pme) {
 				// 这个页是内核临时页表页
 				pcnt++;
@@ -139,7 +153,6 @@ static void rebuild_kernel_page() {
 	}
 	logi("kernel code %d pages", cnt);
 	logi("kernel page %d pages", pcnt);
-	die();
 	release_early_page();
 }
 

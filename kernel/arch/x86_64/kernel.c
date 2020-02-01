@@ -6,6 +6,7 @@
 #include <delog.h>
 #include <boot.h>
 #include <memory.h>
+#include <interrupt.h>
 
 #define TESTTYPE(x) assert((x) / 8 == sizeof(u##x))
 void test_types(void) {
@@ -91,12 +92,14 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	console_initialize();
 	serial_initialize();
 	test_types();
+
+	interrupt_table_init();
 	logi("System init finish");
 	assert(rax == MULTIBOOT_BOOTLOADER_MAGIC);
 	multiboot_info = (multiboot_info_t *)rbx;
 	logi("multiboot info addr: %x%08x", rbx >> 32, rbx & 0xffffffff);
 	u64 kernel_code_end = (u64)&_bss_end;
-	kernel_code_end = kernel_code_end - (u64)(&KERNEL_VMA) + (&KERNEL_LMA);
+	kernel_code_end = kernel_code_end - (u64)(&KERNEL_VMA) + (u64)(&KERNEL_LMA);
 	logi("kernel code end: 0x%x%08x", kernel_code_end >> 32, kernel_code_end & 0xffffffff);
 	print_sys_info();
 	// logi("0x%x%8x", ((u64)(&a)) >> 32, ((u64)(&a)) & 0xffffffff);

@@ -11,3 +11,11 @@
 #define __WEAK                  __attribute__((weak))
 #define __PURE                  __attribute__((pure))
 #define __NORETURN              __attribute__((noreturn))
+
+#define PAGESIZE 4096
+
+#define __aligned(x) __attribute__((__aligned__(x)))
+#define __section(S) __attribute__ ((__section__(#S)))
+#define __page_aligned_data	__section(.data..page_aligned) __aligned(PAGESIZE)
+#define __page_aligned_bss	__section(.bss..page_aligned) __aligned(PAGESIZE)
+

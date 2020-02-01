@@ -19,11 +19,7 @@ void init_page(void *mmp_addr, u64 mmap_length);
 
 typedef u64 PageTable;
 
-#define PML4OFFSET(x) (((x) >> 39) & 0x7f)
-#define PML3OFFSET(x) (((x) >> 30) & 0x7f)
-#define PML2OFFSET(x) (((x) >> 21) & 0x7f)
-#define PML1OFFSET(x) (((x) >> 12) & 0x7f)
-#define PMLOFFSET(x, n) (((x) >> ((n - 1) * 9 + 12)) & 0x7f)
+#define PMLOFFSET(x, n) (((x) >> ((n - 1) * 9 + 12)) & 0x1ff)
 #define PTENTRYADDR(x) (x & (~0xfff))
 
 
