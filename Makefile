@@ -46,10 +46,10 @@ iso: build
 	grub-mkrescue -o $(ISOFILE) $(ISODIR) 
 
 run: iso
-	qemu-system-x86_64 -accel kvm -smp 4 -m 16384 \
+	qemu-system-x86_64 -m 16384 \
 	    -cdrom $(ISOFILE) -vga vmware -serial stdio -gdb tcp::4444 -boot order=d
 
 debug: iso
-	qemu-system-x86_64 -accel kvm -smp 4 -m 16384 -S \
+	qemu-system-x86_64 -accel kvm -smp 1 -m 16384 -S \
 	    -cdrom $(ISOFILE) -vga vmware -serial stdio -gdb tcp::4444 -boot order=d
 

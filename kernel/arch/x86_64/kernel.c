@@ -6,7 +6,7 @@
 #include <delog.h>
 #include <boot.h>
 #include <memory.h>
-#include <interrupt.h>
+#include <init.h>
 
 #define TESTTYPE(x) assert((x) / 8 == sizeof(u##x))
 void test_types(void) {
@@ -82,7 +82,7 @@ void print_sys_info(void) {
 		logi("boot loader name %s", (char *)(u64)mbi->boot_loader_name);
 	}
 	if (mbi->flags & MULTIBOOT_INFO_APM_TABLE) {
-		// logi("apm table: %d", mbi->apm_table);
+		logi("apm table: %d", mbi->apm_table);
 	}
 }
 
@@ -92,8 +92,10 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	console_initialize();
 	serial_initialize();
 	test_types();
+	gdt_init();
+	idt_init();
+	tss_init();
 
-	interrupt_table_init();
 	logi("System init finish");
 	assert(rax == MULTIBOOT_BOOTLOADER_MAGIC);
 	multiboot_info = (multiboot_info_t *)rbx;

@@ -228,8 +228,8 @@ pm_end:
 
 .balign 0x1000
 boot_stack:
-    .skip   0x4000
-boot_stack_top:
+    .skip   0x8192
+GLOBAL(boot_stack_top)
 
 // .section .bss
 // .code

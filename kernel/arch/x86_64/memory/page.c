@@ -153,6 +153,6 @@ static void rebuild_kernel_page() {
 	}
 	logi("kernel code %d pages", cnt);
 	logi("kernel page %d pages", pcnt);
-	release_early_page();
+	// release_early_page();
 }
 

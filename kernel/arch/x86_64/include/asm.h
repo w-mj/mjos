@@ -1,6 +1,7 @@
 #pragma once
 #include <types.h>
 #define asm __asm__ 
+#define ASM asm volatile
 static inline void outb(u8 v, u16 port) {
 	asm volatile("outb %0,%1" : : "a" (v), "dN" (port));
 }
@@ -133,7 +134,5 @@ static inline u16 gs(void) {
 	asm volatile("movw %%gs,%0" : "=rm" (seg));
 	return seg;
 }
+#define die() asm volatile("hlt");
 
-static inline void die(void) {
-	asm volatile("hlt");
-}

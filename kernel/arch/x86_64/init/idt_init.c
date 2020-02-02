@@ -2,18 +2,19 @@
 #include <delog.h>
 #include <asm.h>
 #include <attribute.h>
+#include <delog.h>
 
 struct IDTR {
 	u16 size;
 	u64 address;
-}__attribute__((packed));
+}__PACKED;
 struct Attr {
 	u16	ist	 : 3,
 		zero : 5,
 		type : 5,
 		dpl	 : 2,
 		p	 : 1;
-}__attribute__((packed));
+}__PACKED;
 struct ID {
 	u16 offset_low;
 	u16 segment;
@@ -21,7 +22,8 @@ struct ID {
 	u16 offset_mid;
 	u32 offset_high;
 	u32 pad;
-}__attribute__((packed));
+}__PACKED;
+
 
 static void handle_divide_zero() {
 	loge("Divide zero");
@@ -36,7 +38,7 @@ static void handle_page_fault() {
 struct ID idt[IDT_LENGTH];
 struct IDTR idtr;
 
-static void set_id(int i, void (*handle)()) {
+static void set_id(int i, u64 handle) {
 	idt[i].offset_low  = (u16)(u64)handle;
 	idt[i].segment     = 8;
 	idt[i].attr.ist    = 0;   // default stack
@@ -52,23 +54,30 @@ static void set_id(int i, void (*handle)()) {
 extern u64 interrupt_stub_entry;
 extern u64 interrupt_stub_entry_end;
 void load_idtr(struct IDTR *);
-void interrupt_table_init() {
-	logi("interrupt table init");
+void idt_init() {
+	logi("idt init");
 	// set_id(0,  handle_divide_zero);
 	// set_id(14, handle_page_fault);
 	int entry_size = ((u64)&interrupt_stub_entry_end - (u64)&interrupt_stub_entry) / IDT_LENGTH;
+	_si(entry_size);
 	for (int i = 0; i < IDT_LENGTH; i++) {
-		set_id(i, ((u64)&interrupt_stub_entry + entry_size));
+		set_id(i, ((u64)(&interrupt_stub_entry)) + i * entry_size);
 	}
 	idtr.size = sizeof(struct ID) * IDT_LENGTH - 1;
 	idtr.address = (u64)idt;
 	asm volatile("lidt %0"::"m" (idtr));
 	asm volatile("sti");
+	// asm volatile("int $14");
 	// asm volatile("int $100");
 	// asm volatile("int $0");
+	logi("idt init finish");
 }
 
 void interrupt_stub(u64 vec) {
 	loge("interrupt %d.", vec);
+	u64 rsp;
+	asm volatile("movq %%rsp, %0": "=m"(rsp));
+	// _sa((void*)rsp, 1024);
 	die();
 }
+

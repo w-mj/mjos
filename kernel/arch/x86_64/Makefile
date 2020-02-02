@@ -1,6 +1,6 @@
 
-srclist := boot.S copy64.S kernel.c interrupt.c interrupt.S
+srclist := boot.S copy64.S kernel.c
 target  := x86_64.o
-subdirs := driver memory
+subdirs := driver memory init
 
 include $(TEMPLATEFILE)
