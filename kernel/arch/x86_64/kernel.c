@@ -93,8 +93,8 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	serial_initialize();
 	test_types();
 	gdt_init();
-	idt_init();
 	tss_init();
+	idt_init();
 
 	logi("System init finish");
 	assert(rax == MULTIBOOT_BOOTLOADER_MAGIC);

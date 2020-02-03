@@ -2,7 +2,7 @@
 #include <delog.h>
 #include <asm.h>
 #include <attribute.h>
-#include <delog.h>
+#include <base.h>
 
 struct IDTR {
 	u16 size;
@@ -71,13 +71,14 @@ void idt_init() {
 	// asm volatile("int $100");
 	// asm volatile("int $0");
 	logi("idt init finish");
+	logi("idt init finish");
 }
 
 void interrupt_stub(u64 vec, u64 errcode) {
-	loge("interrupt %d errcode %d.", vec, errcode);
+	loge("interrupt %d errcode 0x%x%08x.", vec, h32(errcode), l32(errcode));
 	u64 rsp;
 	asm volatile("movq %%rsp, %0": "=m"(rsp));
-	_sa((void*)rsp, 1024);
+	_sa((void*)rsp, 256);
 	die();
 }
 

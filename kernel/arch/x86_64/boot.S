@@ -159,7 +159,7 @@ die64_high:
 // init data section, temporary page table and kernel stack
 
 .section .init.data, "aw"
-/*
+
 .balign 0x1000
 pml4:
     .quad   ABSOLUTE(pdp0) + 7          // pml4[0]   -> pdp0
@@ -188,9 +188,11 @@ index = 0
     .quad   (index << 21) + 0x87        // 2MB page, US, RW
     index = index + 1
 .endr
-*/
+pm_end:
+
 .global pml4
 .global pm_end
+/*
 .balign 0x1000
 pml4:
 	.quad ABSOLUTE(pml3) + 7
@@ -223,7 +225,7 @@ index = 0
 	index = index + 1
 .endr
 pm_end:
-
+*/
 
 
 .balign 0x1000

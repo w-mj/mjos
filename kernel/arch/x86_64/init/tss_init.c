@@ -36,12 +36,13 @@ typedef struct tss {
 } __PACKED Tss;
 
 Tss tss;
-extern u64 *gdt;
+extern u64 gdt[8];
 
 void tss_init() {
 	logi("tss init");
-    u64 tss_size = (u64) sizeof(Tss);
-    u64 tss_addr = (u64)(&tss);
+	logi("gdt2 0x%x%08x", h32(gdt[2]), l32(gdt[2]));
+    u64 tss_size = (u64)sizeof(Tss);
+    u64 tss_addr = (u64)&tss;
     memset((void *) tss_addr, 0, tss_size);
 
     u64 lower = 0UL;
@@ -58,4 +59,5 @@ void tss_init() {
 
 	u64 tr = (6 << 3) | 3;
 	ASM("ltr  %0"::"m" (tr));
+	logi("tss init finish");
 }

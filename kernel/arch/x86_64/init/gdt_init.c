@@ -28,7 +28,7 @@ static struct {
 	u16  size;
 	u64  address;
 }__PACKED gdtr;
-
+void load_gdtr(void *);
 void gdt_init() {
 	logi("gdt init");
 	gdt[0] = 0;   // dummy
@@ -39,5 +39,6 @@ void gdt_init() {
 	gdt[5] = 0x00a0f80000000000UL;  // user code
 	gdtr.size = GDT_LENGTH * 8 - 1;
 	gdtr.address = (u64)gdt;
-	ASM("lgdt %0"::"m" (gdtr));
+	// ASM("lgdt %0"::"m" (gdtr));
+	load_gdtr(&gdtr);
 }
