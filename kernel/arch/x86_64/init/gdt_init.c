@@ -2,6 +2,7 @@
 #include <types.h>
 #include <string.h>
 #include <asm.h>
+#include <base.h>
 #include <delog.h>
 
 typedef struct {

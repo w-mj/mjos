@@ -206,8 +206,8 @@ _wmj_delog_END:
 #define fmt_ext_hex(s, n) fmt_str(s, n, "XX ")
 #define fmt_continue(s, n, num) fmt_str(s, n, ".. (mode %d bytes not show)\n", num)
 #define fmt_new_line(s, n, addr) fmt_str(s, n, "\n0x%08x : ", _Lclr(addr, 4))
-#define fmt_ascii(s, n, d) fmt_str(s, n, "%c", isprint(d)?(_u8)(d):'x')
-#define fmt_dot(s, n) fmt_str(s, n, "x")
+#define fmt_ascii(s, n, d) fmt_str(s, n, "%c", isprint(d)?(_u8)(d):'.')
+#define fmt_dot(s, n) fmt_str(s, n, ".")
 
 #define DEF_SHOW_MAX 256
 #define LINEBSIZE 4

@@ -3,6 +3,7 @@
 #include <string.h>
 #include <asm.h>
 #include <delog.h>
+#include <base.h>
 
 typedef struct tss {
     u32 reserved1;

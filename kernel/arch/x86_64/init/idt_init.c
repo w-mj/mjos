@@ -41,11 +41,11 @@ struct IDTR idtr;
 static void set_id(int i, u64 handle) {
 	idt[i].offset_low  = (u16)(u64)handle;
 	idt[i].segment     = 8;
-	idt[i].attr.ist    = 0;   // default stack
-	idt[i].attr.zero   = 0;   // zero
-	idt[i].attr.type   = 0xE; // GATE_INTERRUPT
-	idt[i].attr.dpl    = 0x0;   // DPL = 0
-	idt[i].attr.p      = 1;   // P = 1
+	idt[i].attr.ist    = 0;    // default stack
+	idt[i].attr.zero   = 0;    // zero
+	idt[i].attr.type   = 0xE;  // GATE_INTERRUPT
+	idt[i].attr.dpl    = 0x0;  // DPL = 0
+	idt[i].attr.p      = 1;    // P = 1
 	idt[i].offset_mid  = (u16)((u64)handle >> 16);
 	idt[i].offset_high = (u32)((u64)handle >> 32);
 	idt[i].pad         = 0;
@@ -73,11 +73,11 @@ void idt_init() {
 	logi("idt init finish");
 }
 
-void interrupt_stub(u64 vec) {
-	loge("interrupt %d.", vec);
+void interrupt_stub(u64 vec, u64 errcode) {
+	loge("interrupt %d errcode %d.", vec, errcode);
 	u64 rsp;
 	asm volatile("movq %%rsp, %0": "=m"(rsp));
-	// _sa((void*)rsp, 1024);
+	_sa((void*)rsp, 1024);
 	die();
 }
 
