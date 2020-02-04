@@ -29,7 +29,6 @@
 #define null NULL
 
 
-#define ASM(...)                __asm__ volatile(__VA_ARGS__)
 #define TYPE(x)                 __typeof__(x)
 
 #define CLZ32(x)                __builtin_clz(x)

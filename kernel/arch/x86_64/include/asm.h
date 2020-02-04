@@ -1,6 +1,7 @@
 #pragma once
 #include <types.h>
 #define asm __asm__ 
+#define ASM asm volatile
 static inline void outb(u8 v, u16 port) {
 	asm volatile("outb %0,%1" : : "a" (v), "dN" (port));
 }
@@ -135,3 +136,68 @@ static inline u16 gs(void) {
 }
 #define die() asm volatile("hlt");
 
+#define DEFINE_READ_CR(n)                               \
+static inline u64 read_cr ## n () {                     \
+    u64 x;                                              \
+    ASM("mov %%cr" #n ", %0" : "=r"(x));                \
+    return x;                                           \
+}
+#define DEFINE_WRITE_CR(n)                              \
+static inline void write_cr ## n (u64 x) {              \
+    ASM("mov %0, %%cr" #n :: "r"(x));                   \
+}
+
+DEFINE_READ_CR (0)      // read_cr0
+DEFINE_READ_CR (2)      // read_cr2
+DEFINE_READ_CR (3)      // read_cr3
+DEFINE_READ_CR (4)      // read_cr4
+DEFINE_WRITE_CR(0)      // write_cr0
+DEFINE_WRITE_CR(2)      // write_cr2
+DEFINE_WRITE_CR(3)      // write_cr3
+DEFINE_WRITE_CR(4)      // write_cr4
+
+
+// read msr registers
+static inline u64 read_msr(u32 msr) {
+    union {
+        u32 d[2];
+        u64 q;
+    } u;
+    ASM("rdmsr" : "=d"(u.d[1]), "=a"(u.d[0]) : "c"(msr));
+    return u.q;
+}
+
+// write msr registers
+static inline void write_msr(u32 msr, u64 val) {
+    union {
+        u32 d[2];
+        u64 q;
+    } u;
+    u.q = val;
+    ASM("wrmsr" :: "d"(u.d[1]), "a"(u.d[0]), "c"(msr));
+}
+
+// special msr registers
+static inline u64 read_fsbase() {
+    return read_msr(0xc0000100U);
+}
+
+static inline u64 read_gsbase() {
+    return read_msr(0xc0000101U);
+}
+
+static inline u64 read_kgsbase() {
+    return read_msr(0xc0000102U);
+}
+
+static inline void write_fsbase(u64 val) {
+    write_msr(0xc0000100U, val);
+}
+
+static inline void write_gsbase(u64 val) {
+    write_msr(0xc0000101U, val);
+}
+
+static inline void write_kgsbase(u64 val) {
+    write_msr(0xc0000102U, val);
+}

@@ -2,6 +2,7 @@
 #include <string.h>
 #include <base.h>
 #include <delog.h>
+#include <asm.h>
 
 static inline void cpuid(u32 *a, u32 *b, u32 *c, u32 *d) {
 	u32 eax, ebx, ecx, edx;
@@ -36,4 +37,21 @@ void cpu_init() {
 	memcpy(&vendor_id[8], &c, sizeof(u32));
 	vendor_id[12] = 0;
 	logi("cpu vecdor %s", vendor_id);
+
+	a = 0x80000008;
+	cpuid(&a, &b, &c, &d);
+	logi("Physical address bits %d", a & 0xff);
+	logi("Linear address bits %d", (a >> 8) & 0xff);
+
+	u64 cr0 = read_cr0();
+    cr0 |=  (1UL <<  1);        // cr0.MP
+    cr0 &= ~(1UL <<  2);        // cr0.EM: disable emulated mode
+    cr0 |=  (1UL <<  5);        // cr0.NE: enable native exception
+    cr0 |=  (1UL << 16);        // cr0.WP: enable write protection
+    write_cr0(cr0);
+
+    // enable syscall/sysret on intel processors
+    // u64 efer = read_msr(0xc0000080U);
+    // efer |= (1UL <<  0);
+    // write_msr(0xc0000080U, efer);
 }
