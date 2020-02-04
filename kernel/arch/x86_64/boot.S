@@ -161,19 +161,20 @@ die64_high:
 .section .init.data, "aw"
 
 .balign 0x1000
+
 pml4:
     .quad   ABSOLUTE(pdp0) + 7          // pml4[0]   -> pdp0
     .skip   255 * 8
-    // .quad   ABSOLUTE(pdp0) + 7          // pml4[256] -> pdp0
-    .skip   255 * 8
+    .quad   ABSOLUTE(pdp0) + 7          // pml4[256] -> pdp0
+    .skip   254 * 8
     .quad   ABSOLUTE(pdp1) + 7          // pml4[511] -> pdp1
 
 .balign 0x1000
 pdp0:
     .quad   ABSOLUTE(pd + 0x0000) + 7   // pdp0[0]   -> pd0
-    //.quad   ABSOLUTE(pd + 0x1000) + 7   // pdp0[1]   -> pd1
-    //.quad   ABSOLUTE(pd + 0x2000) + 7   // pdp0[2]   -> pd2
-    //.quad   ABSOLUTE(pd + 0x3000) + 7   // pdp0[3]   -> pd3
+    .quad   ABSOLUTE(pd + 0x1000) + 7   // pdp0[1]   -> pd1
+    .quad   ABSOLUTE(pd + 0x2000) + 7   // pdp0[2]   -> pd2
+    .quad   ABSOLUTE(pd + 0x3000) + 7   // pdp0[3]   -> pd3
 
 .balign 0x1000
 pdp1:
@@ -190,6 +191,10 @@ index = 0
 .endr
 pm_end:
 
+/*pml4:
+	.incbin "tools/page"
+pm_end:
+*/
 .global pml4
 .global pm_end
 /*

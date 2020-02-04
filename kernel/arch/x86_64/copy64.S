@@ -10,7 +10,7 @@ GLOBAL(memcpy)
 	rep; movsq
 	popq  %rcx
 	andq  $7, %rcx
-	rep; movsq
+	rep; movsb
 	popq  %rcx
 	ret
 ENDPROC(memcpy)
@@ -54,7 +54,7 @@ tag:
 	rep; stosq
 	popq     %rcx
 	andq     $7,   %rcx
-	rep; stosq
+	rep; stosb
 	popq     %rcx
 	popq     %rax
 	ret

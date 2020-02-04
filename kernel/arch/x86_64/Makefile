@@ -1,6 +1,6 @@
 
 srclist := boot.S copy64.S kernel.c
 target  := x86_64.o
-subdirs := driver memory init
+subdirs := driver memory init tools
 
 include $(TEMPLATEFILE)

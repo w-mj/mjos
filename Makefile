@@ -50,6 +50,6 @@ run: iso
 	    -cdrom $(ISOFILE) -vga vmware -serial stdio -gdb tcp::4444 -boot order=d
 
 debug: iso
-	qemu-system-x86_64 -accel kvm -smp 1 -m 16384 -S \
+	qemu-system-x86_64 -m 16384 -S \
 	    -cdrom $(ISOFILE) -vga vmware -serial stdio -gdb tcp::4444 -boot order=d
 

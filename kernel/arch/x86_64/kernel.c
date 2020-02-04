@@ -92,6 +92,7 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	console_initialize();
 	serial_initialize();
 	test_types();
+	cpu_init();
 	gdt_init();
 	tss_init();
 	idt_init();

@@ -41,6 +41,7 @@ static void init_mem_area(u64 addr, u64 len) {
 		mmap->count = 0;
 		mmap->state = AVAILABLE;
 		mmap++;
+		list_init(&mmap->next);
 		list_add(&mmap->next, &mem_free_head);
 	}
 	mem_free_cnt = mem_frame_cnt; // 空闲页框与页框总数保持一致

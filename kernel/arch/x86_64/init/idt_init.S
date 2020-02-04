@@ -24,6 +24,7 @@ int_err_code:
 
 
 .balign 16
+.section .init.text, "ax"
 GLOBAL(interrupt_stub_entry)
 vec = 0
 .rept 256
