@@ -10,7 +10,7 @@
 GLOBAL_FUNC(_start)
 EXTERN_FUNC(kernel_main)  // 六十四位内核程序入口
 EXTERN_FUNC(init16)  // 十六位实模式C语言程序入口
-
+#define PAGE_4K
 //------------------------------------------------------------------------------
 // first piece of code to run, 32-bit protected mode, paging disabled
 
@@ -160,8 +160,8 @@ die64_high:
 
 .section .init.data, "aw"
 
+#ifdef PAGE_2M
 .balign 0x1000
-
 pml4:
     .quad   ABSOLUTE(pdp0) + 7          // pml4[0]   -> pdp0
     .skip   255 * 8
@@ -190,14 +190,16 @@ index = 0
     index = index + 1
 .endr
 pm_end:
-
-/*pml4:
+#endif
+#ifdef PAGE_ALL
+.balign 0x1000
+pml4:
 	.incbin "tools/page"
 pm_end:
-*/
+#endif
 .global pml4
 .global pm_end
-/*
+#ifdef PAGE_4K
 .balign 0x1000
 pml4:
 	.quad ABSOLUTE(pml3) + 7
@@ -230,7 +232,7 @@ index = 0
 	index = index + 1
 .endr
 pm_end:
-*/
+#endif
 
 
 .balign 0x1000

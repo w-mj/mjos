@@ -15,7 +15,7 @@ u64 heap_ptr;
 void early_kmalloc_init(void) {
 	heap_ptr = heap_end = (u64)&_bss_end;
 	heap_end = ROUND_UP(heap_end, PAGESIZE);
-	logi("init early kmelloc heap_ptr: %x heap_end: %x", heap_end, heap_ptr);
+	logi("init early kmelloc heap_ptr: %x heap_end: %x", heap_ptr, heap_end);
 }
 
 void *early_kmalloc(size_t size) {

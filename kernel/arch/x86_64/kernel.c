@@ -82,7 +82,7 @@ void print_sys_info(void) {
 		logi("boot loader name %s", (char *)(u64)mbi->boot_loader_name);
 	}
 	if (mbi->flags & MULTIBOOT_INFO_APM_TABLE) {
-		logi("apm table: %d", mbi->apm_table);
+		// logi("apm table: %d", mbi->apm_table);
 	}
 }
 
@@ -105,8 +105,7 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	kernel_code_end = kernel_code_end - (u64)(&KERNEL_VMA) + (u64)(&KERNEL_LMA);
 	logi("kernel code end: 0x%x%08x", kernel_code_end >> 32, kernel_code_end & 0xffffffff);
 	print_sys_info();
-	// logi("0x%x%8x", ((u64)(&a)) >> 32, ((u64)(&a)) & 0xffffffff);
-	init_page((void*)(u64)multiboot_info->mmap_addr, multiboot_info->mmap_length);
+	// init_page((void*)(u64)multiboot_info->mmap_addr, multiboot_info->mmap_length);
 	die();
 	while (1);
 }

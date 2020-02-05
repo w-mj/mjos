@@ -66,12 +66,15 @@ void idt_init() {
 	idtr.size = sizeof(struct ID) * IDT_LENGTH - 1;
 	idtr.address = (u64)idt;
 	asm volatile("lidt %0"::"m" (idtr));
-	asm volatile("sti");
+	u64 page_fault_addr = 0xFFFFF0FFFFFFFFFF;
+	ASM("movq %rax, (0xFFFFF0FFFFFFFFFF)");
+	// asm volatile("sti");
+	// while (1);
 	// asm volatile("int $14");
 	// asm volatile("int $100");
 	// asm volatile("int $0");
 	logi("idt init finish");
-	logi("idt init finish");
+	// logi("idt init finish");
 }
 
 void interrupt_stub(u64 vec, u64 errcode) {
