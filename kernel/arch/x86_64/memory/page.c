@@ -15,13 +15,20 @@ static ListEntry mem_occupied_head;  // 已被占用页框列表头
 static int mem_free_cnt = 0;
 static int mem_occupied_cnt = 0;
 
-static void pf3() {
-	ListEntry *c = mem_free_head.next;
-	for (int i = 0; i < 3; i++) {
-		FrameEntry *e = list_entry(c, FrameEntry,next);
-		c = c->next;
-		_sL(e->address);
+u64 virtual_to_physics(u64 pml, u64 vir) {
+	int level = 4;
+	while (level >= 1) {
+		u64 *pml_addr = (u64*)VIRTUAL(pml);
+		u16 pmli = PMLOFFSET(vir, level);
+		u64 pmle = pml_addr[pmli];
+		if (!PRESENT(pmle)) {
+			loge("page not present at level %d", level);
+			die();
+		}
+		pml = PTENTRYADDR(pmle);
+		level--;
 	}
+	return pml | (vir &0xfff);
 }
 
 static void init_mem_area(u64 addr, u64 len) {
@@ -63,55 +70,7 @@ static void init_mem_area(u64 addr, u64 len) {
 
 extern u64 heap_end;
 extern u64 pml4, pm_end;
-void *kernel_pml4;
-/*
-static inline void load_page_addr(PageTable *pts[5], int pmloffset[5], u64 addr) {
-	_sL(addr);
-	_sL(pts[4]);
-	for (int i = 4; i > 1; i--) {
-		pmloffset[i] = PMLOFFSET(addr, i);
-		// _sx(pmloffset[i]);
-		pts[i - 1] = (PageTable*)PTENTRYADDR(pts[i][pmloffset[i]]);
-	}
-	pmloffset[1] = PMLOFFSET(addr, 1);
-}
-
-static void release_early_page() {
-	PageTable *pts[5];
-	int pts_removes[5] = {0};
-	int pmloffset[5];
-	pts[4] = (PageTable*)kernel_pml4;
-	u64 addr = (u64)(-1);
-	u64 need_release = (addr - heap_end) / PAGESIZE + 1;
-	_si(need_release);
-	load_page_addr(pts, pmloffset, addr);
-	int level = 1;
-	while (addr >= heap_end) {
-		pts[1][pmloffset[1]] = 0;  // 清除页表项
-		pts_removes[1] ++;
-		while (pmloffset[level] == 0 && level < 4) {
-			level++;
-			pts[level][pmloffset[level]] = 0;
-			pts_removes[level]++;
-		}
-
-		if(level > 1) {
-			_si(level);
-			repet(4) {_si(_+1);_si(pmloffset[_+1]);}
-			repet(4) _si(pts[_+1]);
-		}
-		pmloffset[level]--;
-		while (level > 1) {
-			pts[level - 1] = (PageTable*)PTENTRYADDR(pts[level][pmloffset[level]]);
-			// die();
-			pmloffset[level - 1] = 511;
-			level--;
-		}
-		addr -= PAGESIZE;
-	}
-	for (int i = 1; i <= 4; i++)
-		logi("release kernel pml%d %d", i, pts_removes[i]);
-}*/
+u64 kernel_pml4; // 内核4级页表物理地址
 
 // 分配一个空闲页框，返回页框号
 static int frame_alloc_cnt = 0;
@@ -121,7 +80,7 @@ FrameEntry *frame_alloc() {
 		return 0;
 	}
 	frame_alloc_cnt++;
-	ListEntry *free_frame = mem_free_head.next;
+	ListEntry *free_frame = mem_free_head.prev;
 	FrameEntry *frame_entry = list_entry(free_frame, FrameEntry, next);
 	frame_entry->count++;
 	frame_entry->state = OCCUPIED;
@@ -129,6 +88,7 @@ FrameEntry *frame_alloc() {
 	list_add(free_frame, &mem_occupied_head);
 	mem_free_cnt--;
 	mem_occupied_cnt++;
+	// heap_end += PAGESIZE;
 	return frame_entry;
 }
 
@@ -143,10 +103,11 @@ void frame_release(FrameEntry *frame) {
 	mem_occupied_cnt--;
 }
 
-void page_table_set_entry(u64 *pmltop, u64 page_table_entry, u64 value, bool auto_alloc) {
+void page_table_set_entry(u64 pmltop, u64 page_table_entry, u64 value, bool auto_alloc) {
 	int level = 4;
-	u64 *pml = pmltop;
+	u64 *pml = (u64*)pmltop;
 	while (level > 1) {
+		pml = (u64*)VIRTUAL(pml);  // 物理页框号转换为虚拟地址
 		u16 pmli = PMLOFFSET(page_table_entry, level);
 		u64 pmle = pml[pmli];
 		if (!PRESENT(pmle)) {
@@ -156,51 +117,53 @@ void page_table_set_entry(u64 *pmltop, u64 page_table_entry, u64 value, bool aut
 			} else {
 				// 自动分配页框
 				pmle = pml[pmli] = frame_alloc()->address + 7;
+				// logd("auto alloc frame %llx %llx", VIRTUAL(pmle), pmle);
+				page_table_set_entry(pmltop, VIRTUAL(pmle), pmle, true);
 			}
 		}
 		pml = (u64*)PTENTRYADDR(pmle);
 		level--;
 	}
+	pml = (u64*)VIRTUAL(pml);  // 物理页框号转换为虚拟地址
 	u16 pml1i = PMLOFFSET(page_table_entry, 1);
 	pml[pml1i] = value;
 }
+#define logadd(x) \
+	logd("vir %llx psy %llx abs %llx", (x), virtual_to_physics(newmp, (x)), ABSOLUTE(x));
 
 static void write_new_kernel_page_table(void *mmap_addr, u64 mmap_length) {
-	u64 *newmp = (u64*)frame_alloc()->address;  // 新的四级页表地址
+	u64 newmp = frame_alloc()->address;  // 新的四级页表地址（页框号是物理地址）
 	_sL(newmp);
-	memset(newmp, 0, PAGESIZE);
+	memset((u64*)VIRTUAL(newmp), 0, PAGESIZE);
+	_sL(VIRTUAL(newmp));
 	u64 addr = 0;
-	// 重新遍历内存表，构建新内核页表
-	for (multiboot_memory_map_t *mmap = (multiboot_memory_map_t *)mmap_addr;
-	        (u64) mmap < (u64)mmap_addr + mmap_length;
-	        mmap = (multiboot_memory_map_t *)((unsigned long ) mmap + mmap->size + sizeof(mmap->size))) {
-		// 跳过不可用内存区域
-		if (mmap->type != 1) {
-			continue;
-		}
-		addr = mmap->addr;
-		if (mmap->addr < (1 << 20)) { // 低于1M的内存区域
-			while (addr < (1 << 20) && addr < mmap->addr + mmap->len) {
-				page_table_set_entry(newmp, addr, addr + 7, true);
-				addr += PAGESIZE;
-			}
-		} else if (mmap->addr < 16 * (1 << 20)) { // DMA内存区域
-			while (addr < 16 * (1 << 20) && addr < mmap->addr + mmap->len) {
-				page_table_set_entry(newmp, addr, addr + 7, true);
-				addr += PAGESIZE;
-			}
-		}
-	}
 
-	// 构建内核代码数据页表
-	// 0xffffffff81000000 -> 0x0000000001000000
-	addr = KERNEL_VMA;
-	while (addr < heap_end) {
-		page_table_set_entry(newmp, addr, (addr & 0x7fffffff) + 7, true);
+	addr = 0;
+	// 低16M全部直接映射
+	while(addr < 16 * (1 << 20)) {
+		page_table_set_entry(newmp, addr, addr + 7, true);
 		addr += PAGESIZE;
 	}
+	// 构建内核代码数据页表
+	// 0xffffffff81000000 -> 0x0000000001000000
+	addr = (u64)&KERNEL_VMA;
+	while (addr < heap_end) {
+		page_table_set_entry(newmp, addr,  ABSOLUTE(addr & (~(0xfff)))+ 7, true);
+		addr += PAGESIZE;
+	}
+	page_table_set_entry(newmp, VIRTUAL(newmp), newmp + 7, true);
 
-	logd("new kernel page %d frames", frame_alloc_cnt);
+	logd("new kernel page table occupies %d frames", frame_alloc_cnt);
+	// logd("vir %d psy %d", 0x1000, virtual_to_physics(newmp, 0x1000));
+	// logadd(VIRTUAL(newmp));
+	// logadd(0xffffffff8b000007);
+	// logadd(0xffffffff81019180);
+	// logadd(0xffffffff81000000);
+	// logadd(0xB8000);
+	write_cr3(newmp);
+	kernel_pml4 = newmp;
+	// ASM("int $3");
+	logd("load new page table finish");
 }
 
 static void rebuild_kernel_page(void *mmap_addr, u64 mmap_length) {
@@ -214,7 +177,7 @@ static void rebuild_kernel_page(void *mmap_addr, u64 mmap_length) {
 	// 临时内核页表地址
 	void *early_pms = (void *)ABSOLUTE(&pml4);
 	void *early_pme = (void *)ABSOLUTE(&pm_end);
-	kernel_pml4 = &pml4;  // 内核4级页表地址
+	kernel_pml4 = (u64)early_pms;  // 内核4级页表地址
 	for (int i = 0; i < mem_frame_cnt; i++) {
 		u64 addr = mem_pool[i].address;
 		// 将内核代码占用的页框标记为已占用
@@ -234,7 +197,18 @@ static void rebuild_kernel_page(void *mmap_addr, u64 mmap_length) {
 	}
 	logi("kernel code %d pages", cnt);
 	logi("kernel page %d pages", pcnt);
+	// 写入新内核页表
 	write_new_kernel_page_table(mmap_addr, mmap_length);
+	
+	// 释放临时页表
+	cnt = 0;
+	u64 addr = (u64)&pml4;
+	while (addr < (u64)&pm_end) {
+		page_table_set_entry(kernel_pml4, addr, 0, false);
+		addr += PAGESIZE;
+		cnt++;
+	}
+	logi("release %d early kernel frames.", cnt);
 }
 void init_page(void *mmap_addr, u64 mmap_length) {
 	logi("init page");

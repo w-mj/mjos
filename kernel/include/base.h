@@ -60,6 +60,6 @@ static inline void *_container_of(void *ptr, size_t offset) {
         const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
         (type *)( (char *)__mptr - offsetof(type,member) );})
 */
-#define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
+#define offsetof(TYPE, MEMBER) ((size_t) (u64)&((TYPE *)0)->MEMBER)
 
 #define repet(x) for (int _ = 0; _ < (x); _++)

@@ -34,6 +34,9 @@ ENDPROC(memcpy)
 //
 // void memset(void *ptr, int value, _u16 num);
 //                   rdi      rsi         rdx
+
+
+
 GLOBAL(memset)
 	pushq    %rax
 	pushq    %rcx
@@ -48,7 +51,7 @@ tag:
 
 	// movq     $0x0101010101010101, %rdx
 	// imulq    %rdx   // rdx:rax = rax * rdx
-	movq     %rdx, %rcx
+	// movq     %rdx, %rcx
 	pushq    %rcx
 	shrq     $3,   %rcx
 	rep; stosq
@@ -59,6 +62,7 @@ tag:
 	popq     %rax
 	ret
 ENDPROC(memset)
+
 //GLOBAL(memset)
 //	pushw	%di
 //	movw	%ax, %di

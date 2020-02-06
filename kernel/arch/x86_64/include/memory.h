@@ -23,5 +23,6 @@ typedef u64 PageTable;
 #define PMLOFFSET(x, n) (((x) >> ((n - 1) * 9 + 12)) & 0x1ff)
 #define PTENTRYADDR(x) ((x) & (~0xfff))
 #define PRESENT(x)     ((x) & 0x01)
+#define PAGEPS(x)      ((x) & (0x01 << 7))
 
 
