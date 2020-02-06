@@ -5,13 +5,6 @@ typedef struct _ListEntry {
 	struct _ListEntry *prev, *next;
 } ListEntry;
 
-
-#define init_list(x) do {\
-	x.prev = &x; \
-	x.next = &x; \
-} while(0)
-
-
 #define list_entry(ptr, type, member) container_of(ptr, type, member)
 static inline void list_init(ListEntry* head) {
 	head->prev = head;
@@ -35,4 +28,8 @@ static inline void list_remove(ListEntry *n) {
 	n->prev->next = n->next;
 	n->prev = n;
 	n->next = n;
+}
+
+static inline u8 list_empty(ListEntry *head) {
+	return head->next == head;
 }

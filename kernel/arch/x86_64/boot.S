@@ -10,7 +10,7 @@
 GLOBAL_FUNC(_start)
 EXTERN_FUNC(kernel_main)  // 六十四位内核程序入口
 EXTERN_FUNC(init16)  // 十六位实模式C语言程序入口
-#define PAGE_4K
+#define PAGE_2M
 //------------------------------------------------------------------------------
 // first piece of code to run, 32-bit protected mode, paging disabled
 

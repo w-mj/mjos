@@ -16,6 +16,11 @@ typedef _c* _s;
 typedef void* _p;
 typedef unsigned long addr_t;
 
+#ifndef __cplusplus
+#define bool _u8
+#define true 1
+#define false 0
+#endif
 
 #define def_type(x)  \
 	typedef _i##x i##x; \

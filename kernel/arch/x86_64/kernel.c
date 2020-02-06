@@ -105,7 +105,7 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	kernel_code_end = kernel_code_end - (u64)(&KERNEL_VMA) + (u64)(&KERNEL_LMA);
 	logi("kernel code end: 0x%x%08x", kernel_code_end >> 32, kernel_code_end & 0xffffffff);
 	print_sys_info();
-	// init_page((void*)(u64)multiboot_info->mmap_addr, multiboot_info->mmap_length);
+	init_page((void*)(u64)multiboot_info->mmap_addr, multiboot_info->mmap_length);
 	die();
 	while (1);
 }

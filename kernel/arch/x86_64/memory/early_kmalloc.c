@@ -11,14 +11,34 @@
 extern u64 _bss_end;
 u64 heap_end;
 u64 heap_ptr;
+static u8 inited = 0, available=0;
 
 void early_kmalloc_init(void) {
+	if (inited) {
+		loge("early kmalloc is already inited.");
+		return;
+	}
 	heap_ptr = heap_end = (u64)&_bss_end;
 	heap_end = ROUND_UP(heap_end, PAGESIZE);
 	logi("init early kmelloc heap_ptr: %x heap_end: %x", heap_ptr, heap_end);
+	inited = 1;
+	available = 1;
+}
+
+void early_kmalloc_depercated() {
+	logd("early kmalloc depercated");
+	available = 0;
 }
 
 void *early_kmalloc(size_t size) {
+	if (!inited) {
+		loge("early kmalloc not inited");
+		return NULL;
+	}
+	if (!available) {
+		loge("early kmalloc can not be used anymode.");
+		return NULL;
+	}
 	void *ptr = (void*)heap_ptr;
 	heap_ptr += size;
 	while (heap_ptr >= heap_end)

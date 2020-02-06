@@ -11,7 +11,7 @@ early_page.S: create_early_page
 	./create_early_page
 
 $(target): early_page.S
-	$(CC) $(CFLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $< -o $@
 
 clean: 
 	rm -f $(toclean)

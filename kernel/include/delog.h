@@ -61,6 +61,8 @@ _I print_bin(_s str, _I size, _u8 *p, _I len);
 	console_setcolor(c); \
 } while(0)
 
+#define logd logi
+
 #define logw(...) do { \
 	_u8 c = console_getcolor(); \
 	console_setcolor(vga_entry_color(VGA_COLOR_LIGHT_BLUE, VGA_COLOR_BLACK)); \
