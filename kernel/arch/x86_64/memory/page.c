@@ -31,7 +31,7 @@ u64 virtual_to_physics(u64 pml, u64 vir) {
 	return pml | (vir &0xfff);
 }
 
-static void init_mem_area(u64 addr, u64 len) {
+static void init_mem_area(u64 addr, u64 len, u32 type) {
 	u64 addr_end = addr + len;
 	// 内存头部和尾部少于一个页的空间都舍弃
 	addr_end = ROUND_DOWN(addr_end, PAGESIZE);
@@ -155,7 +155,7 @@ static void write_new_kernel_page_table(void *mmap_addr, u64 mmap_length) {
 
 	logd("new kernel page table occupies %d frames", frame_alloc_cnt);
 	// logd("vir %d psy %d", 0x1000, virtual_to_physics(newmp, 0x1000));
-	// logadd(VIRTUAL(newmp));
+	//logadd(VIRTUAL(newmp));
 	// logadd(0xffffffff8b000007);
 	// logadd(0xffffffff81019180);
 	// logadd(0xffffffff81000000);
@@ -208,6 +208,14 @@ static void rebuild_kernel_page(void *mmap_addr, u64 mmap_length) {
 		addr += PAGESIZE;
 		cnt++;
 	}
+	ListEntry *cursor = mem_occupied_head.next;
+	while (cursor != &mem_occupied_head) {
+		FrameEntry *frame = list_entry(cursor, FrameEntry, next);
+		cursor = cursor->next;
+		if (frame->address >= (u64) early_pms && frame->address < (u64) early_pme) {
+			list_remove(&frame->next);
+		}
+	}
 	logi("release %d early kernel frames.", cnt);
 }
 void init_page(void *mmap_addr, u64 mmap_length) {
@@ -228,7 +236,7 @@ void init_page(void *mmap_addr, u64 mmap_length) {
 		if (mmap->addr < (1 << 20)) {
 			continue;
 		}
-		init_mem_area(mmap->addr, mmap->len);
+		init_mem_area(mmap->addr, mmap->len, mmap->type);
 	}
 	logi("frames count: %d", mem_frame_cnt);
 	rebuild_kernel_page(mmap_addr, mmap_length);
