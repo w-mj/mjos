@@ -31,7 +31,7 @@ u64 virtual_to_physics(u64 pml, u64 vir) {
 	return pml | (vir &0xfff);
 }
 
-static void init_mem_area(u64 addr, u64 len, u32 type) {
+static void init_mem_area(u64 addr, u64 len) {
 	u64 addr_end = addr + len;
 	// 内存头部和尾部少于一个页的空间都舍弃
 	addr_end = ROUND_DOWN(addr_end, PAGESIZE);
@@ -131,7 +131,7 @@ void page_table_set_entry(u64 pmltop, u64 page_table_entry, u64 value, bool auto
 #define logadd(x) \
 	logd("vir %llx psy %llx abs %llx", (x), virtual_to_physics(newmp, (x)), ABSOLUTE(x));
 
-static void write_new_kernel_page_table(void *mmap_addr, u64 mmap_length) {
+static void write_new_kernel_page_table() {
 	u64 newmp = frame_alloc()->address;  // 新的四级页表地址（页框号是物理地址）
 	_sL(newmp);
 	memset((u64*)VIRTUAL(newmp), 0, PAGESIZE);
@@ -155,7 +155,7 @@ static void write_new_kernel_page_table(void *mmap_addr, u64 mmap_length) {
 
 	logd("new kernel page table occupies %d frames", frame_alloc_cnt);
 	// logd("vir %d psy %d", 0x1000, virtual_to_physics(newmp, 0x1000));
-	//logadd(VIRTUAL(newmp));
+	// logadd(VIRTUAL(newmp));
 	// logadd(0xffffffff8b000007);
 	// logadd(0xffffffff81019180);
 	// logadd(0xffffffff81000000);
@@ -166,7 +166,7 @@ static void write_new_kernel_page_table(void *mmap_addr, u64 mmap_length) {
 	logd("load new page table finish");
 }
 
-static void rebuild_kernel_page(void *mmap_addr, u64 mmap_length) {
+static void rebuild_kernel_page() {
 	logi("rebuild kernel page");
 	// logi("0x%x%08x", h32(heap_end), l32(heap_end));
 	u64 real_heap_end = ABSOLUTE(heap_end);
@@ -198,7 +198,7 @@ static void rebuild_kernel_page(void *mmap_addr, u64 mmap_length) {
 	logi("kernel code %d pages", cnt);
 	logi("kernel page %d pages", pcnt);
 	// 写入新内核页表
-	write_new_kernel_page_table(mmap_addr, mmap_length);
+	write_new_kernel_page_table();
 	
 	// 释放临时页表
 	cnt = 0;
@@ -236,8 +236,8 @@ void init_page(void *mmap_addr, u64 mmap_length) {
 		if (mmap->addr < (1 << 20)) {
 			continue;
 		}
-		init_mem_area(mmap->addr, mmap->len, mmap->type);
+		init_mem_area(mmap->addr, mmap->len);
 	}
 	logi("frames count: %d", mem_frame_cnt);
-	rebuild_kernel_page(mmap_addr, mmap_length);
+	rebuild_kernel_page();
 }

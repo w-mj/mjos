@@ -24,16 +24,6 @@ struct ID {
 	u32 pad;
 }__PACKED;
 
-
-static void handle_divide_zero() {
-	loge("Divide zero");
-	die();
-}
-
-static void handle_page_fault() {
-	loge("Page fault");
-	die();
-}
 #define IDT_LENGTH 256
 struct ID idt[IDT_LENGTH];
 struct IDTR idtr;

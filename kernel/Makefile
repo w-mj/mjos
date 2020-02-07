@@ -1,5 +1,5 @@
 
-subdirs := misc arch
+subdirs := misc arch memory
 binfile := kernel.bin
 elffile := kernel.elf
 mapfile := kernel.map
