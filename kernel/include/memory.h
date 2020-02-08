@@ -18,6 +18,10 @@ typedef struct {
 void init_page(void *mmp_addr, u64 mmap_length);
 FrameEntry *frame_alloc();
 void frame_release(FrameEntry *frame);
+
+// 分配一个内核页表，返回虚拟首地址
+void *kernel_page_alloc();
+
 typedef u64 PageTable;
 
 #define PMLOFFSET(x, n) (((x) >> ((n - 1) * 9 + 12)) & 0x1ff)

@@ -88,9 +88,9 @@ FrameEntry *frame_alloc() {
 	list_add(free_frame, &mem_occupied_head);
 	mem_free_cnt--;
 	mem_occupied_cnt++;
-	// heap_end += PAGESIZE;
 	return frame_entry;
 }
+
 
 void frame_release(FrameEntry *frame) {
 	frame->count--;
@@ -118,7 +118,8 @@ void page_table_set_entry(u64 pmltop, u64 page_table_entry, u64 value, bool auto
 				// 自动分配页框
 				pmle = pml[pmli] = frame_alloc()->address + 7;
 				// logd("auto alloc frame %llx %llx", VIRTUAL(pmle), pmle);
-				page_table_set_entry(pmltop, VIRTUAL(pmle), pmle, true);
+				page_table_set_entry(pmltop, heap_end, pmle, true);
+				heap_end += PAGESIZE;
 			}
 		}
 		pml = (u64*)PTENTRYADDR(pmle);
@@ -238,6 +239,15 @@ void init_page(void *mmap_addr, u64 mmap_length) {
 		}
 		init_mem_area(mmap->addr, mmap->len);
 	}
+	early_kmalloc_depercated();  //  停用early_kmalloc
 	logi("frames count: %d", mem_frame_cnt);
 	rebuild_kernel_page();
+}
+
+void *kernel_page_alloc() {
+	FrameEntry *t = frame_alloc();
+	page_table_set_entry(kernel_pml4, heap_end, t->address, true);
+	u64 te = heap_end;
+	heap_end += PAGESIZE;
+	return (void*)te;
 }

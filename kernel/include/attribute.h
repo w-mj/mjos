@@ -1,6 +1,5 @@
 #pragma once
 
-
 #define __UNUSED                __attribute__((unused))
 #define __PACKED                __attribute__((packed))
 #define __ALIGNED(x)            __attribute__((aligned(x)))
