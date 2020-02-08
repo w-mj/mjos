@@ -8,11 +8,12 @@ symfile := kernel.sym
 subobjs := $(foreach d, $(subdirs), $(addsuffix .o, $(d)/$(d)))
 objlist := $(subobjs)
 
-INCLIST := $(CURDIR)/include $(CURDIR)/arch/$(ARCH)/include
+INCLIST := $(CURDIR)/include $(CURDIR)/arch/$(ARCH)/include/interface
 LFLAGS  := -nostdlib -lgcc -T arch/$(ARCH)/linker.ld -Wl,-Map=$(mapfile),--gc-sections
+
 include arch/$(ARCH)/Makefile.config
 
-export INCLIST CFLAGS
+export INCLIST CFLAGS INCFILE
 
 build: $(subdirs) $(binfile) $(symfile)
 
