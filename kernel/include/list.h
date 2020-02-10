@@ -6,6 +6,9 @@ typedef struct _ListEntry {
 } ListEntry;
 
 #define list_entry(ptr, type, member) container_of(ptr, type, member)
+#define foreach(c, list) \
+	for(c = &list.next; c != &list; c = c->next)
+
 static inline void list_init(ListEntry* head) {
 	head->prev = head;
 	head->next = head;
@@ -21,6 +24,10 @@ static inline void __list_add(ListEntry *n,
 
 static inline void list_add(ListEntry *n, ListEntry *head) {
 	__list_add(n, head, head->next);
+}
+
+static inline void list_add_tail(ListEntry *n, ListEntry *head) {
+	__list_add(n, head->prev, head);
 }
 
 static inline void list_remove(ListEntry *n) {
