@@ -15,9 +15,9 @@
 #define _clr_bit(d, bit) ((d) &= (~(_BITSET(bit))))
 #define _chk_bit(d, bit) _get_bit(d, bit)
 
-#define chk_bitmap(bitmap, n) _chk_bit(bitmap[(n) >> 3], (n) & 0x7);
-#define clr_bitmap(bitmap, n) _clr_bit(bitmap[(n) >> 3], (n) & 0x7);
-#define set_bitmap(bitmap, n) _set_bit(bitmap[(n) >> 3], (n) & 0x7);
+#define chk_bitmap(bitmap, n) _chk_bit(bitmap[(n) >> 3], (n) & 0x7)
+#define clr_bitmap(bitmap, n) _clr_bit(bitmap[(n) >> 3], (n) & 0x7)
+#define set_bitmap(bitmap, n) _set_bit(bitmap[(n) >> 3], (n) & 0x7)
 
 #define _rshf(a, n) ((a) << (n))
 #define _lshf(a, n) ((a) >> (n))

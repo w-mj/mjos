@@ -31,43 +31,6 @@ u64 virtual_to_physics(u64 pml, u64 vir) {
 	return pml | (vir &0xfff);
 }
 
-static void init_mem_area(u64 addr, u64 len) {
-	u64 addr_end = addr + len;
-	// 内存头部和尾部少于一个页的空间都舍弃
-	addr_end = ROUND_DOWN(addr_end, PAGESIZE);
-	addr     = ROUND_UP(addr, PAGESIZE);
-	// 低于16M的空间为DMA区域，不放在内存池中
-	if (addr < (16 * (1 << 20))) {
-		addr = (16 * (1 << 20));
-	}
-	len = addr_end - addr;
-	int frame_cnt = len / PAGESIZE;  // 页框数
-	logi("mem area addr: 0x%x%08x, len: %d, frames: %d", h32(addr), l32(addr), len, frame_cnt);
-	if (mem_pool == NULL) {
-		mem_pool = (FrameEntry *)early_kmalloc(frame_cnt * sizeof(FrameEntry));
-	} else {
-		// early_kmalloc 只在这里被连续调用，因此多次分配的空间一定是连续的
-		early_kmalloc(frame_cnt * sizeof(FrameEntry));
-	}
-	FrameEntry *mmap = mem_pool + mem_frame_cnt;
-	mem_frame_cnt += frame_cnt;
-	while (frame_cnt--) {
-		// 初始化新分配的页框
-		mmap->address = addr;
-		assert(addr != 0);
-		addr += PAGESIZE;
-		mmap->count = 0;
-		mmap->state = AVAILABLE;
-		list_init(&mmap->next);
-		list_add(&mmap->next, &mem_free_head);
-		mmap++;
-		// pf3();
-		// while(1);
-	}
-	mem_free_cnt = mem_frame_cnt; // 空闲页框与页框总数保持一致
-}
-
-
 extern u64 heap_end;
 extern u64 pml4, pm_end;
 u64 kernel_pml4; // 内核4级页表物理地址
@@ -225,22 +188,52 @@ void init_page(void *mmap_addr, u64 mmap_length) {
 	list_init(&mem_free_head);
 	list_init(&mem_occupied_head);
 	multiboot_memory_map_t *mmap;
-	// 遍历内存表
+	u64 mem_size = 0;
 	for (mmap = (multiboot_memory_map_t *)mmap_addr;
 	        (u64) mmap < (u64)mmap_addr + mmap_length;
 	        mmap = (multiboot_memory_map_t *)((unsigned long ) mmap + mmap->size + sizeof(mmap->size))) {
-		// 跳过不可用内存区域
-		if (mmap->type != 1) {
-			continue;
-		}
-		// 跳过低于1M的内存区域
-		if (mmap->addr < (1 << 20)) {
-			continue;
-		}
-		init_mem_area(mmap->addr, mmap->len);
+		mem_size += mmap->len;	
 	}
+	logi("Detected memory size %d", mem_size);
+	mem_frame_cnt = ROUND_UP(mem_size, 4096) / PAGESIZE;
+	mem_pool = (FrameEntry*)early_kmalloc(mem_frame_cnt * sizeof(FrameEntry));
+	for (int i = 0; i < mem_frame_cnt; i++)
+		mem_pool[i].state = RESERVE;
+	int ava_frame = 0;
+	// 再次遍历内存表，初始化页框表
+	for (mmap = (multiboot_memory_map_t *)mmap_addr;
+	        (u64) mmap < (u64)mmap_addr + mmap_length;
+	        mmap = (multiboot_memory_map_t *)((unsigned long ) mmap + mmap->size + sizeof(mmap->size))) {
+		// init_mem_area(mmap->addr, mmap->len, mmap->type);
+
+		u64 addr_end = ROUND_UP(mmap->addr + mmap->len, PAGESIZE);
+		u64 addr   = ROUND_DOWN(mmap->addr, PAGESIZE);
+		if (mmap->type == 1) {
+			// 可用内存尽量小，不可用区域尽量大
+			addr_end = ROUND_DOWN(mmap->addr + mmap->len, PAGESIZE);
+			addr   = ROUND_UP(mmap->addr, PAGESIZE);
+		}
+		int frame_cnt = (addr_end - addr) / PAGESIZE;
+		int frame_start = (addr) / PAGESIZE;
+		// _si(frame_start);
+		// _si(frame_cnt + frame_start);
+		for (int i = frame_start; i < frame_cnt + frame_start; i++) {
+			list_init(&mem_pool[i].next);
+			mem_pool[i].count = 0;
+			mem_pool[i].address = i * PAGESIZE;
+			if (mmap->type == 2) {
+				mem_pool[i].state = RESERVE;
+			} else if (mem_pool[i].address < 16 * (1 << 20)) {
+				mem_pool[i].state = DMA;
+			} else {
+				mem_pool[i].state = AVAILABLE;
+				ava_frame++;
+				list_add(&mem_pool[i].next, &mem_free_head);
+			}
+		}
+	}
+	logi("Build frame pool %d available, %d frames", ava_frame, mem_frame_cnt);
 	early_kmalloc_depercated();  //  停用early_kmalloc
-	logi("frames count: %d", mem_frame_cnt);
 	rebuild_kernel_page();
 }
 

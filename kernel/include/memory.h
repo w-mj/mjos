@@ -5,7 +5,9 @@
 
 enum PageStatus {
 	AVAILABLE,
-	OCCUPIED
+	OCCUPIED,
+	DMA,
+	RESERVE,
 };
 
 typedef struct {

@@ -91,14 +91,14 @@ extern u64 KERNEL_LMA, KERNEL_VMA;
 __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	console_initialize();
 	serial_initialize();
+	assert(rax == MULTIBOOT_BOOTLOADER_MAGIC);
+	multiboot_info = (multiboot_info_t *)rbx;
 	print_sys_info();
 	test_types();
 	cpu_init();
 	gdt_init();
 	tss_init();
 	idt_init();
-	assert(rax == MULTIBOOT_BOOTLOADER_MAGIC);
-	multiboot_info = (multiboot_info_t *)rbx;
 	logi("multiboot info addr: %x%08x", rbx >> 32, rbx & 0xffffffff);
 	u64 kernel_code_end = (u64)&_bss_end;
 	kernel_code_end = kernel_code_end - (u64)(&KERNEL_VMA) + (u64)(&KERNEL_LMA);
