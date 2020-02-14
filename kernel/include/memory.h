@@ -23,6 +23,10 @@ void frame_release(FrameEntry *frame);
 
 // 分配一个内核页表，返回虚拟首地址
 void *kernel_page_alloc();
+void *kernel_pages_alloc(int n);
+// 通过虚拟地址释放页框
+void kernel_page_release(void *);
+void kernel_pages_release(void *, int n);
 
 typedef u64 PageTable;
 

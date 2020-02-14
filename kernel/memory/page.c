@@ -237,10 +237,37 @@ void init_page(void *mmap_addr, u64 mmap_length) {
 	rebuild_kernel_page();
 }
 
-void *kernel_page_alloc() {
+void *kernel_pages_alloc(int n) {
+	// 分配n个页面，此处应该加锁，后期使用buddy优化
 	FrameEntry *t = frame_alloc();
-	page_table_set_entry(kernel_pml4, heap_end, t->address, true);
-	u64 te = heap_end;
-	heap_end += PAGESIZE;
-	return (void*)te;
+	page_table_set_entry(kernel_pml4, VIRTUAL(t->address), t->address, true);
+	n -= 1;
+	while (n--) {
+		FrameEntry *frame = frame_alloc();
+		page_table_set_entry(kernel_pml4, VIRTUAL(t->address), frame->address, true);
+	}
+	return (void*)VIRTUAL(t->address);
 }
+
+void kernel_pages_release(void *addr, int n) {
+	logi("release kernel %d page %llx", n, addr);
+	// u64 frame = virtual_to_physics(kernel_pml4, (u64)addr);	
+	u64 a = (u64)a;
+	while (n--) {
+		u64 frame = ABSOLUTE(a);
+		frame /= PAGESIZE;
+		FrameEntry *f = mem_pool + frame;
+		frame_release(f);
+		page_table_set_entry(kernel_pml4, a, 0, false);
+		a += PAGESIZE;
+	}
+}
+
+void *kernel_page_alloc() {
+	return kernel_pages_alloc(1);
+}
+
+void kernel_page_release(void *addr) {
+	kernel_pages_release(addr, 1);
+}
+
