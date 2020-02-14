@@ -4,52 +4,52 @@
 #include <base.h>
 #include <types.h>
 #include <string.h>
+#include <slab.h>
+#include <attribute.h>
+#include <asm.h>
 
-typedef struct __MemBlock {
-	u64 addr;
-	size_t size;
-	ListEntry next;
-} MemBlock;
+typedef struct kmalloc_info_struct {
+	char *name;
+	size_t obj_size;
+} __PACKED KmallocInfo;
 
-extern u64 heap_end;
-extern u64 kernel_pml4;
+const struct kmalloc_info_struct kmalloc_info[] = { 
+	{"kmalloc-8",               8},
+	{"kmalloc-16",             16},     
+	{"kmalloc-32",             32},
+	{"kmalloc-64",             64},    
+	{"kmalloc-96",             96},
+	{"kmalloc-128",           128},
+	{"kmalloc-192",           192},     
+	{"kmalloc-256",           256},    
+	{"kmalloc-512",           512},
+	{"kmalloc-1024",         1024},   
+	{"kmalloc-2048",         2048},
+	{"kmalloc-4096",         4096}, 
+	{"kmalloc-8192",         8192},
+};
+#define KMALLOC_CACHE_LENGTH 13
+CacheDescriptor kmalloc_cache[KMALLOC_CACHE_LENGTH];
 
-static ListEntry mem_list;
-
-void kmalloc_init() {
-	list_init(&mem_list);
+static inline int kmalloc_cache_index(size_t size) {
+	for (int i = 0; i < KMALLOC_CACHE_LENGTH; i++) {
+		if (size <= kmalloc_info[i].obj_size)
+			return i;
+	}
+	return -1;
 }
 
-// 分配内存，使用最优匹配法
+void kmalloc_init() {
+	for (int i = 1; i < 14; i++) {
+		cache_init(&kmalloc_cache[i], kmalloc_info[i].name, kmalloc_info[i].obj_size);
+	}
+}
+
 void *kmalloc(size_t size) {
-	if (size == 0)
-		return NULL;
-	ListEntry *c;
-	MemBlock *min_gap_mem = NULL;
-	u32 min_gap = -1;   // 内存块和目标尺寸之间的最小差距
-
-	foreach(c, mem_list) {
-		MemBlock *mb = list_entry(c, MemBlock, next);
-		if (mb->size < size + sizeof(size_t))  // 多出4字节保存内存块长度
-			continue;
-		if (min_gap > mb->size - size) {
-			min_gap_mem = mb;
-			min_gap = mb->size - size;
-		}
+	int index = kmalloc_cache_index(size);
+	if (index == -1) {
+		loge("kmalloc too large %d", size);
+		die();
 	}
-
-	if (min_gap_mem == NULL) {
-		// 需要新分配pages个页
-		int pages = ROUND_UP(size, PAGESIZE) / PAGESIZE;
-		while (pages--) {
-			void *ptr = kernel_page_alloc();
-
-		}
-	}
-
-	min_gap_mem->size -= size + sizeof(size_t);
-	*(size_t*)min_gap_mem->addr = size;
-	void *to_ret = (void*)(min_gap_mem->addr + sizeof(size_t));
-	min_gap_mem->addr += size + sizeof(size_t);
-	return to_ret;
+	return 
 }
