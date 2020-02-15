@@ -71,6 +71,11 @@ void idt_init() {
 void interrupt_stub(u64 vec, u64 errcode) {
 	loge("interrupt %d errcode 0x%x%08x.", vec, h32(errcode), l32(errcode));
 	u64 rsp;
+	if (vec == 14) {
+		u64 cr2 = read_cr2();
+		// _sL(cr2);
+		loge("cr2=%llx", cr2);
+	}
 	asm volatile("movq %%rsp, %0": "=m"(rsp));
 	// _sa((void*)rsp, 256);
 	while(1);

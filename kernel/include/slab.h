@@ -20,4 +20,4 @@ typedef struct __SlabDescriptor {
 void mem_pool_init();
 void cache_init(CacheDescriptor *cache, char *name, size_t obj_size);
 void *cache_obj_alloc(CacheDescriptor *cache);
-void cache_obj_release(CacheDescriptor *cache);
+void cache_obj_release(CacheDescriptor *cache, void *addr);
