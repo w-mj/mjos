@@ -19,11 +19,18 @@
 #define clr_bitmap(bitmap, n) _clr_bit(bitmap[(n) >> 3], (n) & 0x7)
 #define set_bitmap(bitmap, n) _set_bit(bitmap[(n) >> 3], (n) & 0x7)
 
-#define _rshf(a, n) ((a) << (n))
-#define _lshf(a, n) ((a) >> (n))
+#define _lshf(a, n) ((a) << (n))
+#define _rshf(a, n) ((a) >> (n))
 #define _Lclr(a, n) ((a) & (~(_BITS_MASK(n))))
 #define _Hclr(a, n) _rshf(_lshf(a, n), n)
 #define _LNclr(a, n) (((a) & (_BITS_MASK(n))))
+
+#define lshf(a, n) _lshf(a, n)
+#define rshr(a, n) _rshf(a, n)
+#define Lclr(a, n) _Lclr(a, n)
+#define Hclr(a, n) _Hclr(a, n)
+#define LNclr(a, n) _LNclr(a, n)
+
 #define h32(a)  _lshf((u64)(a), 32)
 #define l32(a)  ((u64)(a) & 0xffffffff)
 

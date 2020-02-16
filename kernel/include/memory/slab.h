@@ -1,8 +1,9 @@
 #pragma once
 #include <list.h>
+#include <memory/page.h>
 
 typedef struct __CacheDescriptor {
-	ListEntry partial;
+	PageList partial;
 	ListEntry next;
 	size_t obj_size; // 每个对象的长度
 	int partial_cnt; // parial 链表长度
@@ -10,14 +11,9 @@ typedef struct __CacheDescriptor {
 	char *name;
 } CacheDescriptor;
 
-typedef struct __SlabDescriptor {
-	ListEntry next;
-	void *obj;  // 第一个可用对象的地址
-	int inuse;  // 正在使用的对象数目
-} SlabDescriptor;
-
-
 void mem_pool_init();
 void cache_init(CacheDescriptor *cache, char *name, size_t obj_size);
 void *cache_obj_alloc(CacheDescriptor *cache);
 void cache_obj_release(CacheDescriptor *cache, void *addr);
+
+#define NOOBJ (u16)(-1)

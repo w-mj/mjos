@@ -1,4 +1,4 @@
-#include "memory.h"
+#include <memory/page.h>
 #include <delog.h>
 #include <list.h>
 #include <base.h>
@@ -7,7 +7,7 @@
 #include <string.h>
 #include "early_kmalloc.h"
 
-static Page *page_arr = NULL;  // 存放所有页框的数组
+Page *page_arr = NULL;  // 存放所有页框的数组
 static int mem_frame_cnt = 0;  //  总页框数量
 
 //static ListEntry mem_free_head;  // 空闲页框列表头
@@ -121,7 +121,7 @@ u64 kernel_pml4; // 内核4级页表物理地址
 
 // 分配一个空闲页框，返回页框号
 static int frame_alloc_cnt = 0;
-pfn_t frame_alloc() {
+pfn_t frame_alloc(PageState state) {
 	if (mem_free_cnt == 0) {
 		loge("No remain frame");
 		return 0;
@@ -132,26 +132,46 @@ pfn_t frame_alloc() {
 	// _sx(free_frame);
 	Page *frame_entry = &page_arr[free_frame];
 	// frame_entry->count++;
-	frame_entry->state = OCCUPIED;
+	assert(frame_entry->state == AVAILABLE);
+	frame_entry->state = state;
 	pglist_remove(&mem_free_head, free_frame);
-	pglist_push_head(&mem_occupied_head, free_frame);
 	// list_remove(free_frame);
 	// list_add(free_frame, &mem_occupied_head);
 	mem_free_cnt--;
-	mem_occupied_cnt++;
+	if (state == OCCUPIED) {
+		mem_occupied_cnt++;
+		pglist_push_head(&mem_occupied_head, free_frame);
+	}
 	return free_frame;
 }
 
+pfn_t frames_alloc(int n, PageState state) {
+	pfn_t a = frame_alloc(state);
+	n--;
+	while (n--) {
+		frame_alloc(state);
+	}
+	return a;
+}
 
 void frame_release(pfn_t fn) {
 	Page *frame = &page_arr[fn];
+	if (frame->state == OCCUPIED) {
+		mem_occupied_cnt--;
+		pglist_remove(&mem_occupied_head, fn);
+	}
 	frame->state = AVAILABLE;
-	pglist_remove(&mem_occupied_head, fn);
 	pglist_push_head(&mem_free_head, fn);
 	// list_remove(&frame->next);
 	// list_add(&frame->next, &mem_free_head);
 	mem_free_cnt++;
-	mem_occupied_cnt--;
+}
+
+void frames_release(int n, pfn_t fn) {
+	while (n--) {
+		frame_release(fn);
+		fn++;
+	}
 }
 
 void page_table_set_entry(u64 pmltop, u64 page_table_entry, u64 value, bool auto_alloc) {
@@ -167,7 +187,7 @@ void page_table_set_entry(u64 pmltop, u64 page_table_entry, u64 value, bool auto
 				return;
 			} else {
 				// 自动分配页框
-				pmle = pml[pmli] = (frame_alloc() << PAGEOFFSET) + 7;
+				pmle = pml[pmli] = (frame_alloc(OCCUPIED) << PAGEOFFSET) + 7;
 				// logd("auto alloc frame %llx %llx", VIRTUAL(pmle), pmle);
 				page_table_set_entry(pmltop, heap_end, pmle, true);
 				heap_end += PAGESIZE;
@@ -184,7 +204,7 @@ void page_table_set_entry(u64 pmltop, u64 page_table_entry, u64 value, bool auto
 	logd("vir %llx psy %llx abs %llx", (x), virtual_to_physics(newmp, (x)), ABSOLUTE(x));
 
 static void write_new_kernel_page_table() {
-	u64 newmp = frame_alloc() << PAGEOFFSET;  // 新的四级页表地址（页框号是物理地址）
+	u64 newmp = frame_alloc(OCCUPIED) << PAGEOFFSET;  // 新的四级页表地址（页框号是物理地址）
 	_sL(newmp);
 	memset((u64 *)VIRTUAL(newmp), 0, PAGESIZE);
 	_sL(VIRTUAL(newmp));
@@ -202,7 +222,7 @@ static void write_new_kernel_page_table() {
 		page_table_set_entry(newmp, addr,  ABSOLUTE(addr & (~(0xfff))) + 7, true);
 		addr += PAGESIZE;
 	}
-	page_table_set_entry(newmp, VIRTUAL(newmp), newmp + 7, true);
+	page_table_set_entry(newmp, (u64)VIRTUAL(newmp), newmp + 7, true);
 	logd("new kernel page table occupies %d frames", frame_alloc_cnt);
 	// logd("vir %d psy %d", 0x1000, virtual_to_physics(newmp, 0x1000));
 	// logadd(VIRTUAL(newmp));
@@ -219,7 +239,7 @@ static void write_new_kernel_page_table() {
 static void rebuild_kernel_page() {
 	logi("rebuild kernel page");
 	// logi("0x%x%08x", h32(heap_end), l32(heap_end));
-	u64 real_heap_end = ABSOLUTE(heap_end);
+	// u64 real_heap_end = ABSOLUTE(heap_end);
 	_sL(&pml4);
 	// logi("0x%x%08x", h32((u64)&pml4), l32((u64)&pml4));
 	int cnt = 0;
@@ -284,7 +304,7 @@ static void rebuild_kernel_page() {
 	*/
 	logi("release %d early kernel frames.", cnt);
 }
-void init_page(void *mmap_addr, u64 mmap_length) {
+void page_init(void *mmap_addr, u64 mmap_length) {
 	logi("init page");
 	early_kmalloc_init();
 	//list_init(&mem_free_head);
@@ -300,10 +320,11 @@ void init_page(void *mmap_addr, u64 mmap_length) {
 	for (mmap = (multiboot_memory_map_t *)mmap_addr;
 	        (u64) mmap < (u64)mmap_addr + mmap_length;
 	        mmap = (multiboot_memory_map_t *)((unsigned long ) mmap + mmap->size + sizeof(mmap->size))) {
-		mem_size += mmap->len;
+		mem_size = mmap->addr + mmap->len;
 	}
 	logi("Detected memory size %d", mem_size);
 	mem_frame_cnt = ROUND_UP(mem_size, 4096) / PAGESIZE;
+	_si(mem_frame_cnt);
 	page_arr = (Page *)early_kmalloc(mem_frame_cnt * sizeof(Page)); // 为所有页框分配内存
 	// for (int i = 0; i < mem_frame_cnt; i++)
 	// 	page_arr[i].state = RESERVE;
@@ -360,38 +381,39 @@ void init_page(void *mmap_addr, u64 mmap_length) {
 	rebuild_kernel_page();
 }
 
-void *kernel_pages_alloc(int n) {
+pfn_t kernel_pages_alloc(int n, PageState state) {
 	// 分配n个页面，此处应该加锁，后期使用buddy优化
-	pfn_t p = frame_alloc();
-	page_table_set_entry(kernel_pml4, VIRTUAL(p), p, true);
+	pfn_t p = frame_alloc(state);
+	logd("alloc kernel %d page pfn:%d", n, p);
+	u64 psys = p << PAGEOFFSET;
+	page_table_set_entry(kernel_pml4, (u64)VIRTUAL(psys), psys + 7, true);
 	n -= 1;
 	while (n--) {
 		// Page *frame = &page_arr[frame_alloc()];
-		pfn_t t = frame_alloc();
-		page_table_set_entry(kernel_pml4, VIRTUAL(t), t, true);
+		pfn_t t = frame_alloc(state);
+		psys = t << PAGEOFFSET;
+		page_table_set_entry(kernel_pml4, (u64)VIRTUAL(psys), psys + 7, true);
 	}
-	return (void *)VIRTUAL(p);
+	return p;
 }
 
-void kernel_pages_release(void *addr, int n) {
-	logi("release kernel %d page %llx", n, addr);
+void kernel_pages_release(pfn_t page, int n) {
+	logi("release kernel %d page pfn: %d", n, page);
 	// u64 frame = virtual_to_physics(kernel_pml4, (u64)addr);
-	u64 a = (u64)addr;
 	while (n--) {
-		u64 frame = ABSOLUTE(a);
-		frame /= PAGESIZE;
-		Page *f = page_arr + frame;
-		frame_release(frame);
-		page_table_set_entry(kernel_pml4, a, 0, false);
-		a += PAGESIZE;
+		void *addr = VIRTUAL(page << PAGEOFFSET);
+		// Page *f = page_arr + frame;
+		frame_release(page);
+		page_table_set_entry(kernel_pml4, (u64)addr, 0, false);
+		page += 1;
 	}
 }
 
-void *kernel_page_alloc() {
-	return kernel_pages_alloc(1);
+pfn_t kernel_page_alloc(PageState state) {
+	return kernel_pages_alloc(1, state);
 }
 
-void kernel_page_release(void *addr) {
-	kernel_pages_release(addr, 1);
+void kernel_page_release(pfn_t page) {
+	kernel_pages_release(page, 1);
 }
 

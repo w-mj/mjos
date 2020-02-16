@@ -20,7 +20,7 @@ void early_kmalloc_init(void) {
 	}
 	heap_ptr = heap_end = (u64)&_bss_end;
 	heap_end = ROUND_UP(heap_end, PAGESIZE);
-	logi("init early kmelloc heap_ptr: %x heap_end: %x", heap_ptr, heap_end);
+	logi("init early kmelloc heap_ptr: %llx heap_end: %llx", heap_ptr, heap_end);
 	inited = 1;
 	available = 1;
 }
@@ -43,8 +43,7 @@ void *early_kmalloc(size_t size) {
 	heap_ptr += size;
 	while (heap_ptr >= heap_end)
 		heap_end += PAGESIZE;
-	logi("early kmelloc %d, start: %x%08x heap_ptr: %x%08x heap_end: %x%08x",
-			size, h32(ptr), l32(ptr), h32(heap_ptr), l32(heap_ptr),
-			h32(heap_end), l32(heap_end));
+	logi("early kmelloc %d, start: %llx heap_ptr: %llx heap_end: %llx",
+			size, ptr, heap_ptr, heap_end);
 	return ptr;
 }

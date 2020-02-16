@@ -1,10 +1,9 @@
-#include <memory.h>
 #include <delog.h>
 #include <list.h>
 #include <base.h>
 #include <types.h>
 #include <string.h>
-#include <slab.h>
+#include <memory/slab.h>
 #include <attribute.h>
 #include <asm.h>
 
@@ -27,16 +26,17 @@ const struct kmalloc_info_struct kmalloc_info[] = {
 	{"kmalloc-2048",         2048},
 	{"kmalloc-4096",         4096}, 
 	{"kmalloc-8192",         8192},
+	{"kmalloc-16384",       16384},
 };
 #define KMALLOC_CACHE_LENGTH 13
 CacheDescriptor kmalloc_cache[KMALLOC_CACHE_LENGTH];
 
-static inline int kmalloc_cache_index(size_t size) {
+static inline CacheDescriptor *get_kmalloc_cache(size_t size) {
 	for (int i = 0; i < KMALLOC_CACHE_LENGTH; i++) {
 		if (size <= kmalloc_info[i].obj_size)
-			return i;
+			return &kmalloc_cache[i];
 	}
-	return -1;
+	return NULL;
 }
 
 void kmalloc_init() {
@@ -45,11 +45,22 @@ void kmalloc_init() {
 	}
 }
 
-void *kmalloc(size_t size) {
-	int index = kmalloc_cache_index(size);
-	if (index == -1) {
+void *kmalloc_s(size_t size) {
+	logd("kmalloc %d", size);
+	CacheDescriptor *cache = get_kmalloc_cache(size);
+	if (cache == NULL) {
 		loge("kmalloc too large %d", size);
 		die();
 	}
-	return 
+	return cache_obj_alloc(cache);
+}
+
+void kfree_s(size_t size, void *addr) {
+	logd("kfree %d %llx", size, addr);
+	CacheDescriptor *cache = get_kmalloc_cache(size);
+	if (cache == NULL) {
+		loge("kmalloc too large %d", size);
+		die();
+	}
+	cache_obj_release(cache, addr);
 }

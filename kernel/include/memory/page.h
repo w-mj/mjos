@@ -3,13 +3,13 @@
 #include <boot.h>
 #include <list.h>
 
-enum PageState {
+typedef enum __PageState {
 	AVAILABLE,
 	OCCUPIED,
 	DMA,
 	RESERVE,
 	POOL,
-};
+} PageState;
 
 typedef u32 pfn_t;
 #define NOPAGE (u32)(-1)
@@ -22,7 +22,7 @@ typedef struct __PageList {
 typedef struct {
 	//int count;  // 引用计数
 	//u64 address;  // 起始地址（页框号）
-	enum PageState state;  // 状态
+	PageState state;  // 状态
 	// ListEntry next;  // 下一个
 	pfn_t next;
 	pfn_t prev;
@@ -32,16 +32,20 @@ typedef struct {
 	};
 } Page;
 
-void init_page(void *mmp_addr, u64 mmap_length);
-pfn_t frame_alloc();
-void frame_release(pfn_t frame);
+extern Page *page_arr;
 
-// 分配一个内核页表，返回虚拟首地址
-void *kernel_page_alloc();
-void *kernel_pages_alloc(int n);
+void page_init(void *mmp_addr, u64 mmap_length);
+pfn_t frame_alloc(PageState state);
+void frame_release(pfn_t frame);
+pfn_t frames_alloc(int n, PageState state);
+void frames_release(int n, pfn_t frame);
+
+// 分配一个内核页，返回页框号，并把页框写入内核页表
+pfn_t kernel_page_alloc(PageState state);
+pfn_t kernel_pages_alloc(int n, PageState state);
 // 通过虚拟地址释放页框
-void kernel_page_release(void *);
-void kernel_pages_release(void *, int n);
+void kernel_page_release(pfn_t);
+void kernel_pages_release(pfn_t p, int n);
 
 typedef u64 PageTable;
 

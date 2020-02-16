@@ -5,7 +5,9 @@
 #include <serial.h>
 #include <delog.h>
 #include <boot.h>
-#include <memory.h>
+#include <memory/page.h>
+#include <memory/slab.h>
+#include <memory/kmalloc.h>
 #include <init.h>
 
 #define TESTTYPE(x) assert((x) / 8 == sizeof(u##x))
@@ -103,9 +105,23 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	u64 kernel_code_end = (u64)&_bss_end;
 	kernel_code_end = kernel_code_end - (u64)(&KERNEL_VMA) + (u64)(&KERNEL_LMA);
 	logi("kernel code end: 0x%x%08x", kernel_code_end >> 32, kernel_code_end & 0xffffffff);
-	init_page((void*)(u64)multiboot_info->mmap_addr, multiboot_info->mmap_length);
 
-
+	page_init((void*)(u64)multiboot_info->mmap_addr, multiboot_info->mmap_length);
+	mem_pool_init();
+	kmalloc_init();
+	
+	void *p1 = kmalloc_s(4096);
+	void *p2 = kmalloc_s(4096);
+	void *p3 = kmalloc_s(4096);
+	void *p4 = kmalloc_s(4096);
+	void *p5 = kmalloc_s(4096);
+	void *p6 = kmalloc_s(4096);
+	kfree_s(4096, p1);
+	kfree_s(4096, p2);
+	kfree_s(4096, p3);
+	kfree_s(4096, p4);
+	kfree_s(4096, p5);
+	kfree_s(4096, p6);
 
 	logi("System init finish");
 	die();
