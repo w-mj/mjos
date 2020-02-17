@@ -15,9 +15,9 @@ static inline int calculate_page(size_t obj_size) {
 void cache_add_slab(CacheDescriptor *cache) {
 	int n = calculate_page(cache->obj_size);  // 计算需要多少页
 	logd("cache %s add slab, %d pages.", cache->name, n);
-	pfn_t page = kernel_pages_alloc(n, POOL);  // 分配页框
+	pfn_t page = kernel_pages_alloc(n, PG_POOL);  // 分配页框
 	Page *frame = &page_arr[page];
-	assert(frame->state = POOL);
+	assert(frame->state = PG_POOL);
 	int obj_cnt = PAGESIZE * n / cache->obj_size;
 	// _si(obj_cnt);
 	frame->obj = 0;

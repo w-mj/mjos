@@ -1,10 +1,11 @@
 #include "process_struct.h"
-#include <memory.h>
 #include <string.h>
 #include <list.h>
 #include <base.h>
 #include <delog.h>
 #include <asm.h>
+#include <memory/page.h>
+#include <memory/kmalloc.h>
 
 static ListEntry running_list;
 static u8 *pid_bitmap = NULL;

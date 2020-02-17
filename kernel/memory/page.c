@@ -132,13 +132,13 @@ pfn_t frame_alloc(PageState state) {
 	// _sx(free_frame);
 	Page *frame_entry = &page_arr[free_frame];
 	// frame_entry->count++;
-	assert(frame_entry->state == AVAILABLE);
+	assert(frame_entry->state == PG_AVAILABLE);
 	frame_entry->state = state;
 	pglist_remove(&mem_free_head, free_frame);
 	// list_remove(free_frame);
 	// list_add(free_frame, &mem_occupied_head);
 	mem_free_cnt--;
-	if (state == OCCUPIED) {
+	if (state == PG_KERNEL) {
 		mem_occupied_cnt++;
 		pglist_push_head(&mem_occupied_head, free_frame);
 	}
@@ -156,11 +156,11 @@ pfn_t frames_alloc(int n, PageState state) {
 
 void frame_release(pfn_t fn) {
 	Page *frame = &page_arr[fn];
-	if (frame->state == OCCUPIED) {
+	if (frame->state == PG_KERNEL) {
 		mem_occupied_cnt--;
 		pglist_remove(&mem_occupied_head, fn);
 	}
-	frame->state = AVAILABLE;
+	frame->state = PG_AVAILABLE;
 	pglist_push_head(&mem_free_head, fn);
 	// list_remove(&frame->next);
 	// list_add(&frame->next, &mem_free_head);
@@ -187,7 +187,7 @@ void page_table_set_entry(u64 pmltop, u64 page_table_entry, u64 value, bool auto
 				return;
 			} else {
 				// 自动分配页框
-				pmle = pml[pmli] = (frame_alloc(OCCUPIED) << PAGEOFFSET) + 7;
+				pmle = pml[pmli] = (frame_alloc(PG_KERNEL) << PAGEOFFSET) + 7;
 				// logd("auto alloc frame %llx %llx", VIRTUAL(pmle), pmle);
 				page_table_set_entry(pmltop, heap_end, pmle, true);
 				heap_end += PAGESIZE;
@@ -204,7 +204,7 @@ void page_table_set_entry(u64 pmltop, u64 page_table_entry, u64 value, bool auto
 	logd("vir %llx psy %llx abs %llx", (x), virtual_to_physics(newmp, (x)), ABSOLUTE(x));
 
 static void write_new_kernel_page_table() {
-	u64 newmp = frame_alloc(OCCUPIED) << PAGEOFFSET;  // 新的四级页表地址（页框号是物理地址）
+	u64 newmp = frame_alloc(PG_KERNEL) << PAGEOFFSET;  // 新的四级页表地址（页框号是物理地址）
 	_sL(newmp);
 	memset((u64 *)VIRTUAL(newmp), 0, PAGESIZE);
 	_sL(VIRTUAL(newmp));
@@ -267,7 +267,7 @@ static void rebuild_kernel_page() {
 			_sL(i << PAGEOFFSET);
 			die();
 		}
-		page_arr[i].state = OCCUPIED;
+		page_arr[i].state = PG_KERNEL;
 		// page_arr[i].count = 1;
 		// list_remove(&page_arr[i].next);
 		pglist_remove(&mem_free_head, i);
@@ -288,7 +288,7 @@ static void rebuild_kernel_page() {
 		pfn_t page_index = ABSOLUTE(addr) >> PAGEOFFSET;
 		pglist_remove(&mem_occupied_head, page_index);
 		mem_occupied_cnt -= 1;
-		page_arr[page_index].state = AVAILABLE;
+		page_arr[page_index].state = PG_AVAILABLE;
 		addr += PAGESIZE;
 		cnt++;
 	}
@@ -338,7 +338,7 @@ void page_init(void *mmap_addr, u64 mmap_length) {
 		// 填充在内存表中没有表现出来的空洞
 		logd("last end: %llx, addr: %llx, len %llx", last_end, mmap->addr, mmap->len);
 		while (last_end < mmap->addr) {
-			page_arr[last_end >> PAGEOFFSET].state = RESERVE;
+			page_arr[last_end >> PAGEOFFSET].state = PG_RESERVE;
 			last_end += PAGESIZE;
 		}
 		last_end = mmap->addr + mmap->len;
@@ -362,11 +362,11 @@ void page_init(void *mmap_addr, u64 mmap_length) {
 			// page_arr[i].count = 0;
 			// page_arr[i].address = i * PAGESIZE;
 			if (mmap->type == 2) {
-				page_arr[i].state = RESERVE;
+				page_arr[i].state = PG_RESERVE;
 			} else if (i * PAGESIZE < 16 * (1 << 20)) {
-				page_arr[i].state = DMA;
+				page_arr[i].state = PG_DMA;
 			} else {
-				page_arr[i].state = AVAILABLE;
+				page_arr[i].state = PG_AVAILABLE;
 				ava_frame++;
 				pglist_push_head(&mem_free_head, i);
 				mem_free_cnt++;

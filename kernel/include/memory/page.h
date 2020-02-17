@@ -4,11 +4,11 @@
 #include <list.h>
 
 typedef enum __PageState {
-	AVAILABLE,
-	OCCUPIED,
-	DMA,
-	RESERVE,
-	POOL,
+	PG_AVAILABLE,
+	PG_KERNEL,
+	PG_DMA,
+	PG_RESERVE,
+	PG_POOL,
 } PageState;
 
 typedef u32 pfn_t;
