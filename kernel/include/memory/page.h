@@ -5,10 +5,11 @@
 
 typedef enum __PageState {
 	PG_AVAILABLE,
-	PG_KERNEL,
+	PG_KERNEL,  // 内核页框，不会被换出
 	PG_DMA,
 	PG_RESERVE,
 	PG_POOL,
+	PG_NORMAL,
 } PageState;
 
 typedef u32 pfn_t;
