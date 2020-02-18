@@ -134,7 +134,6 @@ static inline u16 gs(void) {
 	asm volatile("movw %%gs,%0" : "=rm" (seg));
 	return seg;
 }
-#define die() asm volatile("hlt");
 
 #define DEFINE_READ_CR(n)                               \
 static inline u64 read_cr ## n () {                     \
@@ -200,4 +199,25 @@ static inline void write_gsbase(u64 val) {
 
 static inline void write_kgsbase(u64 val) {
     write_msr(0xc0000102U, val);
+}
+
+
+static inline void die() {
+	ASM("hlt");
+}
+
+static inline void relax() {
+	ASM("pause");
+}
+
+static inline u32 int_lock() {
+    u64 key;
+    ASM("pushfq; cli; popq %0" : "=r"(key));
+    return (u32) key & 0x200;
+}
+
+static inline void int_unlock(u32 key) {
+    if (key & 0x200) {
+        ASM("sti");
+    }
 }

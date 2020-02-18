@@ -32,3 +32,5 @@ def_type(32)
 def_type(64)
 
 #define NULL 0
+
+typedef u32 pfn_t;

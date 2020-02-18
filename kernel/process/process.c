@@ -12,7 +12,7 @@ static u8 *pid_bitmap = NULL;
 
 void process_init() {
 	logd("init process");
-	pid_bitmap = (u8*)kernel_page_alloc();
+	pid_bitmap = pfn_to_virt(kernel_page_alloc(PG_KERNEL));
 	memset(pid_bitmap, 0, PAGESIZE);
 	list_init(&running_list);
 }

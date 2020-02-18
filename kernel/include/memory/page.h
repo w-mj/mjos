@@ -12,7 +12,6 @@ typedef enum __PageState {
 	PG_NORMAL,
 } PageState;
 
-typedef u32 pfn_t;
 #define NOPAGE (u32)(-1)
 
 typedef struct __PageList {
