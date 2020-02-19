@@ -5,6 +5,7 @@
 #include <list.h>
 #include <asm.h>
 #include <string.h>
+#include <arch.h>
 #include "early_kmalloc.h"
 
 Page *page_arr = NULL;  // 存放所有页框的数组

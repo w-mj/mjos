@@ -1,6 +1,7 @@
 #pragma once
 #include <types.h>
 #include <list.h>
+#include <biosreg.h>
 
 typedef enum {
 	TASK_RUNNING,
@@ -10,7 +11,8 @@ typedef enum {
 } TaskState;
 
 typedef struct {
-
+	void *ip;
+	struct biosregs regs;
 } ThreadDescriber;
 
 

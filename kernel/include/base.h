@@ -39,7 +39,6 @@
 #define nullptr NULL
 #define null NULL
 
-
 #define TYPE(x)                 __typeof__(x)
 
 #define CLZ32(x)                __builtin_clz(x)

@@ -15,7 +15,9 @@ typedef char _c;
 typedef _c* _s;
 typedef void* _p;
 typedef unsigned long addr_t;
+typedef _u64 usize;
 
+#define NOADDR ((usize)-1)
 #ifndef __cplusplus
 #define bool _u8
 #define true 1

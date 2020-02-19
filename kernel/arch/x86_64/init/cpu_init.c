@@ -3,6 +3,10 @@
 #include <base.h>
 #include <delog.h>
 #include <asm.h>
+#include <cpu.h>
+
+extern u64 _percpu_end, _percpu_addr;
+u64 percpu_base;
 
 static inline void cpuid(u32 *a, u32 *b, u32 *c, u32 *d) {
 	u32 eax, ebx, ecx, edx;
@@ -27,6 +31,8 @@ static inline void cpuid(u32 *a, u32 *b, u32 *c, u32 *d) {
 }
 
 void cpu_init() {
+	percpu_base = (u64)&_percpu_addr;
+
 	char vendor_id[16];
 	u32 a, b, c, d;
 	// get cpu vendor id string
@@ -54,4 +60,20 @@ void cpu_init() {
     // u64 efer = read_msr(0xc0000080U);
     // efer |= (1UL <<  0);
     // write_msr(0xc0000080U, efer);
+}
+
+int cpu_count() {
+    return cpu_installed;
+}
+
+int cpu_index() {
+    return (int) ((read_gsbase() - percpu_base) / percpu_size);
+}
+
+void * calc_percpu_addr(u32 cpu, void * ptr) {
+    return (void *) ((char *) ptr + percpu_base + percpu_size * cpu);
+}
+
+void * calc_thiscpu_addr(void * ptr) {
+    return (void *) ((char *) ptr + read_gsbase());
 }
