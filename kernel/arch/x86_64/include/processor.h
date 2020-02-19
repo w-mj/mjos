@@ -1,6 +1,6 @@
 #pragma once
 #include <types.h>
-#include <attribute.h>
+#include <base.h>
 #include <boot.h>
 
 // 与CPU相关的结构

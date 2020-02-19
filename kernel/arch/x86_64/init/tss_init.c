@@ -1,5 +1,4 @@
 #include <types.h>
-#include <attribute.h>
 #include <string.h>
 #include <asm.h>
 #include <delog.h>

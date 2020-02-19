@@ -1,7 +1,6 @@
 #include <types.h>
 #include <delog.h>
 #include <asm.h>
-#include <attribute.h>
 #include <base.h>
 
 struct IDTR {

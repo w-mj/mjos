@@ -8,7 +8,7 @@
 #define USER_DATA_DEC   0x23  // 用户数据段描述符
 
 #define PAGEOFFSET      12
-#define PAGESIZE       (1 << PAGESHIFT)
+#define PAGESIZE       (1 << PAGEOFFSET)
 
 #define KERNEL_LMA      0x0000000001000000UL    // 内核的实际位置
 #define KERNEL_VMA      0xffffffff81000000UL    // 内核的虚拟地址

@@ -218,7 +218,7 @@ static void write_new_kernel_page_table() {
 	}
 	// 构建内核代码数据页表
 	// 0xffffffff81000000 -> 0x0000000001000000
-	addr = (u64)&KERNEL_VMA;
+	addr = (u64)KERNEL_VMA;
 	while (addr < heap_end) {
 		page_table_set_entry(newmp, addr,  ABSOLUTE(addr & (~(0xfff))) + 7, true);
 		addr += PAGESIZE;
@@ -251,7 +251,7 @@ static void rebuild_kernel_page() {
 	kernel_pml4 = (u64)early_pms;  // 内核4级页表地址
 	void *addr;
 	assert(mem_free_head.tail != NOPAGE);
-	for (addr = &KERNEL_VMA; addr < (void *)heap_end; addr += PAGESIZE) {
+	for (addr = (void*)KERNEL_VMA; addr < (void *)heap_end; addr += PAGESIZE) {
 		if (addr >= early_pms && addr < early_pme) {
 			// 这个页是内核临时页表页
 			pcnt++;

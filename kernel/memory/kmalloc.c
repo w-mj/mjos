@@ -4,7 +4,6 @@
 #include <types.h>
 #include <string.h>
 #include <memory/slab.h>
-#include <attribute.h>
 #include <asm.h>
 
 typedef struct kmalloc_info_struct {

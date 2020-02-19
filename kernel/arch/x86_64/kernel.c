@@ -1,4 +1,3 @@
-#include <attribute.h>
 #include <types.h>
 #include <asm.h>
 #include <console.h>
@@ -9,6 +8,7 @@
 #include <memory/slab.h>
 #include <memory/kmalloc.h>
 #include <init.h>
+#include <acpi.h>
 
 #define TESTTYPE(x) assert((x) / 8 == sizeof(u##x))
 void test_types(void) {
@@ -89,7 +89,6 @@ void print_sys_info(void) {
 }
 
 extern u64 _bss_end;
-extern u64 KERNEL_LMA, KERNEL_VMA;
 __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	console_initialize();
 	serial_initialize();
@@ -101,9 +100,12 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	gdt_init();
 	tss_init();
 	idt_init();
+
+	acpi_tbl_init();
+
 	logi("multiboot info addr: %x%08x", rbx >> 32, rbx & 0xffffffff);
 	u64 kernel_code_end = (u64)&_bss_end;
-	kernel_code_end = kernel_code_end - (u64)(&KERNEL_VMA) + (u64)(&KERNEL_LMA);
+	kernel_code_end = kernel_code_end - (u64)(KERNEL_VMA) + (u64)(KERNEL_LMA);
 	logi("kernel code end: 0x%x%08x", kernel_code_end >> 32, kernel_code_end & 0xffffffff);
 
 	page_init((void*)(u64)multiboot_info->mmap_addr, multiboot_info->mmap_length);

@@ -8,6 +8,8 @@
 #define VIRTUAL(x)  ((void*)((u64)(x) + (((u64)KERNEL_VMA)) - ((u64)KERNEL_LMA)))
 
 static inline usize virt_to_phys(void * va) {
+	return ABSOLUTE(va);
+	/*
     if ((usize) va >= KERNEL_VMA) {
         return (usize) va - KERNEL_VMA + KERNEL_LMA;
     } else if (((u8 *) MAPPED_ADDR <= (u8 *) va) &&
@@ -15,13 +17,20 @@ static inline usize virt_to_phys(void * va) {
         return (usize) va - MAPPED_ADDR;
     }
     return NOADDR;
+	*/
 }
 
 static inline void * phys_to_virt(usize pa) {
+	// 16M以下直接映射
+	if (pa < 16 * (1 << 20))
+		return (void*)pa;
+	return VIRTUAL(pa);
+	/*
     if (pa < MAPPED_SIZE) {
         return (void *) (pa + MAPPED_ADDR);
     }
     return NULL;
+	*/
 }
 
 static inline void *pfn_to_virt(pfn_t pf) {
