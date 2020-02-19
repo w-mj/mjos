@@ -1,10 +1,10 @@
 #pragma once
 #include <base.h>
 
-int cpu_installed;
-int cpu_activated;
-u64 percpu_base;
-u64 percpu_size;
+extern int cpu_installed;
+extern int cpu_activated;
+extern u64 percpu_base;
+extern u64 percpu_size;
 
 int    cpu_count();
 int    cpu_index();

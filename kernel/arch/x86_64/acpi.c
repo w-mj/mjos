@@ -1,6 +1,7 @@
 #include <acpi.h>
 #include <base.h>
 #include <boot.h>
+#include <delog.h>
 
 #define SIG_RSDP ( ((u64) 'R' <<  0) | ((u64) 'S' <<  8) \
                  | ((u64) 'D' << 16) | ((u64) ' ' << 24) \
@@ -52,8 +53,10 @@ static __INIT void parse_rsdt(acpi_rsdt_t * rsdt) {
     if (0 != calc_tbl_checksum(&(rsdt->header))) {
         return;
     }
+	_sa(rsdt, 128);
 
     int count = (rsdt->header.length - sizeof(acpi_tbl_t )) / sizeof(u32);
+	_si(count);
     for (int i = 0; i < count; ++i) {
         store_acpi_tbl((acpi_tbl_t *) phys_to_virt(rsdt->entries[i]));
     }
@@ -100,19 +103,24 @@ static __INIT acpi_rsdp_t * find_rsdp() {
 __INIT void acpi_tbl_init() {
     acpi_rsdp_t * rsdp = find_rsdp();
     if (NULL == rsdp) {
+		loge("rsdp not found");
         return;
     }
+	//_sa(rsdp, 128);
 
     if (rsdp->revision == 0) {
         // version 1
+		// length 是不属于version1的第一个字段
         u8 * end = (u8 *) &(rsdp->length);
         u8   sum = 0;
         for (u8 * p = (u8 *) rsdp; p < end; ++p) {
             sum += *p;
         }
         if (0 != sum) {
+			loge("acpi rsdp checksum err");
             return;
         }
+		// _sa(rsdp->rsdt_addr, 128);
         parse_rsdt((acpi_rsdt_t *) phys_to_virt(rsdp->rsdt_addr));
     } else {
         // version 2
@@ -122,6 +130,7 @@ __INIT void acpi_tbl_init() {
             sum += *p;
         }
         if (0 != sum) {
+			loge("acpi rsdp checksum err");
             return;
         }
         parse_xsdt((acpi_xsdt_t *) phys_to_virt(rsdp->xsdt_addr));

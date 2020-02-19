@@ -21,10 +21,7 @@ static inline usize virt_to_phys(void * va) {
 }
 
 static inline void * phys_to_virt(usize pa) {
-	// 16M以下直接映射
-	if (pa < 16 * (1 << 20))
-		return (void*)pa;
-	return VIRTUAL(pa);
+	return (void*)pa;
 	/*
     if (pa < MAPPED_SIZE) {
         return (void *) (pa + MAPPED_ADDR);

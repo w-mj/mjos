@@ -9,6 +9,7 @@
 #include <memory/kmalloc.h>
 #include <init.h>
 #include <acpi.h>
+#include <cpu.h>
 
 #define TESTTYPE(x) assert((x) / 8 == sizeof(u##x))
 void test_types(void) {
@@ -88,6 +89,38 @@ void print_sys_info(void) {
 	}
 }
 
+static __INIT void parse_madt(madt_t * tbl) {
+    u8 * end = (u8 *) tbl + tbl->header.length;
+    u8 * p   = (u8 *) tbl + sizeof(madt_t);
+    cpu_installed = 0;
+    cpu_activated = 0;
+
+    // loapic_override(tbl->loapic_addr);
+    while (p < end) {
+        acpi_subtbl_t * sub = (acpi_subtbl_t *) p;
+		logi("madt type:%d", sub->type);
+        switch (sub->type) {
+        case MADT_TYPE_IO_APIC:
+            // ioapic_dev_add((madt_ioapic_t *) sub);
+            break;
+        case MADT_TYPE_INTERRUPT_OVERRIDE:
+            // ioapic_int_override((madt_int_override_t *) sub);
+            break;
+        case MADT_TYPE_LOCAL_APIC:
+            // loapic_dev_add((madt_loapic_t *) sub);
+            break;
+        case MADT_TYPE_LOCAL_APIC_OVERRIDE:
+            // loapic_override(((madt_loapic_override_t *) sub)->address);
+            break;
+        case MADT_TYPE_LOCAL_APIC_NMI:
+            // loapic_set_nmi((madt_loapic_mni_t *) sub);
+            break;
+        default:
+            break;
+        }
+        p += sub->length;
+    }
+}
 extern u64 _bss_end;
 __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	console_initialize();
@@ -102,6 +135,7 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	idt_init();
 
 	acpi_tbl_init();
+	parse_madt(acpi_madt);
 
 	logi("multiboot info addr: %x%08x", rbx >> 32, rbx & 0xffffffff);
 	u64 kernel_code_end = (u64)&_bss_end;
