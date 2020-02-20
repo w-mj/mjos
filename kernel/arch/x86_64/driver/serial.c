@@ -27,16 +27,16 @@ u16 early_serial_base;
 static void early_serial_init(int port, int baud) {
 	unsigned char c;
 	unsigned divisor;
-	outb(0x3, port + LCR);	/* 8n1 */
-	outb(0, port + IER);	/* no interrupt */
-	outb(0, port + FCR);	/* no fifo */
-	outb(0x3, port + MCR);	/* DTR + RTS */
+	out8(0x3, port + LCR);	/* 8n1 */
+	out8(0, port + IER);	/* no interrupt */
+	out8(0, port + FCR);	/* no fifo */
+	out8(0x3, port + MCR);	/* DTR + RTS */
 	divisor	= 115200 / baud;
-	c = inb(port + LCR);
-	outb(c | DLAB, port + LCR);
-	outb(divisor & 0xff, port + DLL);
-	outb((divisor >> 8) & 0xff, port + DLH);
-	outb(c & ~DLAB, port + LCR);
+	c = in8(port + LCR);
+	out8(c | DLAB, port + LCR);
+	out8(divisor & 0xff, port + DLL);
+	out8((divisor >> 8) & 0xff, port + DLH);
+	out8(c & ~DLAB, port + LCR);
 	early_serial_base = port;
 }
 
@@ -61,20 +61,20 @@ void serial_initialize(void) {
 }
 
 int is_transmit_empty() {
-	return inb(early_serial_base + LSR) & 0x20;
+	return in8(early_serial_base + LSR) & 0x20;
 }
 
 void serial_putchar(char a) {
 	// while (is_transmit_empty() == 0);
-	outb(a, early_serial_base + TXR);
+	out8(a, early_serial_base + TXR);
 }
 
 int serial_received() {
-	return inb(early_serial_base + LSR) & 1;
+	return in8(early_serial_base + LSR) & 1;
 }
 
 char serial_getchar() {
 	// while (serial_received() == 0);
-	return inb(early_serial_base);
+	return in8(early_serial_base);
 }
 

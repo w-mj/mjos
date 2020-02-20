@@ -31,6 +31,7 @@ static __INIT u8 calc_tbl_checksum(acpi_tbl_t * header) {
 }
 
 static __INIT void store_acpi_tbl(acpi_tbl_t * tbl) {
+	// _sL(tbl);
     switch (tbl->signature) {
     case SIG_MADT:
         acpi_madt = (madt_t *) tbl;
@@ -53,7 +54,7 @@ static __INIT void parse_rsdt(acpi_rsdt_t * rsdt) {
     if (0 != calc_tbl_checksum(&(rsdt->header))) {
         return;
     }
-	_sa(rsdt, 128);
+	// _sa(rsdt, 128);
 
     int count = (rsdt->header.length - sizeof(acpi_tbl_t )) / sizeof(u32);
 	_si(count);
@@ -101,6 +102,9 @@ static __INIT acpi_rsdp_t * find_rsdp() {
 }
 
 __INIT void acpi_tbl_init() {
+	// 初始化acpi设备表
+	// acpi设备表会放在内存中标记为“不可用”的区域
+	
     acpi_rsdp_t * rsdp = find_rsdp();
     if (NULL == rsdp) {
 		loge("rsdp not found");

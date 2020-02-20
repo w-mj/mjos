@@ -1,5 +1,5 @@
 
-srclist := boot.S copy64.S atomic.S kernel.c acpi.c
+srclist := boot.S copy64.S atomic.S kernel.c
 target  := x86_64.o
 subdirs := driver init
 

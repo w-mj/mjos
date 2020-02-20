@@ -2,57 +2,57 @@
 #include <types.h>
 #define asm __asm__ 
 #define ASM asm volatile
-static inline void outb(u8 v, u16 port) {
-	asm volatile("outb %0,%1" : : "a" (v), "dN" (port));
+
+#define DEFINE_OUT(n, suffix) \
+static inline void out##n(u##n v, u16 port) {\
+	asm volatile("out"#suffix" %0,%1" : : "a" (v), "dN" (port)); \
+} 
+#define DEFINE_IN(n, suffix)\
+static inline u##n in##n(u16 port) { \
+	u8 v; \
+	asm volatile("in"#suffix" %1,%0" : "=a" (v) : "dN" (port)); \
+	return v; \
+} \
+
+DEFINE_IN (8,  b)
+DEFINE_IN (16, w)
+DEFINE_IN (32, l)
+DEFINE_OUT(8,  b)
+DEFINE_OUT(16, w)
+DEFINE_OUT(32, l)
+
+#define DEFINE_READ(n) \
+static inline u##n read##n (void * p) {\
+    return *((u##n volatile *) p); \
 }
-static inline u8 inb(u16 port) {
-	u8 v;
-	asm volatile("inb %1,%0" : "=a" (v) : "dN" (port));
-	return v;
+#define DEFINE_WRITE(n) \
+static inline void write##n (u##n x, void *p)  { \
+    *((u##n volatile*)p) = x; \
 }
 
-static inline void outw(u16 v, u16 port) {
-	asm volatile("outw %0,%1" : : "a" (v), "dN" (port));
-}
-static inline u16 inw(u16 port) {
-	u16 v;
-	asm volatile("inw %1,%0" : "=a" (v) : "dN" (port));
-	return v;
+DEFINE_READ (8) 
+DEFINE_READ (16)
+DEFINE_READ (32)
+DEFINE_READ (64)
+DEFINE_WRITE(8) 
+DEFINE_WRITE(16)
+DEFINE_WRITE(32)
+DEFINE_WRITE(64)
+
+
+#define DEFINE_READ_SEG(seg, n, suf) \
+static inline u##n rd##seg##n(addr_t addr) { \
+	u##n v; \
+	ASM("mov"#suf" %%"#seg":%1, %0" : "=q"(v):"m"(*(u##n*)addr));\
+	return v; \
 }
 
-static inline void outl(u32 v, u16 port) {
-	asm volatile("outl %0,%1" : : "a" (v), "dN" (port));
-}
-static inline u32 inl(u16 port) {
-	u32 v;
-	asm volatile("inl %1,%0" : "=a" (v) : "dN" (port));
-	return v;
-}
-
-static inline void outq(u64 v, u16 port) {
-	asm volatile("outq %0,%1" : : "a" (v), "dN" (port));
-}
-static inline u64 inq(u16 port) {
-	u64 v;
-	asm volatile("inq %1,%0" : "=a" (v) : "dN" (port));
-	return v;
-}
-
-static inline u8 rdfs8(addr_t addr) {
-	u8 v;
-	asm volatile("movb %%fs:%1,%0" : "=q" (v) : "m" (*(u8 *)addr));
-	return v;
-}
-static inline u16 rdfs16(addr_t addr) {
-	u16 v;
-	asm volatile("movw %%fs:%1,%0" : "=r" (v) : "m" (*(u16 *)addr));
-	return v;
-}
-static inline u32 rdfs32(addr_t addr) {
-	u32 v;
-	asm volatile("movl %%fs:%1,%0" : "=r" (v) : "m" (*(u32 *)addr));
-	return v;
-}
+DEFINE_READ_SEG(fs, 8,  b)
+DEFINE_READ_SEG(fs, 16, w)
+DEFINE_READ_SEG(fs, 32, l)
+DEFINE_READ_SEG(gs, 8,  b)
+DEFINE_READ_SEG(gs, 16, w)
+DEFINE_READ_SEG(gs, 32, l)
 
 static inline void wrfs8(u8 v, addr_t addr) {
 	asm volatile("movb %1,%%fs:%0" : "+m" (*(u8 *)addr) : "qi" (v));
@@ -62,22 +62,6 @@ static inline void wrfs16(u16 v, addr_t addr) {
 }
 static inline void wrfs32(u32 v, addr_t addr) {
 	asm volatile("movl %1,%%fs:%0" : "+m" (*(u32 *)addr) : "ri" (v));
-}
-
-static inline u8 rdgs8(addr_t addr) {
-	u8 v;
-	asm volatile("movb %%gs:%1,%0" : "=q" (v) : "m" (*(u8 *)addr));
-	return v;
-}
-static inline u16 rdgs16(addr_t addr) {
-	u16 v;
-	asm volatile("movw %%gs:%1,%0" : "=r" (v) : "m" (*(u16 *)addr));
-	return v;
-}
-static inline u32 rdgs32(addr_t addr) {
-	u32 v;
-	asm volatile("movl %%gs:%1,%0" : "=r" (v) : "m" (*(u32 *)addr));
-	return v;
 }
 
 static inline void wrgs8(u8 v, addr_t addr) {

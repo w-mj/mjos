@@ -5,6 +5,7 @@ extern int cpu_installed;
 extern int cpu_activated;
 extern u64 percpu_base;
 extern u64 percpu_size;
+extern void *isr_tbl[256];
 
 int    cpu_count();
 int    cpu_index();

@@ -10,6 +10,8 @@
 #include <init.h>
 #include <acpi.h>
 #include <cpu.h>
+#include <loapic.h>
+#include <ioapic.h>
 
 #define TESTTYPE(x) assert((x) / 8 == sizeof(u##x))
 void test_types(void) {
@@ -98,22 +100,21 @@ static __INIT void parse_madt(madt_t * tbl) {
     // loapic_override(tbl->loapic_addr);
     while (p < end) {
         acpi_subtbl_t * sub = (acpi_subtbl_t *) p;
-		logi("madt type:%d", sub->type);
         switch (sub->type) {
         case MADT_TYPE_IO_APIC:
-            // ioapic_dev_add((madt_ioapic_t *) sub);
+            ioapic_dev_add((madt_ioapic_t *) sub);
             break;
         case MADT_TYPE_INTERRUPT_OVERRIDE:
-            // ioapic_int_override((madt_int_override_t *) sub);
+            ioapic_int_override((madt_int_override_t *) sub);
             break;
         case MADT_TYPE_LOCAL_APIC:
-            // loapic_dev_add((madt_loapic_t *) sub);
+            loapic_dev_add((madt_loapic_t *) sub);
             break;
         case MADT_TYPE_LOCAL_APIC_OVERRIDE:
-            // loapic_override(((madt_loapic_override_t *) sub)->address);
+            loapic_override(((madt_loapic_override_t *) sub)->address);
             break;
         case MADT_TYPE_LOCAL_APIC_NMI:
-            // loapic_set_nmi((madt_loapic_mni_t *) sub);
+            loapic_set_nmi((madt_loapic_mni_t *) sub);
             break;
         default:
             break;
