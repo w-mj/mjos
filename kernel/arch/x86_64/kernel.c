@@ -123,6 +123,7 @@ static __INIT void parse_madt(madt_t * tbl) {
     }
 }
 extern u64 _bss_end;
+u64 kernel_code_end;
 __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	console_initialize();
 	serial_initialize();
@@ -138,28 +139,13 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	acpi_tbl_init();
 	parse_madt(acpi_madt);
 
-	logi("multiboot info addr: %x%08x", rbx >> 32, rbx & 0xffffffff);
-	u64 kernel_code_end = (u64)&_bss_end;
-	kernel_code_end = kernel_code_end - (u64)(KERNEL_VMA) + (u64)(KERNEL_LMA);
-	logi("kernel code end: 0x%x%08x", kernel_code_end >> 32, kernel_code_end & 0xffffffff);
+	kernel_code_end = (u64)&_bss_end;
+	kernel_code_end = (u64)per_cpu_init((void*)kernel_code_end);
 
 	page_init((void*)(u64)multiboot_info->mmap_addr, multiboot_info->mmap_length);
 	mem_pool_init();
 	kmalloc_init();
 	
-	void *p1 = kmalloc_s(4096);
-	void *p2 = kmalloc_s(4096);
-	void *p3 = kmalloc_s(4096);
-	void *p4 = kmalloc_s(4096);
-	void *p5 = kmalloc_s(4096);
-	void *p6 = kmalloc_s(4096);
-	kfree_s(4096, p1);
-	kfree_s(4096, p2);
-	kfree_s(4096, p3);
-	kfree_s(4096, p4);
-	kfree_s(4096, p5);
-	kfree_s(4096, p6);
-
 	logi("System init finish");
 	die();
 	while (1);

@@ -68,6 +68,18 @@ void cpu_init() {
     // write_msr(0xc0000080U, efer);
 }
 
+extern u64 _percpu_addr, _percpu_end;
+void *per_cpu_init(void *kernel_end) {
+	logd("per_cpu_init %d cpu(s)", cpu_count());
+	u64 size = &_percpu_end - &_percpu_addr;
+	size = ROUND_UP(size, 64);
+	for (int i = 0; i < cpu_count(); i++) {
+		memcpy(kernel_end, &_percpu_addr, (u16)size);
+		kernel_end += size;
+	}
+	return kernel_end;
+}
+
 int cpu_count() {
     return cpu_installed;
 }
