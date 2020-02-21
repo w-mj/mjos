@@ -3,6 +3,7 @@
 #include <asm.h>
 #include <delog.h>
 #include <base.h>
+#include <cpu.h>
 
 typedef struct tss {
     u32 reserved1;
@@ -34,14 +35,15 @@ typedef struct tss {
     u16 io_map_base;
 } __PACKED Tss;
 
-Tss tss;
+__PERCPU Tss tss;
 extern u64 gdt[8];
 
 void tss_init() {
-	logi("tss init");
-	logi("gdt2 0x%x%08x", h32(gdt[2]), l32(gdt[2]));
+	if (cpu_activated == 0) {
+		logi("tss init");
+	}
     u64 tss_size = (u64)sizeof(Tss);
-    u64 tss_addr = (u64)&tss;
+    u64 tss_addr = (u64)thiscpu_ptr(tss);
     memset((void *) tss_addr, 0, tss_size);
 
     u64 lower = 0UL;
@@ -55,8 +57,9 @@ void tss_init() {
 
     gdt[6] = lower;
     gdt[7] = upper;
-
-	u64 tr = (6 << 3) | 3;
+	// _si(cpu_index());
+	// die();
+	u64 tr = ((2 * cpu_index()) << 3) | 3;
 	ASM("ltr  %0"::"m" (tr));
-	logi("tss init finish");
+	// logi("tss init finish");
 }

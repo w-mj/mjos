@@ -1,6 +1,6 @@
 #pragma once
 #include <types.h>
 
-void  early_kmalloc_init(void);
+void  early_kmalloc_init(u64);
 void *early_kmalloc(size_t size);
 void early_kmalloc_depercated();

@@ -5,6 +5,6 @@ void idt_init();
 void gdt_init();
 void tss_init();
 void cpu_init();
-void *per_cpu_init(void*);
+void per_cpu_init();
 #endif
 

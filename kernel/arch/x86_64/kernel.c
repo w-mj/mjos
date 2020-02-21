@@ -12,6 +12,7 @@
 #include <cpu.h>
 #include <loapic.h>
 #include <ioapic.h>
+#include <early_kmalloc.h>
 
 #define TESTTYPE(x) assert((x) / 8 == sizeof(u##x))
 void test_types(void) {
@@ -123,7 +124,6 @@ static __INIT void parse_madt(madt_t * tbl) {
     }
 }
 extern u64 _bss_end;
-u64 kernel_code_end;
 __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	console_initialize();
 	serial_initialize();
@@ -131,16 +131,19 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	multiboot_info = (multiboot_info_t *)rbx;
 	print_sys_info();
 	test_types();
-	cpu_init();
-	gdt_init();
-	tss_init();
-	idt_init();
 
 	acpi_tbl_init();
 	parse_madt(acpi_madt);
 
-	kernel_code_end = (u64)&_bss_end;
-	kernel_code_end = (u64)per_cpu_init((void*)kernel_code_end);
+	u64 kernel_code_end = (u64)&_bss_end;
+	early_kmalloc_init(kernel_code_end);
+
+
+	cpu_init();
+	gdt_init();
+	per_cpu_init();
+	idt_init();
+	tss_init();
 
 	page_init((void*)(u64)multiboot_info->mmap_addr, multiboot_info->mmap_length);
 	mem_pool_init();

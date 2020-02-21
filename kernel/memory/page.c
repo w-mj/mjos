@@ -307,7 +307,6 @@ static void rebuild_kernel_page() {
 }
 void page_init(void *mmap_addr, u64 mmap_length) {
 	logi("init page");
-	early_kmalloc_init();
 	//list_init(&mem_free_head);
 	//ist_init(&mem_occupied_head);
 	mem_free_head.head = NOPAGE;
