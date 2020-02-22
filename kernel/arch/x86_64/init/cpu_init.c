@@ -1,10 +1,15 @@
-#include <types.h>
-#include <string.h>
 #include <base.h>
 #include <delog.h>
 #include <asm.h>
 #include <cpu.h>
 #include <early_kmalloc.h>
+#include <biosreg.h>
+#include <process.h>
+#include <boot.h>
+#include <string.h>
+
+__PERCPU ThreadDescriber *tid_prev = NULL,
+                         *tid_next = NULL;  // 在线程切换时由prev切换至next
 
 extern u64 _percpu_end, _percpu_addr;
 u64 percpu_base;
@@ -73,7 +78,7 @@ void per_cpu_init() {
 		percpu_size = &_percpu_end - &_percpu_addr;
 		percpu_size = ROUND_UP(percpu_size, 64);
 		void *percpu_area = early_kmalloc(cpu_count() * percpu_size);
-		percpu_base = (u64)(percpu_area - (void*)&_percpu_addr);
+		percpu_base = (u64)(percpu_area - (void *)&_percpu_addr);
 		for (int i = 0; i < cpu_count(); i++) {
 			memcpy(percpu_area, &_percpu_addr, percpu_size);
 			percpu_area += percpu_size;
@@ -102,3 +107,4 @@ void *calc_percpu_addr(u32 cpu, void *ptr) {
 void *calc_thiscpu_addr(void *ptr) {
 	return (void *) ((char *) ptr + read_gsbase());
 }
+

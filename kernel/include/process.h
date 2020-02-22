@@ -11,8 +11,9 @@ typedef enum {
 } TaskState;
 
 typedef struct {
-	void *ip;
-	struct biosregs regs;
+	void *rsp;
+	void *rsp0;
+	int tid;
 } ThreadDescriber;
 
 

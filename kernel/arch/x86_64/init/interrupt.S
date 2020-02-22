@@ -1,13 +1,64 @@
 #include <linkage.h>
 
+#define save_regs               \
+	pushq   %rax;               \
+    pushq   %rbx;               \
+    pushq   %rcx;               \
+    pushq   %rdx;               \
+    pushq   %rdi;               \
+    pushq   %rsi;               \
+    pushq   %rbp;               \
+    pushq   %r8;                \
+    pushq   %r9;                \
+    pushq   %r10;               \
+    pushq   %r11;               \
+    pushq   %r12;               \
+    pushq   %r13;               \
+    pushq   %r14;               \
+    pushq   %r15;
+
+#define restore_regs            \
+    popq    %r15;               \
+    popq    %r14;               \
+    popq    %r13;               \
+    popq    %r12;               \
+    popq    %r11;               \
+    popq    %r10;               \
+    popq    %r9;                \
+    popq    %r8;                \
+    popq    %rbp;               \
+    popq    %rsi;               \
+    popq    %rdi;               \
+    popq    %rdx;               \
+    popq    %rcx;               \
+    popq    %rbx;               \
+    popq    %rax;
+
 EXTERN_FUNC(interrupt_stub)
 
+// High |    SS    |
+//      |   RSP    |
+//      |  RFLAGS  |
+//      |    CS    | <-- %rsp + 0x18
+//      |   RIP    |
+//      | ERR CODE |
+// Low  |   RDI    | <-- %rsp
 
 int_err_code:
+	testl   $3, 0x18(%rsp)  // cs = rsp + 0x18 
+    jz  1f   // 判断cs的特权级别，如果为用户态则交换gsbase和kgsbase
+    swapgs 
+1:
+
 	xchgq   %rsi, 8(%rsp)  // 把rsi备份到栈里，同时取出error code
 	call   interrupt_stub
 	popq    %rdi
 	popq    %rsi
+
+	testl  $3, 0x08(%rsp)  // 弹出rdi和errcode后，cs = rsp + 8
+	jz 2f
+	swapgs
+2:
 	iretq
 
 #define with_errcode(vec) \
@@ -37,3 +88,45 @@ vec = 0
 	.balign 16
 .endr
 GLOBAL(interrupt_stub_entry_end)
+
+
+EXTERN_DATA(tid_prev)
+EXTERN_DATA(tid_next)
+
+GLOBAL_FUNC(task_switch)
+// 进行线程切换，必须在内核模式下以函数调用方式执行
+// 函数调用时栈顶为进程切换回来后要执行的地址
+// 此函数会保存当前线程上下文，再把栈构建成目标线程的中断上下文
+// 通过iret执行目标线程
+thread_switch:
+	pushfq
+	cli
+	popq    %rax
+
+    movq    %gs:(tid_prev), %rsi
+    movq    %gs:(tid_next), %rdi
+
+    movq    %cs, %r8                // r8  = cs
+    popq    %r9                     // r9  = rip
+    movq    %ss,  %r10              // r10 = ss
+    movq    %rsp, %r11              // r11 = rsp
+    pushq   %r10                    // ss
+    pushq   %r11                    // rsp
+    pushq   %rax                    // rflags
+    pushq   %r8                     // cs
+    pushq   %r9                     // rip
+    pushq   $0                      // error code
+    save_regs                       // 备份寄存器
+    movq    %rsp, (%rsi)            // 备份当前的rsp
+
+load_tid_next:
+    movq    %rdi, %gs:(tid_prev)    // 新线程中的tid_prev保存当前线程的tid
+    movq    0x00(%rdi), %rsp        // 切换上下文
+4:
+    testl   $3, 0x88(%rsp)          // (15 + 2)* 8 = 0x88
+    jz      3f
+    swapgs
+3:
+    restore_regs                    // 恢复寄存器
+	addq    $8, %rsp                // 跳过errcode
+    iretq
