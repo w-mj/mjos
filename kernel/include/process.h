@@ -9,12 +9,14 @@ typedef enum {
 	TASK_UNINTERRUPTIBLE,
 	TASK_STOPPED,
 } TaskState;
+struct __ProcessDescriber;
 
 typedef struct {
 	void *rsp;
 	void *rsp0;
-	int tid;
-} ThreadDescriber;
+	u64 cr3;
+	struct __ProcessDescriber *process;
+} __PACKED ThreadDescriber;
 
 
 typedef struct __ProcessDescriber {
@@ -24,5 +26,4 @@ typedef struct __ProcessDescriber {
 	ListEntry threads;
 	ListEntry children;
 	ListEntry sublings;
-	u64 cr3;
 } ProcessDescriber;
