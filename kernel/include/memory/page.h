@@ -55,7 +55,20 @@ typedef u64 PageTable;
 #define PT_PS(x)       ((x) & (1 << 7))
 #define PAGEPS(x)      ((x) & (0x01 << 7))
 
-
+#define MMU_NX          0x8000000000000000UL    // (NX)  No Execute
+#define MMU_ADDR        0x000ffffffffff000UL    // addr field
+#define MMU_AVL         0x0000000000000e00UL    // AVL
+#define MMU_G           0x0000000000000100UL    // (G)   Global
+#define MMU_PS          0x0000000000000080UL    // (PS)  Page Size, is it 2M PDE?
+#define MMU_D           0x0000000000000040UL    // (D)   Dirty
+#define MMU_A           0x0000000000000020UL    // (A)   Accessed
+#define MMU_PCD         0x0000000000000010UL    // (PCD) Page-level Cache Disable
+#define MMU_PWT         0x0000000000000008UL    // (PWD) Page-level WriteThough
+#define MMU_US          0x0000000000000004UL    // (U/S) User Supervisor
+#define MMU_RW          0x0000000000000002UL    // (R/W) Read Write
+#define MMU_P           0x0000000000000001UL    // (P)   Present
+#define MMU_PAT_4K      0x0000000000000080UL    // (PAT) for 4K PTE
+#define MMU_PAT_2M      0x0000000000001000UL    // (PAT) for 2M PDE
 
 bool  pglist_is_empty (PageList *list);
 void  pglist_push_head(PageList *list, pfn_t page);

@@ -216,6 +216,12 @@ static void write_new_kernel_page_table() {
 		page_table_set_entry(newmp, addr, addr + 7, true);
 		addr += PAGESIZE;
 	}
+	addr = 0xC0000000;  // 3G
+	// 3G - 4G　PCI映射区直接映射
+	while (addr < (u64)4 * (1 << 30)) {
+		page_table_set_entry(newmp, addr, addr | MMU_P | MMU_RW | MMU_US, true);
+		addr += PAGESIZE;
+	}
 	// 构建内核代码数据页表
 	// 0xffffffff81000000 -> 0x0000000001000000
 	addr = (u64)KERNEL_VMA;
@@ -416,4 +422,29 @@ pfn_t kernel_page_alloc(PageState state) {
 void kernel_page_release(pfn_t page) {
 	kernel_pages_release(page, 1);
 }
+static inline u64 mk_page_entry(pfn_t frame, u64 flags) {
+	return (frame << PAGEOFFSET) & flags;
+}
+// 创建用户页表
+// 内核空间从0xffffffff81000000 - 全F共有2G空间
+// 占用2^19个页面，2^10个二级页表项，2个三级页表项
+// 即占用四级页表的最后一项和三级页表的最后两项
+/*
+pfn_t create_user_page() {
+	pfn_t pmls[5]; // 4,3,2,1 都是正常的页表
+	pfn_t pml4 = kernel_page_alloc(PG_KERNEL);
+	pfn_t pml3_0 = kernel_page_alloc(PG_KERNEL);
+	pfn_t pml3_512 = kernel_page_alloc(PG_KERNEL);
+	pfn_t pml2 = kernel_page_alloc(PG_KERNEL);
+	pfn_t pml1 = kernel_page_alloc(PG_KERNEL);
+	
+	u64 *pml4_vir     = VIRTUAL(pml4);
+	u64 *pml3_0_vir   = VIRTUAL(pml3_0);
+	u64 *pml3_512_vir = VIRTUAL(pml3_512);
+	u64 *pml2_vir     = VIRTUAL(pml2);
+	u64 *pml1_vir     = VIRTUAL(pml1);
+	pml4_vir[0] = mk_page_entry(pml3_0, MMU_P);
 
+	return pml4;
+}
+*/

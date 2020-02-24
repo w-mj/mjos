@@ -1,4 +1,4 @@
-#include "process_struct.h"
+#include <process.h>
 #include <string.h>
 #include <list.h>
 #include <base.h>
@@ -9,6 +9,8 @@
 
 static ListEntry running_list;
 static u8 *pid_bitmap = NULL;
+
+static ProcessDescriber *current = NULL;
 
 void process_init() {
 	logd("init process");
@@ -29,11 +31,32 @@ static u16 find_usable_pid() {
 	return (u16)-1;
 }
 
-void create_process() {
+ThreadDescriber *create_thread(ProcessDescriber *process, void *main) {
+	ThreadDescriber *thread = kmalloc_s(sizeof(ThreadDescriber));
+	pfn_t stack = kernel_page_alloc(PG_NORMAL); 
+}
+
+void create_process(ProcessDescriber *parent, ProcessType type, void *main) {
 	u16 pid = find_usable_pid();
 	if (pid == (u16)-1) {
 		loge("no usable pid.");
 		die();
+	}
+
+	ProcessDescriber *pd = kmalloc_s(sizeof(ProcessDescriber));
+	pd->pid = pid;
+	pd->type = type;
+	pd->parent = current;
+	list_init(&pd->threads);
+	list_init(&pd->children);
+	list_init(&pd->sublings);
+	if (parent != NULL) {
+		list_add_tail(&pd->sublings, &parent->children);
+	}
+
+	// 用户进程需要复制页表
+	if (type == PROCESS_USER) {
+		// TODO: 创建用户进程页表
 	}
 }
 
