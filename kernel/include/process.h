@@ -20,6 +20,8 @@ struct __ProcessDescriber;
 typedef struct {
 	void *rsp;
 	void *rsp0;
+	// 同一个进程的所有线程的cr3都相同
+	// 这里冗余的cr3为了在汇编语言里寻址方便，以后可以优化掉
 	u64 cr3;
 	ThreadState state;
 	struct __ProcessDescriber *process;
@@ -33,4 +35,7 @@ typedef struct __ProcessDescriber {
 	ListEntry threads;
 	ListEntry children;  // list head
 	ListEntry sublings;  // list entry
+	u64 cr3;
 } ProcessDescriber;
+
+extern ProcessDescriber *current;

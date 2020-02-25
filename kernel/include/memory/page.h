@@ -5,11 +5,11 @@
 
 typedef enum __PageState {
 	PG_AVAILABLE,
-	PG_KERNEL,  // 内核页框，不会被换出
-	PG_DMA,
+	PG_KERNEL,  // 从直接映射区间分配页框
+	PG_DMA,     // 从DMA区间分配页框
 	PG_RESERVE,
 	PG_POOL,
-	PG_NORMAL,
+	PG_NORMAL,  // 从自由映射区间分配页框
 } PageState;
 
 #define NOPAGE (u32)(-1)
@@ -46,6 +46,11 @@ pfn_t kernel_pages_alloc(int n, PageState state);
 // 通过虚拟地址释放页框
 void kernel_page_release(pfn_t);
 void kernel_pages_release(pfn_t p, int n);
+
+// 通过页表转换找到虚拟地址对应的物理地址
+// PML 第四级页表的物理地址
+// vir 虚拟地址
+u64 page_translate(u64 pml, u64 vir);
 
 typedef u64 PageTable;
 

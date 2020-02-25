@@ -34,6 +34,7 @@ static u16 find_usable_pid() {
 ThreadDescriber *create_thread(ProcessDescriber *process, void *main) {
 	ThreadDescriber *thread = kmalloc_s(sizeof(ThreadDescriber));
 	pfn_t stack = kernel_page_alloc(PG_NORMAL); 
+	return NULL;
 }
 
 void create_process(ProcessDescriber *parent, ProcessType type, void *main) {

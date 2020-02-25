@@ -14,6 +14,7 @@ static int mem_frame_cnt = 0;  //  总页框数量
 //static ListEntry mem_free_head;  // 空闲页框列表头
 //static ListEntry mem_occupied_head;  // 已被占用页框列表头
 static PageList mem_free_head, mem_occupied_head;
+static PageList mem_map_head;  // 可以自由映射的页框
 static int mem_free_cnt = 0;
 static int mem_occupied_cnt = 0;
 
@@ -100,7 +101,7 @@ void pglist_free_all(PageList *list) {
 // 通过页表转换找到虚拟地址对应的物理地址
 // PML 第四级页表的物理地址
 // vir 虚拟地址
-u64 virtual_to_physics(u64 pml, u64 vir) {
+u64 page_translate(u64 pml, u64 vir) {
 	int level = 4;
 	while (level >= 1) {
 		u64 *pml_addr = (u64 *)VIRTUAL(pml);
@@ -128,18 +129,21 @@ pfn_t frame_alloc(PageState state) {
 		return 0;
 	}
 	frame_alloc_cnt++;
-	pfn_t free_frame = mem_free_head.tail;
+	pfn_t free_frame = NOPAGE;
+	assert(state == PG_KERNEL || state == PG_NORMAL || state == PG_POOL);
+	if (state == PG_KERNEL || state == PG_POOL) {
+		free_frame = pglist_pop_tail(&mem_free_head);
+	} else if (state == PG_NORMAL) {
+		free_frame = pglist_pop_tail(&mem_map_head);
+	}
 	assert(free_frame != NOPAGE);
 	// _sx(free_frame);
 	Page *frame_entry = &page_arr[free_frame];
 	// frame_entry->count++;
 	assert(frame_entry->state == PG_AVAILABLE);
 	frame_entry->state = state;
-	pglist_remove(&mem_free_head, free_frame);
-	// list_remove(free_frame);
-	// list_add(free_frame, &mem_occupied_head);
 	mem_free_cnt--;
-	if (state == PG_KERNEL) {
+	if (state == PG_KERNEL || state == PG_NORMAL) {
 		mem_occupied_cnt++;
 		pglist_push_head(&mem_occupied_head, free_frame);
 	}
@@ -160,9 +164,17 @@ void frame_release(pfn_t fn) {
 	if (frame->state == PG_KERNEL) {
 		mem_occupied_cnt--;
 		pglist_remove(&mem_occupied_head, fn);
+		frame->state = PG_AVAILABLE;
+		pglist_push_head(&mem_free_head, fn);
+	} else if (frame->state == PG_NORMAL) {
+		mem_occupied_cnt--;
+		pglist_remove(&mem_occupied_head, fn);
+		frame->state = PG_AVAILABLE;
+		pglist_push_head(&mem_map_head, fn);
+	} else if (frame->state == PG_POOL) {
+		frame->state = PG_AVAILABLE;
+		pglist_push_head(&mem_free_head, fn);
 	}
-	frame->state = PG_AVAILABLE;
-	pglist_push_head(&mem_free_head, fn);
 	// list_remove(&frame->next);
 	// list_add(&frame->next, &mem_free_head);
 	mem_free_cnt++;
@@ -215,7 +227,6 @@ void *find_virtual_addr(u64 pml4) {
 	int pml_cursor[5] = {0};
 	u64 *pml_addr[5] = {0};
 	pml_addr[level] = phys_to_virt(pml4);
-	u64 addr = 0;
 	do {
 		// 初始化4级页表的虚拟地址
 		while (level > 1) {
@@ -255,8 +266,6 @@ void *find_virtual_addr(u64 pml4) {
 }
 
 
-#define logadd(x) \
-	logd("vir %llx psy %llx abs %llx", (x), virtual_to_physics(newmp, (x)), ABSOLUTE(x));
 
 static void write_new_kernel_page_table() {
 	u64 newmp = frame_alloc(PG_KERNEL) <<
@@ -271,7 +280,7 @@ static void write_new_kernel_page_table() {
 		page_table_set_entry(newmp, addr, addr + 7, true);
 		addr += PAGESIZE;
 	}
-	addr = 0xC0000000;  // 3G
+	addr = 0xbfee0000;  // 3G
 	// 3G - 4G　PCI映射区直接映射
 	while (addr < (u64)4 * (1 << 30)) {
 		page_table_set_entry(newmp, addr, addr | MMU_P | MMU_RW | MMU_US, true);
@@ -286,12 +295,6 @@ static void write_new_kernel_page_table() {
 	}
 	page_table_set_entry(newmp, (u64)VIRTUAL(newmp), newmp + 7, true);
 	logd("new kernel page table occupies %d frames", frame_alloc_cnt);
-	// logd("vir %d psy %d", 0x1000, virtual_to_physics(newmp, 0x1000));
-	// logadd(VIRTUAL(newmp));
-	// logadd(0xffffffff8b000007);
-	// logadd(0xffffffff81019180);
-	// logadd(0xffffffff81000000);
-	// logadd(0xB8000);
 	write_cr3(newmp);
 	kernel_pml4 = newmp;
 	// ASM("int $3");
@@ -374,6 +377,8 @@ void page_init(void *mmap_addr, u64 mmap_length) {
 	mem_free_head.tail = NOPAGE;
 	mem_occupied_head.head = NOPAGE;
 	mem_occupied_head.tail = NOPAGE;
+	mem_map_head.head = NOPAGE;
+	mem_map_head.tail = NOPAGE;
 	mem_free_cnt = 0;
 	mem_occupied_cnt = 0;
 	multiboot_memory_map_t *mmap;
@@ -391,6 +396,9 @@ void page_init(void *mmap_addr, u64 mmap_length) {
 	// 	page_arr[i].state = RESERVE;
 	int ava_frame = 0;
 	u64 last_end = 0;
+
+	int kernel_frame = 0;
+	int map_frame = 0;
 	// 再次遍历内存表，初始化页框表
 	for (mmap = (multiboot_memory_map_t *)mmap_addr;
 	        (u64) mmap < (u64)mmap_addr + mmap_length;
@@ -429,12 +437,21 @@ void page_init(void *mmap_addr, u64 mmap_length) {
 			} else {
 				page_arr[i].state = PG_AVAILABLE;
 				ava_frame++;
-				pglist_push_head(&mem_free_head, i);
+				if (IS_PHYS_KERNEL((u64)i << PAGEOFFSET)) {
+					assert(((u64)i << PAGEOFFSET) < (u64)2 * (1 << 30));
+					pglist_push_head(&mem_free_head, i);
+					kernel_frame++;
+				} else {
+					pglist_push_head(&mem_map_head, i);
+					map_frame++;
+				}
 				mem_free_cnt++;
 				// list_add(&page_arr[i].next, &mem_free_head);
 			}
 		}
 	}
+	_si(kernel_frame);
+	_si(map_frame);
 	_si(mem_free_head.head);
 	_si(mem_free_head.tail);
 	logi("Build frame pool %d available, %d frames", ava_frame, mem_frame_cnt);
@@ -460,7 +477,6 @@ pfn_t kernel_pages_alloc(int n, PageState state) {
 
 void kernel_pages_release(pfn_t page, int n) {
 	logi("release kernel %d page pfn: %d", n, page);
-	// u64 frame = virtual_to_physics(kernel_pml4, (u64)addr);
 	while (n--) {
 		void *addr = VIRTUAL(page << PAGEOFFSET);
 		// Page *f = page_arr + frame;

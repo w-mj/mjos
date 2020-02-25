@@ -104,7 +104,7 @@ static __INIT acpi_rsdp_t * find_rsdp() {
 __INIT void acpi_tbl_init() {
 	// 初始化acpi设备表
 	// acpi设备表会放在内存中标记为“不可用”的区域
-	
+	logd("acpi tbl init");
     acpi_rsdp_t * rsdp = find_rsdp();
     if (NULL == rsdp) {
 		loge("rsdp not found");
@@ -139,4 +139,5 @@ __INIT void acpi_tbl_init() {
         }
         parse_xsdt((acpi_xsdt_t *) phys_to_virt(rsdp->xsdt_addr));
     }
+	logd("acpi tbl init finish");
 }

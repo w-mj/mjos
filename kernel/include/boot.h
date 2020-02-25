@@ -2,38 +2,49 @@
 #include <types.h>
 #include <multiboot.h>
 #include <arch.h>
+#include <process.h>
+#include <delog.h>
 
 
 #define ABSOLUTE(x) (((u64)(x) - ((u64)KERNEL_VMA)) + ((u64)KERNEL_LMA))
 #define VIRTUAL(x)  ((void*)((u64)(x) + (((u64)KERNEL_VMA)) - ((u64)KERNEL_LMA)))
 
+#define KERNEL_SIZE ((-1) - KERNEL_VMA + 1)   // 内核空间大小
+#define IS_VIRT_KERNEL(x) ((x) >= KERNEL_VMA)
+#define IS_VIRT_DMA(x)    ((x) <  16 * (1 << 20))
+#define IS_VIRT_PCI(x)    ((x) >= (u64)0xbfee0000 && (x) < (u64)4 * (1 << 30))
+#define IS_PHYS_KERNEL(x) (((x) & (KERNEL_VMA - KERNEL_LMA)) == 0)
+#define IS_PHYS_DMA(x) IS_VIRT_DMA(x)
+#define IS_PHYS_PCI(x) IS_VIRT_PCI(x)
+
+u64 page_translate(u64, u64);
 static inline usize virt_to_phys(void * va) {
 	u64 v = (u64)va;
-	if (v >= KERNEL_VMA) {
+	if (IS_VIRT_KERNEL(v)) {
 		return ABSOLUTE(v);
-	} else if (v < 16 * (1 << 20)) {
+	} else if (IS_VIRT_DMA(v)) {
 		return v;
-	} else if (v >= (u64)3 * (1 << 30) && v < (u64)4 * (1 << 30)) {
+	} else if (IS_VIRT_PCI(v)) {
 		return v;
 	}
-	// TODO: 通过页表转换取物理地址
-	return 0;
-
+	assert(current != NULL);
+	return page_translate(current->cr3, v);
 }
 
 static inline void * phys_to_virt(usize pa) {
-	if (pa < 16 * (1 << 20)) {
+	if (IS_PHYS_DMA(pa)) {
 		// DMA 直接映射
 		return (void*)pa;
-	} else if (pa < KERNEL_LMA + ((-1) - KERNEL_VMA)) {
+	} else if (IS_PHYS_KERNEL(pa)) {
 		// 16M ~ 16M + 2G 内核偏移映射
 		return VIRTUAL(pa);
 	}
-	if (pa >= (u64)3 * (1 << 30) && pa < (u64)4 * (1 << 30)) {
+	if (IS_PHYS_PCI(pa)) {
 		// 3G ~ 4G PCI 直接映射
 		return (void *)pa;
 	}
 	// 自由页表映射区，不能直接找到虚拟地址
+	assert(0);
 	return NULL;
 }
 
