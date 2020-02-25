@@ -46,6 +46,10 @@ pfn_t kernel_pages_alloc(int n, PageState state);
 // 通过虚拟地址释放页框
 void kernel_page_release(pfn_t);
 void kernel_pages_release(pfn_t p, int n);
+// 分配一个自由映射页，返回映射好的虚拟地址
+// pn: 返回分配的物理页框
+void *normal_page_alloc(pfn_t *pn);
+void normal_page_release(void *addr);
 
 // 通过页表转换找到虚拟地址对应的物理地址
 // PML 第四级页表的物理地址

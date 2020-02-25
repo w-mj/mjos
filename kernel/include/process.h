@@ -38,4 +38,4 @@ typedef struct __ProcessDescriber {
 	u64 cr3;
 } ProcessDescriber;
 
-extern ProcessDescriber *current;
+extern ThreadDescriber *current;

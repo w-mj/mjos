@@ -4,13 +4,14 @@
 #include <base.h>
 #include <delog.h>
 #include <asm.h>
+#include <init.h>
 #include <memory/page.h>
 #include <memory/kmalloc.h>
 
 static ListEntry running_list;
 static u8 *pid_bitmap = NULL;
 
-static ProcessDescriber *current = NULL;
+ThreadDescriber *current = NULL;
 
 void process_init() {
 	logd("init process");
@@ -33,8 +34,14 @@ static u16 find_usable_pid() {
 
 ThreadDescriber *create_thread(ProcessDescriber *process, void *main) {
 	ThreadDescriber *thread = kmalloc_s(sizeof(ThreadDescriber));
-	pfn_t stack = kernel_page_alloc(PG_NORMAL); 
-	return NULL;
+	current = thread;
+	void *stack = normal_page_alloc(NULL);  
+	stack = stack + PAGESIZE;  // stack 指向栈的尾部，向下增长
+	thread->rsp = init_thread_stack(stack, main);
+	thread->rsp0 = thread->rsp;
+	thread->cr3 = process->cr3;
+	// TODO: 将新进程加入调度队列
+	return thread;
 }
 
 void create_process(ProcessDescriber *parent, ProcessType type, void *main) {
@@ -47,7 +54,7 @@ void create_process(ProcessDescriber *parent, ProcessType type, void *main) {
 	ProcessDescriber *pd = kmalloc_s(sizeof(ProcessDescriber));
 	pd->pid = pid;
 	pd->type = type;
-	pd->parent = current;
+	pd->parent = parent;
 	list_init(&pd->threads);
 	list_init(&pd->children);
 	list_init(&pd->sublings);

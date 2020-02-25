@@ -460,6 +460,7 @@ void page_init(void *mmap_addr, u64 mmap_length) {
 }
 
 pfn_t kernel_pages_alloc(int n, PageState state) {
+	assert(state == PG_KERNEL || state == PG_POOL);
 	// 分配n个页面，此处应该加锁，后期使用buddy优化
 	pfn_t p = frame_alloc(state);
 	logd("alloc kernel %d page pfn:%d", n, p);
@@ -492,6 +493,20 @@ pfn_t kernel_page_alloc(PageState state) {
 
 void kernel_page_release(pfn_t page) {
 	kernel_pages_release(page, 1);
+}
+
+void *normal_page_alloc(pfn_t *pn) {
+	pfn_t t = frame_alloc(PG_NORMAL);
+	void *vir = find_virtual_addr(current->cr3);
+	page_table_set_entry(current->cr3, (u64)vir, (t << PAGEOFFSET) | MMU_P | MMU_RW | MMU_US, true);
+	if (pn != NULL)
+		*pn = t;
+	return vir;
+}
+
+void normal_page_release(void *addr) {
+	pfn_t fn = virt_to_pfn(addr);
+	frame_release(fn);
 }
 static inline u64 mk_page_entry(pfn_t frame, u64 flags) {
 	return (frame << PAGEOFFSET) & flags;

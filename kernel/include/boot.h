@@ -49,11 +49,11 @@ static inline void * phys_to_virt(usize pa) {
 }
 
 static inline void *pfn_to_virt(pfn_t pf) {
-	return VIRTUAL(pf << PAGEOFFSET);
+	return phys_to_virt(pf << PAGEOFFSET);
 }
 
 static inline pfn_t virt_to_pfn(void *addr) {
-	return ABSOLUTE(addr) >> PAGEOFFSET;
+	return virt_to_phys(addr) >> PAGEOFFSET;
 }
 
 

@@ -132,3 +132,25 @@ load_tid_next:
     restore_regs                    // 恢复寄存器
 	addq    $8, %rsp                // 跳过errcode
     iretq
+
+
+// 初始化线程栈，传入栈地址和线程的入口地址
+// void *init_thread_stack(void *sp, void *main)
+GLOBAL_FUNC(init_thread_stack)
+init_thread_stack:
+	movq  %rsp, %r11  // 备份当前栈指针
+	movq  %rdi, %rsp  // 设置栈指针
+	movq  %ss,  %r10  // r10 = ss
+	movq  %cs,  %r9   // r9  = cs
+
+	pushq  %r10   // ss
+	pushq  %rdi   // rsp
+	pushfq        // rflags
+	pushq  %r9    // cs
+	pushq  %rsi   // ip = main
+	pushq  $0     // errcode
+	save_regs     // regs
+	movq  %rsp, %rax  // 当前栈指针作为返回值
+
+	movq  %r11, %rsp  // 恢复栈指针
+	retq  
