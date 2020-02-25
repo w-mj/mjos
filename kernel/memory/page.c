@@ -201,11 +201,66 @@ void page_table_set_entry(u64 pmltop, u64 page_table_entry, u64 value, bool auto
 	u16 pml1i = PMLOFFSET(page_table_entry, 1);
 	pml[pml1i] = value;
 }
+
+static inline u64 mk_virtual(int *frames) {
+	return ((u64)frames[4] << PML4TE_SHIFT) + \
+	       ((u64)frames[3] << PDPTE_SHIFT)  + \
+	       ((u64)frames[2] << PDTE_SHIFT)   + \
+	       ((u64)frames[1] << PTE_SHIFT);
+}
+// 找到一个空闲的虚拟地址
+// 硬件映射地址已经被标记为直接映射，可以大胆遍历
+void *find_virtual_addr(u64 pml4) {
+	int level = 4;
+	int pml_cursor[5] = {0};
+	u64 *pml_addr[5] = {0};
+	pml_addr[level] = phys_to_virt(pml4);
+	u64 addr = 0;
+	do {
+		// 初始化4级页表的虚拟地址
+		while (level > 1) {
+			// 当前等级的页表项
+			u64 entry = pml_addr[level][pml_cursor[level]];
+			if (! (entry & MMU_P)) {
+				u64 addr = mk_virtual(pml_cursor);
+				if (addr < KERNEL_VMA)
+					return (void*)addr;
+				return NULL;
+			}
+			pml_addr[level - 1] = phys_to_virt(entry & MMU_ADDR);
+			level--;
+		}
+		// 遍历最低级页表，此处level == 1
+		while (pml_cursor[level] < 512) {
+			u64 entry = pml_addr[level][pml_cursor[level]];
+			if (! (entry & MMU_P)) {
+				u64 addr = mk_virtual(pml_cursor);
+				if (addr < KERNEL_VMA)
+					return (void*)addr;
+				return NULL;
+			}
+			pml_cursor[level]++;
+		}
+		while (level < 4 && pml_cursor[level] == 512) {
+			// 向上升级
+			pml_cursor[level] = 0;
+			level++;
+			pml_cursor[level]++;
+			if (level == 4 && pml_cursor[4] == 512) {
+				return NULL;
+			}
+		}
+	} while (true);
+	return NULL;
+}
+
+
 #define logadd(x) \
 	logd("vir %llx psy %llx abs %llx", (x), virtual_to_physics(newmp, (x)), ABSOLUTE(x));
 
 static void write_new_kernel_page_table() {
-	u64 newmp = frame_alloc(PG_KERNEL) << PAGEOFFSET;  // 新的四级页表地址（页框号是物理地址）
+	u64 newmp = frame_alloc(PG_KERNEL) <<
+	            PAGEOFFSET;  // 新的四级页表地址（页框号是物理地址）
 	_sL(newmp);
 	memset((u64 *)VIRTUAL(newmp), 0, PAGESIZE);
 	_sL(VIRTUAL(newmp));
@@ -257,7 +312,7 @@ static void rebuild_kernel_page() {
 	kernel_pml4 = (u64)early_pms;  // 内核4级页表地址
 	void *addr;
 	assert(mem_free_head.tail != NOPAGE);
-	for (addr = (void*)KERNEL_VMA; addr < (void *)heap_end; addr += PAGESIZE) {
+	for (addr = (void *)KERNEL_VMA; addr < (void *)heap_end; addr += PAGESIZE) {
 		if (addr >= early_pms && addr < early_pme) {
 			// 这个页是内核临时页表页
 			pcnt++;
@@ -437,7 +492,7 @@ pfn_t create_user_page() {
 	pfn_t pml3_512 = kernel_page_alloc(PG_KERNEL);
 	pfn_t pml2 = kernel_page_alloc(PG_KERNEL);
 	pfn_t pml1 = kernel_page_alloc(PG_KERNEL);
-	
+
 	u64 *pml4_vir     = VIRTUAL(pml4);
 	u64 *pml3_0_vir   = VIRTUAL(pml3_0);
 	u64 *pml3_512_vir = VIRTUAL(pml3_512);

@@ -55,6 +55,11 @@ typedef u64 PageTable;
 #define PT_PS(x)       ((x) & (1 << 7))
 #define PAGEPS(x)      ((x) & (0x01 << 7))
 
+#define PML4TE_SHIFT     39                     // page-map level-4 table
+#define PDPTE_SHIFT      30                     // page-directory-pointer table
+#define PDTE_SHIFT       21                     // page-directory table
+#define PTE_SHIFT        12                     // page table
+
 #define MMU_NX          0x8000000000000000UL    // (NX)  No Execute
 #define MMU_ADDR        0x000ffffffffff000UL    // addr field
 #define MMU_AVL         0x0000000000000e00UL    // AVL
@@ -78,3 +83,7 @@ pfn_t pglist_pop_tail (PageList *list);
 void  pglist_remove   (PageList *list, pfn_t page);
 void  pglist_free_all (PageList *list);
 
+// 在页表中找到一个未被映射的虚拟地址
+// pml4:4级页表的物理地址
+// ret：空闲的虚拟地址
+void *find_virtual_addr(u64 pml4);
