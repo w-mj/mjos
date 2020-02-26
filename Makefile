@@ -45,9 +45,9 @@ iso: build
 	cp $(BINFILE) $(ISODIR)/boot/$(NAME).bin
 	grub-mkrescue -o $(ISOFILE) $(ISODIR) 
 
-QEMUFLAGS := -m 16385 -smp 4 -cdrom $(ISOFILE) -vga vmware -serial stdio -gdb tcp::4444 -boot order=d
+QEMUFLAGS := -m 16385 -smp 4 -cdrom $(ISOFILE) -vga vmware -serial stdio -boot order=d
 run: iso
 	qemu-system-x86_64 $(QEMUFLAGS)
 
 debug: iso
-	qemu-system-x86_64 -S $(QEMUFLAGS)
+	qemu-system-x86_64 -S -gdb tcp::4444 $(QEMUFLAGS)

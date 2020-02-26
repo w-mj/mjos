@@ -31,7 +31,7 @@ typedef struct {
 
 
 typedef struct __ProcessDescriber {
-	u16 pid;   // 0~32767
+	pid_t pid;   // 0~32767
 	ProcessType type;
 	struct __ProcessDescriber *parent;
 	ListEntry threads;
@@ -39,6 +39,13 @@ typedef struct __ProcessDescriber {
 	ListEntry sublings;  // list entry
 	u64 cr3;
 	int threads_cnt;
+	ListEntry process_list_entry;
 } ProcessDescriber;
 
 extern ThreadDescriber *current;
+
+
+void process_init();
+pid_t create_process(ProcessDescriber *parent, ProcessType type, void *main);
+ThreadDescriber *create_thread(ProcessDescriber *process, void *main);
+ProcessDescriber *get_process(pid_t pid);

@@ -13,6 +13,8 @@
 #include <loapic.h>
 #include <ioapic.h>
 #include <early_kmalloc.h>
+#include <process/process.h>
+#include <process/scheduler.h>
 
 #define TESTTYPE(x) assert((x) / 8 == sizeof(u##x))
 void test_types(void) {
@@ -123,6 +125,13 @@ static __INIT void parse_madt(madt_t * tbl) {
         p += sub->length;
     }
 }
+
+void init_main() {
+	logi("start init process");
+	while (1);
+}
+
+void load_tid_next(ThreadDescriber *);
 extern u64 _bss_end;
 __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	console_initialize();
@@ -148,8 +157,22 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	page_init((void*)(u64)multiboot_info->mmap_addr, multiboot_info->mmap_length);
 	mem_pool_init();
 	kmalloc_init();
+
+	process_init();
+	scheduler_init();
 	
 	logi("System init finish");
+
+	pid_t pid = create_process(NULL, PROCESS_KERNEL, init_main);
+	ProcessDescriber *pd = get_process(pid);
+	assert(pd->cr3 == read_cr3());
+	ListEntry *thread_list_entry = pd->threads.next;
+	assert(thread_list_entry != &pd->threads);
+	ThreadDescriber *thread = list_entry(thread_list_entry, ThreadDescriber, next);
+	assert(thread->process == pd);
+	load_tid_next(thread);
 	die();
 	while (1);
 }
+
+

@@ -6,8 +6,9 @@ typedef struct _ListEntry {
 } ListEntry;
 
 #define list_entry(ptr, type, member) container_of(ptr, type, member)
+
 #define foreach(c, list) \
-	for(c = &list.next; c != &list; c = c->next)
+	for(c = list.next; c != &list; c = c->next)
 
 #define LIST_INIT ((ListEntry){NULL, NULL})
 

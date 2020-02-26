@@ -202,7 +202,7 @@ void page_table_set_entry(u64 pmltop, u64 page_table_entry, u64 value, bool auto
 				// 自动分配页框
 				pmle = pml[pmli] = (frame_alloc(PG_KERNEL) << PAGEOFFSET) + 7;
 				// logd("auto alloc frame %llx %llx", VIRTUAL(pmle), pmle);
-				page_table_set_entry(pmltop, heap_end, pmle, true);
+				page_table_set_entry(pmltop, (u64)VIRTUAL(pmle), pmle, true);
 				heap_end += PAGESIZE;
 			}
 		}
@@ -497,8 +497,10 @@ void kernel_page_release(pfn_t page) {
 
 void *normal_page_alloc(pfn_t *pn) {
 	pfn_t t = frame_alloc(PG_NORMAL);
-	void *vir = find_virtual_addr(current->cr3);
-	page_table_set_entry(current->cr3, (u64)vir, (t << PAGEOFFSET) | MMU_P | MMU_RW | MMU_US, true);
+	void *vir = find_virtual_addr(read_cr3());
+	// _sL(vir);
+	assert(kernel_pml4 == read_cr3());
+	page_table_set_entry(read_cr3(), (u64)vir, (t << PAGEOFFSET) | MMU_P | MMU_RW | MMU_US, true);
 	if (pn != NULL)
 		*pn = t;
 	return vir;

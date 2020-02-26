@@ -123,7 +123,7 @@ thread_switch:
 load_tid_next:
     movq    %rdi, %gs:(tid_prev)    // 新线程中的tid_prev保存当前线程的tid
     movq    0x00(%rdi), %rsp        // 切换上下文
-	movq    0xa0(%rdi), %rax        // rax = cr3
+	movq    0x10(%rdi), %rax        // rax = cr3
 	movq    %rax, %cr3              // 换新线程页表
 4:
     testl   $3, 0x88(%rsp)          // (15 + 2)* 8 = 0x88

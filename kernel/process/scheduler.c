@@ -4,7 +4,11 @@
 #include <delog.h>
 
 __PERCPU ThreadDescriber *current = NULL;
-static ListEntry running_threads = LIST_INIT;
+static ListEntry running_threads;
+
+void scheduler_init() {
+	list_init(&running_threads);
+}
 
 void add_thread_to_running(ThreadDescriber *thread) {
 	thread->state = THREAD_RUNNING;
