@@ -1,5 +1,5 @@
 srclist := init.c biosreg.c bioscall.S copy16.S
-target  := realmode.o
+target  := realmode.obj
 subdirs := 
 
 objlist := $(addsuffix .o, $(srclist))

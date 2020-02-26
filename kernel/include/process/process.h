@@ -4,10 +4,10 @@
 #include <biosreg.h>
 
 typedef enum {
-	THEREAD_RUNNING,
-	THEREAD_INTERRUPTIBLE,
-	THEREAD_UNINTERRUPTIBLE,
-	THEREAD_STOPPED,
+	THREAD_RUNNING,
+	THREAD_INTERRUPTIBLE,
+	THREAD_UNINTERRUPTIBLE,
+	THREAD_STOPPED,
 } ThreadState;
 
 typedef enum {
@@ -25,7 +25,9 @@ typedef struct {
 	u64 cr3;
 	ThreadState state;
 	struct __ProcessDescriber *process;
-} __PACKED ThreadDescriber;
+	ListEntry next;   // 用于调度队列
+	int tid;
+} ThreadDescriber;
 
 
 typedef struct __ProcessDescriber {
@@ -36,6 +38,7 @@ typedef struct __ProcessDescriber {
 	ListEntry children;  // list head
 	ListEntry sublings;  // list entry
 	u64 cr3;
+	int threads_cnt;
 } ProcessDescriber;
 
 extern ThreadDescriber *current;

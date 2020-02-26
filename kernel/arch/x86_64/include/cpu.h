@@ -16,3 +16,8 @@ void *calc_thiscpu_addr(void * ptr);
 #define thiscpu_ptr(var)    ((TYPE(&var)) calc_thiscpu_addr(&var))
 #define percpu_var(i, var)  (* percpu_ptr(i, var))
 #define thiscpu_var(var)    (* thiscpu_ptr(var))
+
+#include <process/process.h>
+void prepare_switch(ThreadDescriber *prev, ThreadDescriber *next);
+// 初始化线程栈，传入栈地址和线程的入口地址
+void *init_thread_stack(void *sp, void *main);

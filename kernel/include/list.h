@@ -49,7 +49,11 @@ static inline void list_insert_before(ListEntry *x, ListEntry *y) {
 }
 
 
-static inline void list_pop_head(ListEntry *head) {
-	if (head->next != head)
+static inline ListEntry *list_pop_head(ListEntry *head) {
+	ListEntry *to_return = head->next;
+	if (head->next != head) {
 		list_remove(head->next);
+		return to_return;
+	}
+	return NULL;
 }

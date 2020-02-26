@@ -4,7 +4,7 @@
 #include <cpu.h>
 #include <early_kmalloc.h>
 #include <biosreg.h>
-#include <process.h>
+#include <process/process.h>
 #include <boot.h>
 #include <string.h>
 
@@ -53,7 +53,7 @@ void cpu_init() {
 		memcpy(&vendor_id[4], &d, sizeof(u32));
 		memcpy(&vendor_id[8], &c, sizeof(u32));
 		vendor_id[12] = 0;
-		logi("cpu vecdor %s", vendor_id);
+		logi("cpu vendor %s", vendor_id);
 		a = 0x80000008;
 		cpuid(&a, &b, &c, &d);
 		logi("Physical address bits %d", a & 0xff);
@@ -108,3 +108,8 @@ void *calc_thiscpu_addr(void *ptr) {
 	return (void *) ((char *) ptr + read_gsbase());
 }
 
+
+void prepare_switch(ThreadDescriber *prev, ThreadDescriber *next) {
+	thiscpu_var(tid_prev) = prev;
+	thiscpu_var(tid_next) = next;
+}

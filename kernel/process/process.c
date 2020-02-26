@@ -1,23 +1,21 @@
-#include <process.h>
 #include <string.h>
 #include <list.h>
 #include <base.h>
 #include <delog.h>
 #include <asm.h>
-#include <init.h>
+#include <cpu.h>
 #include <memory/page.h>
 #include <memory/kmalloc.h>
+#include <process/schedule.h>
+#include <process/process.h>
 
-static ListEntry running_list;
 static u8 *pid_bitmap = NULL;
 
-ThreadDescriber *current = NULL;
 
 void process_init() {
 	logd("init process");
 	pid_bitmap = pfn_to_virt(kernel_page_alloc(PG_KERNEL));
 	memset(pid_bitmap, 0, PAGESIZE);
-	list_init(&running_list);
 }
 
 static u16 find_usable_pid() {
@@ -40,7 +38,10 @@ ThreadDescriber *create_thread(ProcessDescriber *process, void *main) {
 	thread->rsp = init_thread_stack(stack, main);
 	thread->rsp0 = thread->rsp;
 	thread->cr3 = process->cr3;
-	// TODO: 将新进程加入调度队列
+	thread->tid = process->threads_cnt;
+	process->threads_cnt++;
+	list_init(&thread->next);
+	add_thread_to_running(thread);
 	return thread;
 }
 
@@ -55,6 +56,7 @@ void create_process(ProcessDescriber *parent, ProcessType type, void *main) {
 	pd->pid = pid;
 	pd->type = type;
 	pd->parent = parent;
+	pd->threads_cnt = 0;
 	list_init(&pd->threads);
 	list_init(&pd->children);
 	list_init(&pd->sublings);
@@ -65,6 +67,9 @@ void create_process(ProcessDescriber *parent, ProcessType type, void *main) {
 	// 用户进程需要复制页表
 	if (type == PROCESS_USER) {
 		// TODO: 创建用户进程页表
+	} else {
+		pd->cr3 = read_cr3();
 	}
+	create_thread(pd, main);
 }
 

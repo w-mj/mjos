@@ -94,7 +94,8 @@ EXTERN_DATA(tid_prev)
 EXTERN_DATA(tid_next)
 
 GLOBAL_FUNC(task_switch)
-// 进行线程切换，必须在内核模式下以函数调用方式执行
+GLOBAL_FUNC(load_tid_next)
+// 进行线程切换，调用时栈顶为中断返回地址
 // 函数调用时栈顶为进程切换回来后要执行的地址
 // 此函数会保存当前线程上下文，再把栈构建成目标线程的中断上下文
 // 通过iret执行目标线程

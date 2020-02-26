@@ -2,6 +2,7 @@
 *.vhd
 *.efi
 *.o
+*.obj
 *.d
 *.t
 *.a

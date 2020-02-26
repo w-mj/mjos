@@ -2,7 +2,7 @@
 #include <types.h>
 #include <multiboot.h>
 #include <arch.h>
-#include <process.h>
+#include <process/process.h>
 #include <delog.h>
 
 

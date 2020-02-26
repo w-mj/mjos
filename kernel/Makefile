@@ -1,11 +1,11 @@
 
-subdirs := misc arch memory
+subdirs := misc arch memory process
 binfile := kernel.bin
 elffile := kernel.elf
 mapfile := kernel.map
 symfile := kernel.sym
 
-subobjs := $(foreach d, $(subdirs), $(addsuffix .o, $(d)/$(d)))
+subobjs := $(foreach d, $(subdirs), $(addsuffix .obj, $(d)/$(d)))
 objlist := $(subobjs)
 
 INCLIST := $(CURDIR)/include $(CURDIR)/arch/$(ARCH)/include

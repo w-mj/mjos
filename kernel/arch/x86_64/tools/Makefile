@@ -1,5 +1,5 @@
 
-target := tools.o
+target := tools.obj
 toclean:= create_early_page early_page.S $(target)
 
 build: $(target)
