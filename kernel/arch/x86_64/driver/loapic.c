@@ -162,7 +162,8 @@ static __INIT int calibrate_freq() {
     write32(0xffffffff, loapic_base + LOAPIC_ICR);  // max minus 1
 
     // use pit channel 2 mode 3, set counter to 65535
-    out8(0xb6, 0x43);
+	// 计时器的输入频率为1.1931817Mhz
+    out8(0xb6, 0x43); 
     out8(0xff, 0x42);
     out8(0xff, 0x42);
 
@@ -172,7 +173,7 @@ static __INIT int calibrate_freq() {
 
     // wait 50ms
     while (1) {
-        out8(0xe8, 0x43);
+        out8(0xe8, 0x43);  // 回读上次指令
         if ((in8(0x42) & 0x80) != 0x80) {
             break;
         }
@@ -196,7 +197,7 @@ static __INIT int calibrate_freq() {
 // this function registers isr, must be called after int_init
 __INIT void loapic_dev_init() {
     u64 msr = read_msr(IA32_APIC_BASE);  
-	// 统一所有CPU的APIC基地址
+	// 统一所有CPU的APIC基地址，不同CPU的APCI基质可以相同
 	// APIC的基地址可以在MP/MADT中找到
     if ((loapic_addr & LOAPIC_MSR_BASE) != (msr & LOAPIC_MSR_BASE)) {
         msr = loapic_addr & LOAPIC_MSR_BASE;
