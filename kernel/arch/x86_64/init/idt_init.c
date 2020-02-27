@@ -42,6 +42,8 @@ static void set_id(int i, u64 handle) {
 
 extern u64 interrupt_stub_entry;
 extern u64 interrupt_stub_entry_end;
+void *isr_tbl[256];
+void interrupt_stub(u64 vec, u64 errcode);
 void load_idtr(struct IDTR *);
 void idt_init() {
 	if (cpu_activated == 0) {
@@ -52,6 +54,9 @@ void idt_init() {
 		_si(entry_size);
 		for (int i = 0; i < IDT_LENGTH; i++) {
 			set_id(i, ((u64)(&interrupt_stub_entry)) + i * entry_size);
+		}
+		for (int i = 0; i < 256; i++) {
+			isr_tbl[i] = interrupt_stub;
 		}
 	}
 	struct IDTR idtr;

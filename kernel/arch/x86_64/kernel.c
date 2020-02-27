@@ -120,6 +120,7 @@ static __INIT void parse_madt(madt_t * tbl) {
             loapic_set_nmi((madt_loapic_mni_t *) sub);
             break;
         default:
+			logw("unrecognized madt type %d", sub->type);
             break;
         }
         p += sub->length;
@@ -161,7 +162,10 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	process_init();
 	scheduler_init();
 	
+	loapic_dev_init();
 	logi("System init finish");
+	// ASM("int $0xfc");
+	ASM("sti");
 
 	pid_t pid = create_process(NULL, PROCESS_KERNEL, init_main);
 	ProcessDescriber *pd = get_process(pid);

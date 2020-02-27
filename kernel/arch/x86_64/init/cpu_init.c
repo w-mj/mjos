@@ -18,7 +18,6 @@ int cpu_installed;
 int cpu_activated;
 u64 percpu_base;
 u64 percpu_size;
-void *isr_tbl[256];
 
 static inline void cpuid(u32 *a, u32 *b, u32 *c, u32 *d) {
 	u32 eax, ebx, ecx, edx;

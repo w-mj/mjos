@@ -78,8 +78,8 @@ typedef struct loapic {
 } loapic_t;
 static loapic_t loapic_devs[64];
 
-static u64  loapic_addr   = 0;  // mapped physical address
-static u8 * loapic_base   = 0;  // mapped virtual address
+static u64  loapic_addr   = 0xFEE00000;  // mapped physical address
+static u8 * loapic_base   = (u8*)0xFEE00000;  // mapped virtual address
 static u32  loapic_tmr_hz = 0;  // how many cycles in a second
 
 //------------------------------------------------------------------------------
@@ -107,7 +107,8 @@ static void loapic_svr_proc(int vec) {
 
 static void loapic_timer_proc(int vec) {
     assert(vec == VECNUM_TIMER);
-    tick_proc();
+	logd("tick");
+    // tick_proc();
     loapic_send_eoi();
 }
 
@@ -194,7 +195,9 @@ static __INIT int calibrate_freq() {
 // initialize the local apic of current cpu
 // this function registers isr, must be called after int_init
 __INIT void loapic_dev_init() {
-    u64 msr = read_msr(IA32_APIC_BASE);
+    u64 msr = read_msr(IA32_APIC_BASE);  
+	// 统一所有CPU的APIC基地址
+	// APIC的基地址可以在MP/MADT中找到
     if ((loapic_addr & LOAPIC_MSR_BASE) != (msr & LOAPIC_MSR_BASE)) {
         msr = loapic_addr & LOAPIC_MSR_BASE;
     }
@@ -227,12 +230,13 @@ __INIT void loapic_dev_init() {
         isr_tbl[VECNUM_SPURIOUS] = loapic_svr_proc;
         isr_tbl[VECNUM_TIMER   ] = loapic_timer_proc;
         loapic_tmr_hz = calibrate_freq();
+		_si(loapic_tmr_hz);
     }
 
     // start the timer
     write32(LOAPIC_PERIODIC | VECNUM_TIMER, loapic_base + LOAPIC_TIMER);
     write32(0x0b, loapic_base + LOAPIC_CFG);
-    write32(loapic_tmr_hz / CFG_SYS_CLOCK_RATE, loapic_base + LOAPIC_ICR);
+    write32(loapic_tmr_hz, loapic_base + LOAPIC_ICR);
 }
 
 // send init IPI to the target cpu

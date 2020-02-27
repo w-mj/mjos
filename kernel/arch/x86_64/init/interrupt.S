@@ -43,7 +43,7 @@ EXTERN_FUNC(interrupt_stub)
 //      |   RIP    |
 //      | ERR CODE |
 // Low  |   RDI    | <-- %rsp
-
+EXTERN_DATA(isr_tbl)
 int_err_code:
 	testl   $3, 0x18(%rsp)  // cs = rsp + 0x18 
     jz  1f   // 判断cs的特权级别，如果为用户态则交换gsbase和kgsbase
@@ -51,7 +51,10 @@ int_err_code:
 1:
 
 	xchgq   %rsi, 8(%rsp)  // 把rsi备份到栈里，同时取出error code
-	call   interrupt_stub
+	movq    $isr_tbl, %rax
+    movq    (%rax, %rdi, 8), %rax  // 查表调用相应的中断处理程序
+    call    * %rax
+	//  call   interrupt_stub
 	popq    %rdi
 	popq    %rsi
 
