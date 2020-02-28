@@ -96,7 +96,7 @@ GLOBAL(interrupt_stub_entry_end)
 EXTERN_DATA(tid_prev)
 EXTERN_DATA(tid_next)
 
-GLOBAL_FUNC(task_switch)
+GLOBAL_FUNC(thread_switch)
 GLOBAL_FUNC(load_tid_next)
 // 进行线程切换，调用时栈顶为中断返回地址
 // 函数调用时栈顶为进程切换回来后要执行的地址

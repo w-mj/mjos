@@ -7,6 +7,8 @@
 #include <acpi.h>
 #include <boot.h>
 #include <config.h>
+#include <process/scheduler.h>
+#include <cpu.h>
 
 
 // local APIC memory mapped register offset
@@ -107,9 +109,11 @@ static void loapic_svr_proc(int vec) {
 
 static void loapic_timer_proc(int vec) {
     assert(vec == VECNUM_TIMER);
-	logd("tick");
+	// logd("tick");
     // tick_proc();
+	schedule();
     loapic_send_eoi();
+	thread_switch();
 }
 
 //------------------------------------------------------------------------------

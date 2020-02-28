@@ -104,11 +104,13 @@ void *calc_percpu_addr(u32 cpu, void *ptr) {
 }
 
 void *calc_thiscpu_addr(void *ptr) {
+	// _sL(read_gsbase());
 	return (void *) ((char *) ptr + read_gsbase());
 }
 
 
 void prepare_switch(ThreadDescriber *prev, ThreadDescriber *next) {
+	// logd("prepare switch from %d to %d", prev->process->pid, next->process->pid);
 	thiscpu_var(tid_prev) = prev;
 	thiscpu_var(tid_next) = next;
 }

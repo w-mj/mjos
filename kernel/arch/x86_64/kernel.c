@@ -127,10 +127,31 @@ static __INIT void parse_madt(madt_t * tbl) {
     }
 }
 
-void init_main() {
-	logi("start init process");
-	while (1);
+void processB() {
+	int x = 1;
+	while (1) {
+		logi("B %d", x);
+		for (int i = 0; i < 65536 * 20; i++) 
+			;
+		x++;
+	}
 }
+
+void init_main() {
+	ASM("sti");
+	create_process(thiscpu_var(current)->process, PROCESS_KERNEL, processB);
+	int x = 1;
+	while (1) {
+		logi("A %d", x);
+		for (int i = 0; i < 65536 * 20; i++)
+			;
+		x++;
+	}
+}
+typedef struct {
+	int a;
+	ListEntry entry;
+} Node;
 
 void load_tid_next(ThreadDescriber *);
 extern u64 _bss_end;
@@ -165,8 +186,32 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	loapic_dev_init();
 	logi("System init finish");
 	// ASM("int $0xfc");
-	ASM("sti");
+	//
+	ListEntry head;
+	list_init(&head);
+	Node nodes[10];
+	for (int i= 0; i < 10; i++) {
+		list_init(&nodes[i].entry);
+		nodes[i].a = i;
+	}
+#define plist \
+	foreach(c, head) { \
+		Node *n = list_entry(c, Node, entry); \
+		_si(n->a); \
+	}\
 
+#define alist(i) list_add(&nodes[i].entry, &head)
+#define atlist(i) list_add_tail(&nodes[i].entry, &head)
+	ListEntry *c;
+	alist(0);
+	alist(1);
+	alist(3);
+	atlist(4);
+	atlist(8);
+	list_pop_head(&head);
+	list_pop_head(&head);
+	plist;
+	// die();
 	pid_t pid = create_process(NULL, PROCESS_KERNEL, init_main);
 	ProcessDescriber *pd = get_process(pid);
 	assert(pd->cr3 == read_cr3());
@@ -174,6 +219,7 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	assert(thread_list_entry != &pd->threads);
 	ThreadDescriber *thread = list_entry(thread_list_entry, ThreadDescriber, next);
 	assert(thread->process == pd);
+	thiscpu_var(current) = thread;
 	load_tid_next(thread);
 	die();
 	while (1);
