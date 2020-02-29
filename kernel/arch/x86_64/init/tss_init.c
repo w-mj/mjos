@@ -55,8 +55,9 @@ void tss_init() {
     lower |=                    0x0000e90000000000UL;   // present 64bit ring3
     upper  = (tss_addr >> 32) & 0x00000000ffffffffUL;   // base  [63:32]
 
-    gdt[6] = lower;
-    gdt[7] = upper;
+    gdt[2 * cpu_index() + 6] = lower;
+    gdt[2 * cpu_index() + 7] = upper;
+
 	// _si(cpu_index());
 	// die();
 	u64 tr = ((2 * cpu_index()) << 3) | 3;

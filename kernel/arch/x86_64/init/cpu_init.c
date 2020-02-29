@@ -7,6 +7,7 @@
 #include <process/process.h>
 #include <boot.h>
 #include <string.h>
+#include <syscall.h>
 
 __PERCPU ThreadDescriber *tid_prev = NULL,
                          *tid_next = NULL;  // 在线程切换时由prev切换至next
@@ -41,6 +42,11 @@ static inline void cpuid(u32 *a, u32 *b, u32 *c, u32 *d) {
 	    :  "a"(*a),  "b"(*b),  "c"(*c),  "d"(*d));
 }
 
+#define IA32_EFER  0xC0000080 
+#define IA32_STAR  0xC0000081
+#define IA32_LSTAR 0xC0000082
+#define IA32_FMASK 0xC0000084
+
 void cpu_init() {
 	if (cpu_activated == 0) {
 		char vendor_id[16];
@@ -65,9 +71,13 @@ void cpu_init() {
 	cr0 |=  (1UL << 16);        // cr0.WP: enable write protection
 	write_cr0(cr0);
 	// enable syscall/sysret on intel processors
-	// u64 efer = read_msr(0xc0000080U);
-	// efer |= (1UL <<  0);
-	// write_msr(0xc0000080U, efer);
+	u64 efer = read_msr(IA32_EFER);
+	efer |= (1UL <<  0);
+	write_msr(IA32_EFER, efer);  // 打开syscall
+	write_msr(IA32_LSTAR, (u64)syscall_stub);  // syscall 地址
+	write_msr(IA32_FMASK, 0);   // rflags = rflags & ~(FMASK)
+	u64 star = ((u64)KERNEL_CODE_DEC << 32) | ((u64)(USER_DATA_DEC - 8) << 48);
+	write_msr(IA32_STAR, star);  // 设置段选择子
 }
 
 extern u64 _percpu_addr, _percpu_end;

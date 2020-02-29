@@ -92,6 +92,26 @@ vec = 0
 .endr
 GLOBAL(interrupt_stub_entry_end)
 
+// 由Syscall 进入的地址
+EXTERN_DATA(syscall_tbl)
+EXTERN_FUNC(syscall_program)
+GLOBAL_FUNC(syscall_stub)
+syscall_stub:
+	// rcx = rip
+	// r11 = rflags
+	// rdx = 调用号
+	// rdi = 参数一
+	// rsi = 参数二
+	// rdx = 参数三
+	// r8  = 参数四
+	// r9  = 参数五
+	pushq %rcx
+	movq  $syscall_tbl, %rax
+	movq  (%rax, %rdx, 8), %rax
+	call  * %rax
+	retq
+	// sysret  // sysret 从MSR中找到用户态的cs和ss
+
 
 EXTERN_DATA(tid_prev)
 EXTERN_DATA(tid_next)

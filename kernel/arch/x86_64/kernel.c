@@ -15,6 +15,7 @@
 #include <early_kmalloc.h>
 #include <process/process.h>
 #include <process/scheduler.h>
+#include <syscall.h>
 
 #define TESTTYPE(x) assert((x) / 8 == sizeof(u##x))
 void test_types(void) {
@@ -131,7 +132,7 @@ void processB() {
 	int x = 1;
 	while (1) {
 		logi("B %d", x);
-		for (int i = 0; i < 65536 * 20; i++) 
+		for (int i = 0; i < 65536 * 10; i++) 
 			;
 		x++;
 	}
@@ -143,7 +144,7 @@ void init_main() {
 	int x = 1;
 	while (1) {
 		logi("A %d", x);
-		for (int i = 0; i < 65536 * 20; i++)
+		for (int i = 0; i < 65536 * 10; i++)
 			;
 		x++;
 	}
@@ -179,39 +180,14 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	page_init((void*)(u64)multiboot_info->mmap_addr, multiboot_info->mmap_length);
 	mem_pool_init();
 	kmalloc_init();
-
 	process_init();
 	scheduler_init();
 	
 	loapic_dev_init();
 	logi("System init finish");
-	// ASM("int $0xfc");
-	//
-	ListEntry head;
-	list_init(&head);
-	Node nodes[10];
-	for (int i= 0; i < 10; i++) {
-		list_init(&nodes[i].entry);
-		nodes[i].a = i;
-	}
-#define plist \
-	foreach(c, head) { \
-		Node *n = list_entry(c, Node, entry); \
-		_si(n->a); \
-	}\
 
-#define alist(i) list_add(&nodes[i].entry, &head)
-#define atlist(i) list_add_tail(&nodes[i].entry, &head)
-	ListEntry *c;
-	alist(0);
-	alist(1);
-	alist(3);
-	atlist(4);
-	atlist(8);
-	list_pop_head(&head);
-	list_pop_head(&head);
-	plist;
-	// die();
+	print_msg("msg from sys call");
+	die();
 	pid_t pid = create_process(NULL, PROCESS_KERNEL, init_main);
 	ProcessDescriber *pd = get_process(pid);
 	assert(pd->cr3 == read_cr3());

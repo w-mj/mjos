@@ -132,7 +132,7 @@ void ioapic_gsi_unmask(int gsi) {
 
 __INIT void ioapic_dev_add(madt_ioapic_t * tbl) {
     if (ioapic_count < 4) {
-		logd("add io dev id:%d addr:%d start:%d", tbl->id, tbl->address, tbl->global_irq_base);
+		logd("add io dev id:%d addr:%llx start:%d", tbl->id, tbl->address, tbl->global_irq_base);
         ioapic_devs[ioapic_count].id        = tbl->id;
         ioapic_devs[ioapic_count].addr      = tbl->address;
         ioapic_devs[ioapic_count].gsi_start = tbl->global_irq_base;
