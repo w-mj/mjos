@@ -155,6 +155,7 @@ typedef struct {
 } Node;
 
 void load_tid_next(ThreadDescriber *);
+extern void *elf_addr;
 extern u64 _bss_end;
 __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	console_initialize();
@@ -185,7 +186,8 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	
 	loapic_dev_init();
 	logi("System init finish");
-
+	parse_elf64(&elf_addr);
+	die();
 	print_msg("msg from sys call");
 	die();
 	pid_t pid = create_process(NULL, PROCESS_KERNEL, init_main);

@@ -25,7 +25,7 @@ void schedule() {
 	if (list_empty(&running_threads)) {
 		return;
 	}
-	ListEntry *c;
+	// ListEntry *c;
 	// plist
 	ListEntry *to_run = list_pop_head(&running_threads);
 	assert(to_run != NULL);
