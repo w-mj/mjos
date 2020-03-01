@@ -1,5 +1,6 @@
 #pragma once
 #include <types.h>
+#include <process/elf-em.h>
 
 /* 64-bit ELF base types. */
 typedef u64	Elf64_Addr;
@@ -119,8 +120,6 @@ typedef i64	Elf64_Sxword;
 
 #define ELF_ST_BIND(x)		((x) >> 4)
 #define ELF_ST_TYPE(x)		(((unsigned int) x) & 0xf)
-#define ELF32_ST_BIND(x)	ELF_ST_BIND(x)
-#define ELF32_ST_TYPE(x)	ELF_ST_TYPE(x)
 #define ELF64_ST_BIND(x)	ELF_ST_BIND(x)
 #define ELF64_ST_TYPE(x)	ELF_ST_TYPE(x)
 
@@ -133,8 +132,6 @@ typedef struct {
 } Elf64_Dyn;
 
 /* The following are used with relocations */
-#define ELF32_R_SYM(x) ((x) >> 8)
-#define ELF32_R_TYPE(x) ((x) & 0xff)
 
 #define ELF64_R_SYM(i)			((i) >> 32)
 #define ELF64_R_TYPE(i)			((i) & 0xffffffff)
