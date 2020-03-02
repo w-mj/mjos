@@ -1,7 +1,4 @@
 #include <asm.h>
-extern void *syscall_tbl;
-void syscall_stub();
-
 
 #define SYS_CALL_0(n, name, ret) \
 	static inline ret name() {\

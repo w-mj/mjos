@@ -188,6 +188,11 @@ void frames_release(int n, pfn_t fn) {
 }
 
 void page_table_set_entry(u64 pmltop, u64 page_table_entry, u64 value, bool auto_alloc) {
+	if (pmltop != kernel_pml4) {
+		_sL(pmltop);
+		_sL(page_table_entry);
+		_sL(value);
+	}
 	int level = 4;
 	u64 *pml = (u64 *)pmltop;
 	while (level > 1) {
@@ -268,8 +273,8 @@ void *find_virtual_addr(u64 pml4) {
 
 
 static void write_new_kernel_page_table() {
-	u64 newmp = frame_alloc(PG_KERNEL) <<
-	            PAGEOFFSET;  // 新的四级页表地址（页框号是物理地址）
+	u64 newmp = frame_alloc(PG_KERNEL) << PAGEOFFSET;  // 新的四级页表物理地址
+	kernel_pml4 = newmp;
 	_sL(newmp);
 	memset((u64 *)VIRTUAL(newmp), 0, PAGESIZE);
 	_sL(VIRTUAL(newmp));
@@ -296,7 +301,6 @@ static void write_new_kernel_page_table() {
 	page_table_set_entry(newmp, (u64)VIRTUAL(newmp), newmp + 7, true);
 	logd("new kernel page table occupies %d frames", frame_alloc_cnt);
 	write_cr3(newmp);
-	kernel_pml4 = newmp;
 	// ASM("int $3");
 	logd("load new page table finish");
 }
@@ -495,12 +499,12 @@ void kernel_page_release(pfn_t page) {
 	kernel_pages_release(page, 1);
 }
 
-void *normal_page_alloc(pfn_t *pn) {
+void *normal_page_alloc(pfn_t *pn, u64 pml4) {
 	pfn_t t = frame_alloc(PG_NORMAL);
-	void *vir = find_virtual_addr(read_cr3());
-	// _sL(vir);
+	void *vir = find_virtual_addr(pml4);
+	_sL(vir);
 	assert(kernel_pml4 == read_cr3());
-	page_table_set_entry(read_cr3(), (u64)vir, (t << PAGEOFFSET) | MMU_P | MMU_RW | MMU_US, true);
+	page_table_set_entry(pml4, (u64)vir, ((u64)t << PAGEOFFSET) | MMU_P | MMU_RW | MMU_US, true);
 	if (pn != NULL)
 		*pn = t;
 	return vir;
@@ -511,28 +515,39 @@ void normal_page_release(void *addr) {
 	frame_release(fn);
 }
 static inline u64 mk_page_entry(pfn_t frame, u64 flags) {
-	return (frame << PAGEOFFSET) & flags;
+	return ((u64)frame << PAGEOFFSET) & flags;
 }
+
 // 创建用户页表
 // 内核空间从0xffffffff81000000 - 全F共有2G空间
+//             ffffffff8565dff0
 // 占用2^19个页面，2^10个二级页表项，2个三级页表项
 // 即占用四级页表的最后一项和三级页表的最后两项
-/*
-pfn_t create_user_page() {
-	pfn_t pmls[5]; // 4,3,2,1 都是正常的页表
+u64 create_user_page() {
 	pfn_t pml4 = kernel_page_alloc(PG_KERNEL);
-	pfn_t pml3_0 = kernel_page_alloc(PG_KERNEL);
-	pfn_t pml3_512 = kernel_page_alloc(PG_KERNEL);
-	pfn_t pml2 = kernel_page_alloc(PG_KERNEL);
-	pfn_t pml1 = kernel_page_alloc(PG_KERNEL);
+	pfn_t pml3 = kernel_page_alloc(PG_KERNEL);
+	u64  pml4_phy = pml4 << PAGEOFFSET;
+	u64  pml3_phy = pml3 << PAGEOFFSET;
+	_sL(pml4_phy);
+	_sL(pml3_phy);
+	u64 *pml4_vir = phys_to_virt(pml4_phy);
+	u64 *pml3_vir = phys_to_virt(pml3_phy);
+	memset(pml4_vir, 0, PAGESIZE);
+	memset(pml3_vir, 0, PAGESIZE);
 
-	u64 *pml4_vir     = VIRTUAL(pml4);
-	u64 *pml3_0_vir   = VIRTUAL(pml3_0);
-	u64 *pml3_512_vir = VIRTUAL(pml3_512);
-	u64 *pml2_vir     = VIRTUAL(pml2);
-	u64 *pml1_vir     = VIRTUAL(pml1);
-	pml4_vir[0] = mk_page_entry(pml3_0, MMU_P);
+	u64 *kernel_pml4_vir = phys_to_virt(kernel_pml4);
+	u64  kernel_pml3_phy = kernel_pml4_vir[511] & MMU_ADDR;
+	u64 *kernel_pml3_vir = phys_to_virt(kernel_pml3_phy);
 
-	return pml4;
+	pml4_vir[511] = mk_page_entry(pml3, MMU_US| MMU_P| MMU_RW);
+	pml3_vir[510] = kernel_pml3_vir[510];
+	pml3_vir[511] = kernel_pml3_vir[511];
+	_sL(pml3_vir[510]);
+	_sL(pml3_vir[511]);
+	_pos();
+	page_table_set_entry(pml4_phy, (u64)pml4_vir, pml4_phy + 7, true);
+	page_table_set_entry(pml4_phy, (u64)pml3_vir, pml3_phy + 7, true);
+	_pos();
+	return pml4_phy;
 }
-*/
+

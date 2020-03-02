@@ -34,10 +34,20 @@ static u16 find_usable_pid() {
 ThreadDescriber *create_thread(ProcessDescriber *process, void *main) {
 	logd("create thread %d for pid %d", process->threads_cnt, process->pid);
 	ThreadDescriber *thread = kmalloc_s(sizeof(ThreadDescriber));
-	current = thread;
-	void *stack = normal_page_alloc(NULL);  
+	_sL(process->cr3);
+	void *stack = normal_page_alloc(NULL, process->cr3);  
+	u64* page = phys_to_virt(process->cr3);
+	_sL(page[0]);
 	stack = stack + PAGESIZE;  // stack 指向栈的尾部，向下增长
-	thread->rsp = init_thread_stack(stack, main);
+	if (process->type == PROCESS_KERNEL) {
+		thread->rsp = init_thread_stack(stack, main, KERNEL_CODE_DEC, KERNEL_DATA_DEC);
+	} else {
+		die();
+		u64 cr3 = read_cr3();
+		write_cr3(process->cr3);  // 切换成用户页表
+		thread->rsp = init_thread_stack(stack, main, USER_CODE_DEC, USER_DATA_DEC);
+		write_cr3(cr3);
+	}
 	thread->rsp0 = thread->rsp;
 	thread->cr3 = process->cr3;
 	thread->tid = process->threads_cnt;
@@ -73,8 +83,7 @@ u16 create_process(ProcessDescriber *parent, ProcessType type, void *main) {
 
 	// 用户进程需要复制页表
 	if (type == PROCESS_USER) {
-		assert(0);
-		// TODO: 创建用户进程页表
+		pd->cr3 = create_user_page();  // 分配新的用户四级页表
 	} else {
 		pd->cr3 = read_cr3();
 	}

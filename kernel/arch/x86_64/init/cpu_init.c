@@ -47,6 +47,7 @@ static inline void cpuid(u32 *a, u32 *b, u32 *c, u32 *d) {
 #define IA32_LSTAR 0xC0000082
 #define IA32_FMASK 0xC0000084
 
+void syscall_stub();
 void cpu_init() {
 	if (cpu_activated == 0) {
 		char vendor_id[16];
