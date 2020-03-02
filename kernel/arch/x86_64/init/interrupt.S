@@ -1,4 +1,5 @@
 #include <linkage.h>
+#include <arch.h>
 
 #define save_regs               \
 	pushq   %rax;               \
@@ -82,7 +83,7 @@ int_err_code:
 GLOBAL(interrupt_stub_entry)
 vec = 0
 .rept 256
-	.if (((10 <= vec) && (vec <= 14)) || (vec == 17) || (vec == 1) || (vec == 30))
+	.if (((10 <= vec) && (vec <= 14)) || (vec == 17) || (vec == 8) || (vec == 30))
         with_errcode(vec)
     .else
         without_errcode(vec)
@@ -94,7 +95,7 @@ GLOBAL(interrupt_stub_entry_end)
 
 // 由Syscall 进入的地址
 EXTERN_DATA(syscall_tbl)
-EXTERN_FUNC(syscall_program)
+EXTERN_DATA(kernel_pml4)  // 内核页表
 GLOBAL_FUNC(syscall_stub)
 syscall_stub:
 	// rcx = rip
@@ -105,11 +106,23 @@ syscall_stub:
 	// rdx = 参数三
 	// r8  = 参数四
 	// r9  = 参数五
+	swapgs
 	pushq %rcx
+	pushq %r11
+	// pushq  %cr3
+	// movq  $kernel_pml4, %rax
+	// movq  (%rax), %cr3     // 切换至内核页表
 	movq  $syscall_tbl, %rax
 	movq  (%rax, %rdx, 8), %rax
 	call  * %rax
-	retq
+	movq  $USER_CODE_DEC, %rax
+	movq  %rax,  %ss
+	movq  $USER_DATA_DEC, %rax
+	movq  %rax,  %cs
+	swapgs
+	popfq
+	ret
+	// retq
 	// sysret  // sysret 从MSR中找到用户态的cs和ss
 
 

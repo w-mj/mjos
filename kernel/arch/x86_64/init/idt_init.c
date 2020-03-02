@@ -82,6 +82,10 @@ void interrupt_stub(u64 vec, u64 errcode) {
 		u64 cr2 = read_cr2();
 		// _sL(cr2);
 		loge("cr2=%llx", cr2);
+	} else if (vec == 15) {
+		u64 code;
+		ASM("movq %%r11, %0": "=rm"(code));
+		loge("code=%llx", code);
 	}
 	asm volatile("movq %%rsp, %0": "=m"(rsp));
 	// _sa((void*)rsp, 256);

@@ -76,7 +76,7 @@ void cpu_init() {
 	write_msr(IA32_EFER, efer);  // 打开syscall
 	write_msr(IA32_LSTAR, (u64)syscall_stub);  // syscall 地址
 	write_msr(IA32_FMASK, 0);   // rflags = rflags & ~(FMASK)
-	u64 star = ((u64)KERNEL_CODE_DEC << 32) | ((u64)(USER_DATA_DEC - 8) << 48);
+	u64 star = ((u64)KERNEL_CODE_DEC << 32) | ((u64)(USER_CODE_DEC) << 48);
 	write_msr(IA32_STAR, star);  // 设置段选择子
 }
 

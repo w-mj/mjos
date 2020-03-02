@@ -4,8 +4,8 @@
 
 #define KERNEL_CODE_DEC 0x08  // 内核代码段描述符
 #define KERNEL_DATA_DEC 0x10  // 内核数据段描述符
-#define USER_CODE_DEC   0x2B  // 用户代码段描述符
-#define USER_DATA_DEC   0x23  // 用户数据段描述符
+#define USER_CODE_DEC   0x23  // 用户代码段描述符
+#define USER_DATA_DEC   0x2B  // 用户数据段描述符
 
 #define PAGEOFFSET      12
 #define PAGESIZE       (1 << PAGEOFFSET)

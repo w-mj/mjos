@@ -186,8 +186,10 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	
 	loapic_dev_init();
 	logi("System init finish");
-	parse_elf64(&elf_addr);
-	die();
+	// parse_elf64(&elf_addr);
+	// die();
+	// ASM("movq $0x12, %r11");
+	// ASM("int $15");
 	print_msg("msg from sys call");
 	die();
 	pid_t pid = create_process(NULL, PROCESS_KERNEL, init_main);
