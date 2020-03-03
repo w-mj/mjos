@@ -188,11 +188,11 @@ void frames_release(int n, pfn_t fn) {
 }
 
 void page_table_set_entry(u64 pmltop, u64 page_table_entry, u64 value, bool auto_alloc) {
-	if (pmltop != kernel_pml4) {
-		_sL(pmltop);
-		_sL(page_table_entry);
-		_sL(value);
-	}
+	// if (pmltop != kernel_pml4) {
+	// 	_sL(pmltop);
+	// 	_sL(page_table_entry);
+	// 	_sL(value);
+	// }
 	int level = 4;
 	u64 *pml = (u64 *)pmltop;
 	while (level > 1) {
@@ -204,10 +204,17 @@ void page_table_set_entry(u64 pmltop, u64 page_table_entry, u64 value, bool auto
 				loge("page_table_set_entry pml%d[%d] is not present", level, pmli);
 				return;
 			} else {
+				// if (pmltop != kernel_pml4) {
+				// 	_sL(pml);
+				// 	_si(pmli);
+				// 	_sL(pmle);
+				// 	_si(level);
+				// }
+
 				// 自动分配页框
 				pmle = pml[pmli] = (frame_alloc(PG_KERNEL) << PAGEOFFSET) + 7;
 				// logd("auto alloc frame %llx %llx", VIRTUAL(pmle), pmle);
-				page_table_set_entry(pmltop, (u64)VIRTUAL(pmle), pmle, true);
+								page_table_set_entry(pmltop, (u64)VIRTUAL(pmle), pmle, true);
 				heap_end += PAGESIZE;
 			}
 		}
@@ -515,7 +522,7 @@ void normal_page_release(void *addr) {
 	frame_release(fn);
 }
 static inline u64 mk_page_entry(pfn_t frame, u64 flags) {
-	return ((u64)frame << PAGEOFFSET) & flags;
+	return ((u64)frame << PAGEOFFSET) | flags;
 }
 
 // 创建用户页表
@@ -542,12 +549,15 @@ u64 create_user_page() {
 	pml4_vir[511] = mk_page_entry(pml3, MMU_US| MMU_P| MMU_RW);
 	pml3_vir[510] = kernel_pml3_vir[510];
 	pml3_vir[511] = kernel_pml3_vir[511];
-	_sL(pml3_vir[510]);
-	_sL(pml3_vir[511]);
-	_pos();
+	// _sL(pml4_vir);
+	// _sL(pml4_vir[511]);
+	// _sL(pml3_vir[510]);
+	// _sL(pml3_vir[511]);
+	// _pos();
 	page_table_set_entry(pml4_phy, (u64)pml4_vir, pml4_phy + 7, true);
+	// _pos();
 	page_table_set_entry(pml4_phy, (u64)pml3_vir, pml3_phy + 7, true);
-	_pos();
+	// _pos();
 	return pml4_phy;
 }
 
