@@ -38,15 +38,19 @@ ThreadDescriber *create_thread(ProcessDescriber *process, void *main) {
 	void *stack = normal_page_alloc(NULL, process->cr3);  
 	u64* page = phys_to_virt(process->cr3);
 	_sL(page[0]);
+	_sL(page[511]);
 	stack = stack + PAGESIZE;  // stack 指向栈的尾部，向下增长
 	if (process->type == PROCESS_KERNEL) {
 		thread->rsp = init_thread_stack(stack, main, KERNEL_CODE_DEC, KERNEL_DATA_DEC);
 	} else {
-		die();
-		u64 cr3 = read_cr3();
-		write_cr3(process->cr3);  // 切换成用户页表
+		u64 kcr3 = read_cr3();
+		u64 ucr3 = process->cr3;
+		u64 ip = 0xffffffff8101a1ab;
+		_sL(page_translate(kcr3, ip));
+		_sL(page_translate(ucr3, ip));
+		write_cr3(ucr3);  // 切换成用户页表
 		thread->rsp = init_thread_stack(stack, main, USER_CODE_DEC, USER_DATA_DEC);
-		write_cr3(cr3);
+		write_cr3(kcr3);
 	}
 	thread->rsp0 = thread->rsp;
 	thread->cr3 = process->cr3;

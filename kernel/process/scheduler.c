@@ -21,9 +21,9 @@ void add_thread_to_running(ThreadDescriber *thread) {
 	_sL(running_threads.next->next); \
 	_sL(running_threads.next->next->next);
 
-void schedule() {
+bool schedule() {
 	if (list_empty(&running_threads)) {
-		return;
+		return false;
 	}
 	// ListEntry *c;
 	// plist
@@ -43,4 +43,5 @@ void schedule() {
 		prepare_switch(thiscpu_var(current), next);
 		thiscpu_var(current) = next;
 	}
+	return true;
 }

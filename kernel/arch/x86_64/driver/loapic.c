@@ -109,11 +109,11 @@ static void loapic_svr_proc(int vec) {
 
 static void loapic_timer_proc(int vec) {
     assert(vec == VECNUM_TIMER);
-	// logd("tick");
+	logd("tick");
     // tick_proc();
-	schedule();
+	bool a = schedule();
     loapic_send_eoi();
-	thread_switch();
+	if (a) thread_switch();
 }
 
 //------------------------------------------------------------------------------
@@ -241,7 +241,7 @@ __INIT void loapic_dev_init() {
     // start the timer
     write32(LOAPIC_PERIODIC | VECNUM_TIMER, loapic_base + LOAPIC_TIMER);
     write32(0x0b, loapic_base + LOAPIC_CFG);
-    write32(loapic_tmr_hz / CFG_SYS_CLOCK_RATE, loapic_base + LOAPIC_ICR);
+    write32(loapic_tmr_hz / 10, loapic_base + LOAPIC_ICR);
 }
 
 // send init IPI to the target cpu

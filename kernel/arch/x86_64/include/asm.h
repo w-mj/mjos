@@ -187,6 +187,7 @@ static inline void write_kgsbase(u64 val) {
 
 
 static inline void die() {
+	ASM("cli");
 	ASM("hlt");
 }
 

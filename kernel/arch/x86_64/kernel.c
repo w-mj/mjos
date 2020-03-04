@@ -131,20 +131,22 @@ static __INIT void parse_madt(madt_t * tbl) {
 void processB() {
 	int x = 1;
 	while (1) {
-		print_msg("B");
-		for (int i = 0; i < 65536 * 10; i++) 
+		logi("B %d", x);
+		// sys_print_msg("B");
+		for (int i = 0; i < 65536 * 200; i++) 
 			;
 		x++;
 	}
 }
 
 void init_main() {
+	logi("start init process");
 	ASM("sti");
-	create_process(thiscpu_var(current)->process, PROCESS_USER, processB);
+	sys_create_process(thiscpu_var(current)->process, PROCESS_KERNEL, processB);
 	int x = 1;
 	while (1) {
 		logi("A %d", x);
-		for (int i = 0; i < 65536 * 10; i++)
+		for (int i = 0; i < 65536 * 200; i++)
 			;
 		x++;
 	}
@@ -190,7 +192,6 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	// die();
 	// ASM("movq $0x12, %r11");
 	// ASM("int $15");
-
 	pid_t pid = create_process(NULL, PROCESS_KERNEL, init_main);
 	ProcessDescriber *pd = get_process(pid);
 	assert(pd->cr3 == read_cr3());

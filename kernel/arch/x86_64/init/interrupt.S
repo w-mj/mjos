@@ -96,33 +96,44 @@ GLOBAL(interrupt_stub_entry_end)
 // 由Syscall 进入的地址
 EXTERN_DATA(syscall_tbl)
 EXTERN_DATA(kernel_pml4)  // 内核页表
+EXTERN_DATA(boot_stack_top)
 GLOBAL_FUNC(syscall_stub)
 syscall_stub:
 	// rcx = rip
 	// r11 = rflags
-	// rdx = 调用号
+	// r9  = 调用号
 	// rdi = 参数一
 	// rsi = 参数二
 	// rdx = 参数三
-	// r8  = 参数四
-	// r9  = 参数五
-	swapgs
+	// rcx = 参数四
+	// r8  = 参数五
+	// swapgs
 	pushq %rcx
 	pushq %r11
-	// pushq  %cr3
-	// movq  $kernel_pml4, %rax
-	// movq  (%rax), %cr3     // 切换至内核页表
+	pushq %rbp
+	movq  %cr3, %rdx
+	pushq %rdx
+
+	movq  %rsp, %rbp   // 备份用户栈
+	movq  $boot_stack_top, %rsp  // 切换至内核栈
+	movq  $kernel_pml4, %rax
+	movq  (%rax), %rdx // 切换至内核页表
+	movq  %rdx , %cr3
 	movq  $syscall_tbl, %rax
-	movq  (%rax, %rdx, 8), %rax
-	call  * %rax
-	movq  $USER_CODE_DEC, %rax
-	movq  %rax,  %ss
-	movq  $USER_DATA_DEC, %rax
-	movq  %rax,  %cs
-	swapgs
+	movq  (%rax, %r9, 8), %rax
+	call  * %rax  // 系统调用例程的返回值会放在rax里
+
+	//movq  $KERNEL_DATA_DEC, %rcx
+	//movq  %rcx,  %ss
+	//movq  $KERNEL_CODE_DEC, %rcx
+	//movq  %rcx,  %cs
+	// swapgs
+	movq  %rbp, %rsp   // 恢复用户栈
+	popq  %rdx
+	movq  %rdx, %cr3
+	popq  %rbp
 	popfq
-	ret
-	// retq
+	retq
 	// sysret  // sysret 从MSR中找到用户态的cs和ss
 
 

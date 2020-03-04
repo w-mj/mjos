@@ -6,12 +6,14 @@ NAME = myos
 OUTDIR  :=  $(CURDIR)
 ISODIR  :=  $(OUTDIR)/iso
 
-CC      :=  $(ARCH)-elf-gcc
-CPP     :=  $(ARCH)-elf-g++
-AR      :=  $(ARCH)-elf-ar
-OBJCOPY :=  $(ARCH)-elf-objcopy
-LD      :=  $(ARCH)-elf-ld
-NM      :=  $(ARCH)-elf-nm
+TOOLCHAIN_BASE := /usr/local/x86_64-elf-gcc/bin/# To make clion happy
+
+CC      :=  $(TOOLCHAIN_BASE)$(ARCH)-elf-gcc
+CPP     :=  $(TOOLCHAIN_BASE)$(ARCH)-elf-g++
+AR      :=  $(TOOLCHAIN_BASE)$(ARCH)-elf-ar
+OBJCOPY :=  $(TOOLCHAIN_BASE)$(ARCH)-elf-objcopy
+LD      :=  $(TOOLCHAIN_BASE)$(ARCH)-elf-ld
+NM      :=  $(TOOLCHAIN_BASE)$(ARCH)-elf-nm
 BINFILE :=  kernel/kernel.bin  # must be same with kernel/Makefile
 ISOFILE :=  $(OUTDIR)/$(NAME).iso
 
@@ -51,3 +53,6 @@ run: iso
 
 debug: iso
 	qemu-system-x86_64 -S -gdb tcp::4444 $(QEMUFLAGS)
+
+debugbackground: iso
+	qemu-system-x86_64 -S -gdb tcp::4444 $(QEMUFLAGS) &

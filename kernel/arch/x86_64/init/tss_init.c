@@ -37,14 +37,17 @@ typedef struct tss {
 
 __PERCPU Tss tss;
 extern u64 gdt[8];
-
+extern u64 boot_stack_top;
 void tss_init() {
 	if (cpu_activated == 0) {
 		logi("tss init");
 	}
     u64 tss_size = (u64)sizeof(Tss);
     u64 tss_addr = (u64)thiscpu_ptr(tss);
+	Tss *tss     = (Tss *)tss_addr;
     memset((void *) tss_addr, 0, tss_size);
+	tss->rsp0_lower = (u64)&boot_stack_top & 0xffffffff;
+	tss->rsp0_upper = (u64)&boot_stack_top >> 32;
 
     u64 lower = 0UL;
     u64 upper = 0UL;

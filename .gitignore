@@ -11,10 +11,10 @@
 *.so
 *.elf
 *.sym
-*.bin
 *.iso
 *.map
 dump.txt
+CMakeLists.txt
 iso/
 .vscode
 build/
@@ -25,3 +25,5 @@ compile_commands.json
 .depend
 cscope.*
 .ccls-cache/
+.idea/
+cmake-build-*/

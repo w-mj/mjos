@@ -549,15 +549,15 @@ u64 create_user_page() {
 	pml4_vir[511] = mk_page_entry(pml3, MMU_US| MMU_P| MMU_RW);
 	pml3_vir[510] = kernel_pml3_vir[510];
 	pml3_vir[511] = kernel_pml3_vir[511];
-	// _sL(pml4_vir);
-	// _sL(pml4_vir[511]);
-	// _sL(pml3_vir[510]);
-	// _sL(pml3_vir[511]);
-	// _pos();
+	_sL(pml4_vir);
+	_sL(pml4_vir[511]);
+	_sL(pml3_vir[510]);
+	_sL(pml3_vir[511]);
+	_pos();
 	page_table_set_entry(pml4_phy, (u64)pml4_vir, pml4_phy + 7, true);
-	// _pos();
+	_pos();
 	page_table_set_entry(pml4_phy, (u64)pml3_vir, pml3_phy + 7, true);
-	// _pos();
+	_pos();
 	return pml4_phy;
 }
 
