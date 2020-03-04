@@ -142,7 +142,7 @@ void processB() {
 void init_main() {
 	logi("start init process");
 	ASM("sti");
-	sys_create_process(thiscpu_var(current)->process, PROCESS_KERNEL, processB);
+	sys_create_process(thiscpu_var(current)->process, PROCESS_USER, processB);
 	int x = 1;
 	while (1) {
 		logi("A %d", x);

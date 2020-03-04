@@ -111,14 +111,14 @@ syscall_stub:
 	pushq %rcx
 	pushq %r11
 	pushq %rbp
-	movq  %cr3, %rdx
-	pushq %rdx
+	movq  %cr3, %r10   // r10 = cr3
+	pushq %r10
 
 	movq  %rsp, %rbp   // 备份用户栈
 	movq  $boot_stack_top, %rsp  // 切换至内核栈
 	movq  $kernel_pml4, %rax
-	movq  (%rax), %rdx // 切换至内核页表
-	movq  %rdx , %cr3
+	movq  (%rax), %r10 // 切换至内核页表
+	movq  %r10 , %cr3
 	movq  $syscall_tbl, %rax
 	movq  (%rax, %r9, 8), %rax
 	call  * %rax  // 系统调用例程的返回值会放在rax里
@@ -129,8 +129,8 @@ syscall_stub:
 	//movq  %rcx,  %cs
 	// swapgs
 	movq  %rbp, %rsp   // 恢复用户栈
-	popq  %rdx
-	movq  %rdx, %cr3
+	popq  %r10
+	movq  %r10, %cr3
 	popq  %rbp
 	popfq
 	retq
