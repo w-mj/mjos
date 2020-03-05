@@ -155,7 +155,7 @@ typedef struct {
 	ListEntry entry;
 } Node;
 
-void load_tid_next(ThreadDescriber *);
+void load_tid_next(ThreadDescriptor *);
 extern void *elf_addr;
 extern u64 _bss_end;
 __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
@@ -195,11 +195,11 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	// ASM("int $15");
 	pid_t pid = create_process(NULL, PROCESS_USER, init_main);
 
-	ProcessDescriber *pd = get_process(pid);
+	ProcessDescriptor *pd = get_process(pid);
 	// assert(pd->cr3 == read_cr3());
 	ListEntry *thread_list_entry = pd->threads.next;
 	assert(thread_list_entry != &pd->threads);
-	ThreadDescriber *thread = list_entry(thread_list_entry, ThreadDescriber, next);
+	ThreadDescriptor *thread = list_entry(thread_list_entry, ThreadDescriptor, next);
 	assert(thread->process == pd); // 启动init进程
 	thiscpu_var(current) = thread;
     load_tid_next(thread);

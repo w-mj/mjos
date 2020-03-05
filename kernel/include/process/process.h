@@ -27,7 +27,7 @@ typedef struct {
 	struct __ProcessDescriber *process;
 	ListEntry next;   // 用于调度队列
 	int tid;
-} ThreadDescriber;
+} ThreadDescriptor;
 
 
 typedef struct __ProcessDescriber {
@@ -40,15 +40,15 @@ typedef struct __ProcessDescriber {
 	u64 cr3;
 	int threads_cnt;
 	ListEntry process_list_entry;
-} ProcessDescriber;
+} ProcessDescriptor;
 
-extern ThreadDescriber *current;
+extern ThreadDescriptor *current;
 
 
 void process_init();
-pid_t create_process(ProcessDescriber *parent, ProcessType type, void *main);
-ThreadDescriber *create_thread(ProcessDescriber *process, void *main);
-ProcessDescriber *get_process(pid_t pid);
+pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main);
+ThreadDescriptor *create_thread(ProcessDescriptor *process, void *main);
+ProcessDescriptor *get_process(pid_t pid);
 
 pid_t do_sys_create_process(ProcessType, void *);
 

@@ -3,14 +3,14 @@
 #include <cpu.h>
 #include <delog.h>
 
-__PERCPU ThreadDescriber *current = NULL;
+__PERCPU ThreadDescriptor *current = NULL;
 static ListEntry running_threads;
 
 void scheduler_init() {
 	list_init(&running_threads);
 }
 
-void add_thread_to_running(ThreadDescriber *thread) {
+void add_thread_to_running(ThreadDescriptor *thread) {
 	thread->state = THREAD_RUNNING;
 	list_add(&thread->next, &running_threads);
 }
@@ -30,7 +30,7 @@ bool schedule() {
 	ListEntry *to_run = list_pop_head(&running_threads);
 	assert(to_run != NULL);
 	// assert(list_empty(&running_threads));
-	ThreadDescriber *next = list_entry(to_run, ThreadDescriber, next);
+	ThreadDescriptor *next = list_entry(to_run, ThreadDescriptor, next);
 	if (thiscpu_var(current) == NULL) {
 		thiscpu_var(current) = next;
 		prepare_switch(NULL, next);

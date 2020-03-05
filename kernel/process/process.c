@@ -31,9 +31,9 @@ static u16 find_usable_pid() {
 	return (u16)-1;
 }
 
-ThreadDescriber *create_thread(ProcessDescriber *process, void *main) {
+ThreadDescriptor *create_thread(ProcessDescriptor *process, void *main) {
 	logd("create thread %d for pid %d", process->threads_cnt, process->pid);
-	ThreadDescriber *thread = kmalloc_s(sizeof(ThreadDescriber));
+	ThreadDescriptor *thread = kmalloc_s(sizeof(ThreadDescriptor));
 	_sL(process->cr3);
 	void *stack = normal_page_alloc(NULL, process->cr3);  
 	u64* page = phys_to_virt(process->cr3);
@@ -63,7 +63,7 @@ ThreadDescriber *create_thread(ProcessDescriber *process, void *main) {
 	return thread;
 }
 
-pid_t create_process(ProcessDescriber *parent, ProcessType type, void *main) {
+pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main) {
 	pid_t pid = find_usable_pid();
 	if (pid == (u16)-1) {
 		loge("no usable pid.");
@@ -71,7 +71,7 @@ pid_t create_process(ProcessDescriber *parent, ProcessType type, void *main) {
 	}
 	logd("create process %d", pid);
 
-	ProcessDescriber *pd = kmalloc_s(sizeof(ProcessDescriber));
+	ProcessDescriptor *pd = kmalloc_s(sizeof(ProcessDescriptor));
 	pd->pid = pid;
 	pd->type = type;
 	pd->parent = parent;
@@ -95,11 +95,11 @@ pid_t create_process(ProcessDescriber *parent, ProcessType type, void *main) {
 	return pid;
 }
 
-ProcessDescriber *get_process(u16 pid) {
+ProcessDescriptor *get_process(u16 pid) {
 	ListEntry *c;
 	_si(pid);
 	foreach(c, process_list) {
-		ProcessDescriber *pd = list_entry(c, ProcessDescriber, process_list_entry);
+		ProcessDescriptor *pd = list_entry(c, ProcessDescriptor, process_list_entry);
 		if (pd->pid == pid)
 			return pd;
 	}

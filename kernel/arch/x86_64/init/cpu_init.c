@@ -9,7 +9,7 @@
 #include <string.h>
 #include <syscall.h>
 
-__PERCPU ThreadDescriber *tid_prev = NULL,
+__PERCPU ThreadDescriptor *tid_prev = NULL,
                          *tid_next = NULL;  // 在线程切换时由prev切换至next
 
 extern u64 _percpu_end, _percpu_addr;
@@ -120,7 +120,7 @@ void *calc_thiscpu_addr(void *ptr) {
 }
 
 
-void prepare_switch(ThreadDescriber *prev, ThreadDescriber *next) {
+void prepare_switch(ThreadDescriptor *prev, ThreadDescriptor *next) {
 	// logd("prepare switch from %d to %d", prev->process->pid, next->process->pid);
 	thiscpu_var(tid_prev) = prev;
 	thiscpu_var(tid_next) = next;
