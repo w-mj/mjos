@@ -46,6 +46,9 @@ EXTERN_FUNC(interrupt_stub)
 // Low  |   RDI    | <-- %rsp
 EXTERN_DATA(isr_tbl)
 int_err_code:
+    pushq   %rax
+    movq    $KERNEL_DATA_DEC, %rax
+    movq    %rax, %ss
 	testl   $3, 0x18(%rsp)  // cs = rsp + 0x18 
     jz  1f   // 判断cs的特权级别，如果为用户态则交换gsbase和kgsbase
     swapgs 
@@ -55,6 +58,7 @@ int_err_code:
 	movq    $isr_tbl, %rax
     movq    (%rax, %rdi, 8), %rax  // 查表调用相应的中断处理程序
     call    * %rax
+    popq    %rax
 	//  call   interrupt_stub
 	popq    %rdi
 	popq    %rsi

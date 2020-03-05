@@ -112,6 +112,7 @@ u64 page_translate(u64 pml, u64 vir) {
 			die();
 		}
 		pml = PTENTRYADDR(pmle);
+		_sL(pmle);
 		level--;
 	}
 	return pml | (vir & 0xfff);
@@ -187,7 +188,7 @@ void frames_release(int n, pfn_t fn) {
 	}
 }
 
-void page_table_set_entry(u64 pmltop, u64 page_table_entry, u64 value, bool auto_alloc) {
+static void page_table_set_entry(u64 pmltop, u64 page_table_entry, u64 value, bool auto_alloc) {
 	// if (pmltop != kernel_pml4) {
 	// 	_sL(pmltop);
 	// 	_sL(page_table_entry);

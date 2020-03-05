@@ -45,7 +45,7 @@ ThreadDescriptor *create_thread(ProcessDescriptor *process, void *main) {
 	} else {
 		u64 kcr3 = read_cr3();
 		u64 ucr3 = process->cr3;
-		u64 ip = 0xffffffff81002501;
+		u64 ip = 0xffffffff81016a5d;
 		_sL(page_translate(kcr3, ip));
 		_sL(page_translate(ucr3, ip));
 		write_cr3(ucr3);  // 切换成用户页表

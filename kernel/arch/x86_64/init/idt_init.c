@@ -3,6 +3,7 @@
 #include <asm.h>
 #include <base.h>
 #include <cpu.h>
+#include <arch.h>
 
 struct IDTR {
 	u16 size;
@@ -29,7 +30,7 @@ struct ID idt[IDT_LENGTH];
 
 static void set_id(int i, u64 handle) {
 	idt[i].offset_low  = (u16)(u64)handle;
-	idt[i].segment     = 8;
+	idt[i].segment     = KERNEL_CODE_DEC;
 	idt[i].attr.ist    = 0;    // default stack
 	idt[i].attr.zero   = 0;    // zero
 	idt[i].attr.type   = 0xE;  // GATE_INTERRUPT

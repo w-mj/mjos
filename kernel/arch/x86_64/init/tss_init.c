@@ -36,7 +36,7 @@ typedef struct tss {
 } __PACKED Tss;
 
 __PERCPU Tss tss;
-extern u64 gdt[8];
+extern u64 *gdt;
 extern u64 boot_stack_top;
 void tss_init() {
 	if (cpu_activated == 0) {
@@ -44,10 +44,11 @@ void tss_init() {
 	}
     u64 tss_size = (u64)sizeof(Tss);
     u64 tss_addr = (u64)thiscpu_ptr(tss);
-	Tss *tss     = (Tss *)tss_addr;
+	Tss *tssl     = (Tss *)tss_addr;
     memset((void *) tss_addr, 0, tss_size);
-	tss->rsp0_lower = (u64)&boot_stack_top & 0xffffffff;
-	tss->rsp0_upper = (u64)&boot_stack_top >> 32;
+	tssl->rsp0_lower = ((u64)&boot_stack_top) & 0xffffffff;
+	tssl->rsp0_upper = ((u64)&boot_stack_top) >> 32;
+
 
     u64 lower = 0UL;
     u64 upper = 0UL;
@@ -63,7 +64,9 @@ void tss_init() {
 
 	// _si(cpu_index());
 	// die();
-	u64 tr = ((2 * cpu_index()) << 3) | 3;
-	ASM("ltr  %0"::"m" (tr));
+	u16 tr = ((2 * cpu_index() + 6) << 3) | 3;
+	_sx(tr);
+	ASM("ltr  %0"::"r" (tr));
+	_pos();
 	// logi("tss init finish");
 }
