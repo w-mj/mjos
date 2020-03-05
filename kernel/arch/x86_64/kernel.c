@@ -131,7 +131,7 @@ static __INIT void parse_madt(madt_t * tbl) {
 void processB() {
 	int x = 1;
 	while (1) {
-		logi("B %d", x);
+        sys_print_msg("B");
 		// sys_print_msg("B");
 		for (int i = 0; i < 65536 * 200; i++) 
 			;
@@ -140,12 +140,11 @@ void processB() {
 }
 
 void init_main() {
-	logi("start init process");
-	ASM("sti");
-	sys_create_process(thiscpu_var(current)->process, PROCESS_USER, processB);
+	sys_print_msg("start init process");
+	sys_create_process(PROCESS_USER, processB);
 	int x = 1;
 	while (1) {
-		logi("A %d", x);
+        sys_print_msg("A");
 		for (int i = 0; i < 65536 * 200; i++)
 			;
 		x++;
@@ -187,20 +186,23 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	scheduler_init();
 	
 	loapic_dev_init();
-	logi("System init finish");
+    ASM("sti");
+
+    logi("System init finish");
 	// parse_elf64(&elf_addr);
 	// die();
 	// ASM("movq $0x12, %r11");
 	// ASM("int $15");
-	pid_t pid = create_process(NULL, PROCESS_KERNEL, init_main);
+	pid_t pid = create_process(NULL, PROCESS_USER, init_main);
+
 	ProcessDescriber *pd = get_process(pid);
-	assert(pd->cr3 == read_cr3());
+	// assert(pd->cr3 == read_cr3());
 	ListEntry *thread_list_entry = pd->threads.next;
 	assert(thread_list_entry != &pd->threads);
 	ThreadDescriber *thread = list_entry(thread_list_entry, ThreadDescriber, next);
 	assert(thread->process == pd); // 启动init进程
 	thiscpu_var(current) = thread;
-	load_tid_next(thread);
+    load_tid_next(thread);
 
 	die();
 	while (1);

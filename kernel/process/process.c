@@ -45,7 +45,7 @@ ThreadDescriber *create_thread(ProcessDescriber *process, void *main) {
 	} else {
 		u64 kcr3 = read_cr3();
 		u64 ucr3 = process->cr3;
-		u64 ip = 0xffffffff8101a1ab;
+		u64 ip = 0xffffffff81002501;
 		_sL(page_translate(kcr3, ip));
 		_sL(page_translate(ucr3, ip));
 		write_cr3(ucr3);  // 切换成用户页表
@@ -63,7 +63,7 @@ ThreadDescriber *create_thread(ProcessDescriber *process, void *main) {
 	return thread;
 }
 
-u16 create_process(ProcessDescriber *parent, ProcessType type, void *main) {
+pid_t create_process(ProcessDescriber *parent, ProcessType type, void *main) {
 	pid_t pid = find_usable_pid();
 	if (pid == (u16)-1) {
 		loge("no usable pid.");
@@ -105,4 +105,8 @@ ProcessDescriber *get_process(u16 pid) {
 	}
 	loge("no pid %d", pid);
 	return NULL;
+}
+
+pid_t do_sys_create_process(ProcessType type, void *main) {
+    return create_process(thiscpu_var(current)->process, type, main);
 }

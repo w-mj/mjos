@@ -107,14 +107,15 @@ syscall_stub:
 	// rdx = 参数三
 	// rcx = 参数四
 	// r8  = 参数五
-	// swapgs
-	pushq %rcx
+	swapgs
+    pushq %rcx
 	pushq %r11
 	pushq %rbp
-	movq  %cr3, %r10   // r10 = cr3
-	pushq %r10
 
-	movq  %rsp, %rbp   // 备份用户栈
+	pushq %rbx
+    movq  %rsp, %rbp  // rpb = rsp 备份用户栈
+	movq  %cr3, %rbx  // rbx = cr3 备份用户页表
+
 	movq  $boot_stack_top, %rsp  // 切换至内核栈
 	movq  $kernel_pml4, %rax
 	movq  (%rax), %r10 // 切换至内核页表
@@ -128,13 +129,32 @@ syscall_stub:
 	//movq  $KERNEL_CODE_DEC, %rcx
 	//movq  %rcx,  %cs
 	// swapgs
+    movq  %rbx, %cr3  // 恢复用户页表
+	movq  %rbp, %rsi
 	movq  %rbp, %rsp   // 恢复用户栈
-	popq  %r10
-	movq  %r10, %cr3
+    popq  %rbx
 	popq  %rbp
 	popfq
-	retq
-	// sysret  // sysret 从MSR中找到用户态的cs和ss
+	// retq
+	// popq %r11
+	popq %rdi
+	jmp  user_return
+
+	sysret  // sysret 从MSR中找到用户态的cs和ss
+
+
+user_return:
+    pushfq
+    cli                             // disable interrupt for now
+    popq    %rcx                    // rflags before cli
+    pushq   $USER_DATA_DEC          // ss
+    pushq   %rsi                    // rsp
+    pushq   %rcx                    // rflags
+    pushq   $USER_CODE_DEC          // cs
+    pushq   %rdi                    // rip
+    swapgs
+    iretq
+
 
 
 EXTERN_DATA(tid_prev)
@@ -176,6 +196,11 @@ load_tid_next:
     testl   $3, 0x88(%rsp)          // (15 + 2)* 8 = 0x88
     jz      3f
     swapgs
+    movw    $USER_DATA_DEC, %ax
+    movw    %ax, %ds
+    movw    %ax, %es
+    movw    %ax, %fs
+    movw    %ax, %gs
 3:
     restore_regs                    // 恢复寄存器
 	addq    $8, %rsp                // 跳过errcode
@@ -194,7 +219,7 @@ init_thread_stack:
 	pushq  %rcx   // ss
 	pushq  %rdi   // rsp
 	pushfq        // rflags
-	pushq  %rdx    // cs
+	pushq  %rdx   // cs
 	pushq  %rsi   // ip = main
 	pushq  $0     // errcode
 	save_regs     // regs

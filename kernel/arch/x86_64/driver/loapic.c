@@ -241,7 +241,7 @@ __INIT void loapic_dev_init() {
     // start the timer
     write32(LOAPIC_PERIODIC | VECNUM_TIMER, loapic_base + LOAPIC_TIMER);
     write32(0x0b, loapic_base + LOAPIC_CFG);
-    write32(loapic_tmr_hz / 1, loapic_base + LOAPIC_ICR);
+    write32(loapic_tmr_hz / 20, loapic_base + LOAPIC_ICR);
 }
 
 // send init IPI to the target cpu

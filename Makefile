@@ -56,3 +56,6 @@ debug: iso
 
 debugbackground: iso
 	qemu-system-x86_64 -S -gdb tcp::4444 $(QEMUFLAGS) &
+
+dump: build
+	objdump -d kernel/kernel.elf > dump.txt

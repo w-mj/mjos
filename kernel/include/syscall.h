@@ -70,4 +70,4 @@
 
 
 SYS_CALL_1(1, sys_print_msg, char *)
-SYS_CALL_3(2, sys_create_process, ProcessDescriber *, ProcessType, void *);
+SYS_CALL_2(2, sys_create_process, ProcessType, void *);
