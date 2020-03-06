@@ -36,7 +36,7 @@ ThreadDescriptor *create_thread(ProcessDescriptor *process, void *main) {
 	ThreadDescriptor *thread = kmalloc_s(sizeof(ThreadDescriptor));
 	_sL(process->cr3);
 	void *stack = normal_page_alloc(NULL, process->cr3);
-	void *sp0 = stack + 1024;  // 栈的最低1K是内核栈
+	void *sp0 = pfn_to_virt(kernel_page_alloc(PG_KERNEL));
 	u64* page = phys_to_virt(process->cr3);
 	_sL(page[0]);
 	_sL(page[511]);

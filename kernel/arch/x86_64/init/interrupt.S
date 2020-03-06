@@ -51,7 +51,7 @@ int_err_code:
     movq    $KERNEL_DATA_DEC, %rax
     movq    %rax, %ss
 
-	xchgq   %rsi, 0x18(%rsp)  // 把rsi备份到栈里，同时取出error code
+	xchgq   %rsi, 0x10(%rsp)  // 把rsi备份到栈里，同时取出error code
 
 	testl   $3, 0x20(%rsp)  // cs = rsp + 0x20
     jz  1f   // 判断cs的特权级别，如果为用户态则交换gsbase和kgsbase
