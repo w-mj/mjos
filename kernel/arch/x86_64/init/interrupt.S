@@ -37,36 +37,39 @@
 
 EXTERN_FUNC(interrupt_stub)
 
-// High |    SS    |
-//      |   RSP    |
-//      |  RFLAGS  |
-//      |    CS    | <-- %rsp + 0x18
-//      |   RIP    |
-//      | ERR CODE |
-// Low  |   RDI    | <-- %rsp
+// High |    SS    | +38
+//      |   RSP    | +30
+//      |  RFLAGS  | +28
+//      |    CS    | +20
+//      |   RIP    | +18
+//      | ERR CODE | +10 (RSI)
+//      |   RDI    | +8
+//      |   RAX    | $rsp
 EXTERN_DATA(isr_tbl)
 int_err_code:
     pushq   %rax
     movq    $KERNEL_DATA_DEC, %rax
     movq    %rax, %ss
-	testl   $3, 0x18(%rsp)  // cs = rsp + 0x18 
+
+	xchgq   %rsi, 0x18(%rsp)  // 把rsi备份到栈里，同时取出error code
+
+	testl   $3, 0x20(%rsp)  // cs = rsp + 0x20
     jz  1f   // 判断cs的特权级别，如果为用户态则交换gsbase和kgsbase
-    swapgs 
+    swapgs
 1:
 
-	xchgq   %rsi, 8(%rsp)  // 把rsi备份到栈里，同时取出error code
 	movq    $isr_tbl, %rax
     movq    (%rax, %rdi, 8), %rax  // 查表调用相应的中断处理程序
     call    * %rax
-    popq    %rax
-	//  call   interrupt_stub
-	popq    %rdi
-	popq    %rsi
 
-	testl  $3, 0x08(%rsp)  // 弹出rdi和errcode后，cs = rsp + 8
+	testl  $3, 0x20(%rsp)   // %cs = %rsp + 0x20
 	jz 2f
 	swapgs
 2:
+    popq    %rax
+	popq    %rdi
+	popq    %rsi
+
 	iretq
 
 #define with_errcode(vec) \
@@ -170,6 +173,18 @@ GLOBAL_FUNC(load_tid_next)
 // 函数调用时栈顶为进程切换回来后要执行的地址
 // 此函数会保存当前线程上下文，再把栈构建成目标线程的中断上下文
 // 通过iret执行目标线程
+// High |    SS    | +58
+//      |   RSP    | +50
+//      |  RFLAGS  | +48
+//      |    CS    | +40
+//      |   RIP    | +38
+//      | ERR CODE | +30
+//      |   RDI    | +28
+//      |   RAX    | +20
+//      |   RBX    | +18
+//      |   CR3    | +10
+//      |CALL *RAX | +8
+// LOW  |CAL switch| <-- %rsp
 thread_switch:
 	pushfq
 	cli
@@ -178,10 +193,11 @@ thread_switch:
     movq    %gs:(tid_prev), %rsi
     movq    %gs:(tid_next), %rdi
 
-    movq    %cs, %r8                // r8  = cs
-    popq    %r9                     // r9  = rip
-    movq    %ss,  %r10              // r10 = ss
-    movq    %rsp, %r11              // r11 = rsp
+    movq    %cs, %r8            // r8  = cs
+    popq    %r9                 // r9  = rip
+    movq    %ss, %r10           // r10 = ss
+    movq    %rsp, %r11          // r11 = rsp
+
     pushq   %r10                    // ss
     pushq   %r11                    // rsp
     pushq   %rax                    // rflags
@@ -200,11 +216,11 @@ load_tid_next:
     testl   $3, 0x88(%rsp)          // (15 + 2)* 8 = 0x88
     jz      3f
     swapgs
-    movw    $USER_DATA_DEC, %ax
-    movw    %ax, %ds
-    movw    %ax, %es
-    movw    %ax, %fs
-    movw    %ax, %gs
+    // movw    $USER_DATA_DEC, %ax
+    // movw    %ax, %ds
+    // movw    %ax, %es
+    // movw    %ax, %fs
+    // movw    %ax, %gs
 3:
     restore_regs                    // 恢复寄存器
 	addq    $8, %rsp                // 跳过errcode

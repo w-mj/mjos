@@ -42,6 +42,7 @@ bool schedule() {
 		//plist
 		prepare_switch(thiscpu_var(current), next);
 		thiscpu_var(current) = next;
+		set_rsp0((u64) next->rsp0);
 	}
 	return true;
 }

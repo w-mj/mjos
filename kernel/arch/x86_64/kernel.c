@@ -202,6 +202,7 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	ThreadDescriptor *thread = list_entry(thread_list_entry, ThreadDescriptor, next);
 	assert(thread->process == pd); // 启动init进程
 	thiscpu_var(current) = thread;
+	set_rsp0((u64) thread->rsp0);
     load_tid_next(thread);
 
 	die();

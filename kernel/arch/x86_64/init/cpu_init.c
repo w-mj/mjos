@@ -121,7 +121,7 @@ void *calc_thiscpu_addr(void *ptr) {
 
 
 void prepare_switch(ThreadDescriptor *prev, ThreadDescriptor *next) {
-	// logd("prepare switch from %d to %d", prev->process->pid, next->process->pid);
+	logd("prepare switch from %d to %d", prev->process->pid, next->process->pid);
 	thiscpu_var(tid_prev) = prev;
 	thiscpu_var(tid_next) = next;
 }

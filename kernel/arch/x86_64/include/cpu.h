@@ -22,3 +22,5 @@ void prepare_switch(ThreadDescriptor *prev, ThreadDescriptor *next);
 // 初始化线程栈，传入栈地址和线程的入口地址
 void *init_thread_stack(void *sp, void *main, u32 cs, u32 ss);
 void thread_switch();
+
+void set_rsp0(u64);

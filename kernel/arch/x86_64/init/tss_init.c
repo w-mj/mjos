@@ -70,3 +70,8 @@ void tss_init() {
 	_pos();
 	// logi("tss init finish");
 }
+
+void set_rsp0(u64 rsp0) {
+    thiscpu_var(tss).rsp0_lower = rsp0 & 0xffffffff;
+    thiscpu_var(tss).rsp0_upper = rsp0 >> 32;
+}

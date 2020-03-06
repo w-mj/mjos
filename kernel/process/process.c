@@ -35,7 +35,8 @@ ThreadDescriptor *create_thread(ProcessDescriptor *process, void *main) {
 	logd("create thread %d for pid %d", process->threads_cnt, process->pid);
 	ThreadDescriptor *thread = kmalloc_s(sizeof(ThreadDescriptor));
 	_sL(process->cr3);
-	void *stack = normal_page_alloc(NULL, process->cr3);  
+	void *stack = normal_page_alloc(NULL, process->cr3);
+	void *sp0 = stack + 1024;  // 栈的最低1K是内核栈
 	u64* page = phys_to_virt(process->cr3);
 	_sL(page[0]);
 	_sL(page[511]);
@@ -52,7 +53,7 @@ ThreadDescriptor *create_thread(ProcessDescriptor *process, void *main) {
 		thread->rsp = init_thread_stack(stack, main, USER_CODE_DEC, USER_DATA_DEC);
 		write_cr3(kcr3);
 	}
-	thread->rsp0 = thread->rsp;
+	thread->rsp0 = sp0;
 	thread->cr3 = process->cr3;
 	thread->tid = process->threads_cnt;
 	thread->process = process;
