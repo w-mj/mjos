@@ -2,6 +2,7 @@
 #include <types.h>
 #include <list.h>
 #include <biosreg.h>
+#include <spin.h>
 
 typedef enum {
 	THREAD_RUNNING,
@@ -36,10 +37,13 @@ typedef struct __ProcessDescriber {
 	struct __ProcessDescriber *parent;
 	ListEntry threads;
 	ListEntry children;  // list head
-	ListEntry sublings;  // list entry
+	ListEntry siblings;  // list entry
 	u64 cr3;
 	int threads_cnt;
 	ListEntry process_list_entry;
+	char *shared_mem;
+	Spin shared_mem_read_lock;
+	Spin shared_mem_write_lock;
 } ProcessDescriptor;
 
 extern ThreadDescriptor *current;

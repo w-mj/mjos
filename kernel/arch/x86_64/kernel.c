@@ -149,6 +149,12 @@ void init_main() {
 	raw_spin_take(&spinB);
 	sys_print_msg("start init process");
 	sys_create_process(PROCESS_USER, processB);
+	// char buf[10];
+	// while(1) {
+    //     int size = sys_read_message(buf);
+    //     buf[size] = 0;
+    //     sys_print_msg(buf);
+	// }
 	int x = 1;
 	while (1) {
 		raw_spin_take(&spinA);

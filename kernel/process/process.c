@@ -41,6 +41,7 @@ ThreadDescriptor *create_thread(ProcessDescriptor *process, void *main) {
 	_sL(page[0]);
 	_sL(page[511]);
 	stack = stack + PAGESIZE;  // stack 指向栈的尾部，向下增长
+	sp0 = sp0 + PAGESIZE;
 	if (process->type == PROCESS_KERNEL) {
 		thread->rsp = init_thread_stack(stack, main, KERNEL_CODE_DEC, KERNEL_DATA_DEC);
 	} else {
@@ -54,6 +55,9 @@ ThreadDescriptor *create_thread(ProcessDescriptor *process, void *main) {
 		write_cr3(kcr3);
 	}
 	thread->rsp0 = sp0;
+	if (process->shared_mem == NULL) {
+	    process->shared_mem = sp0 - PAGESIZE;   // 内核栈的高部分是共享内存空间
+	}
 	thread->cr3 = process->cr3;
 	thread->tid = process->threads_cnt;
 	thread->process = process;
@@ -77,12 +81,16 @@ pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main) {
 	pd->type = type;
 	pd->parent = parent;
 	pd->threads_cnt = 0;
+	pd->shared_mem = NULL;
+	pd->shared_mem_write_lock = SPIN_INIT;
+	pd->shared_mem_read_lock  = SPIN_INIT;
+	raw_spin_take(&pd->shared_mem_read_lock);
 	list_init(&pd->threads);
 	list_init(&pd->children);
-	list_init(&pd->sublings);
+	list_init(&pd->siblings);
 	list_init(&pd->process_list_entry);
 	if (parent != NULL) {
-		list_add_tail(&pd->sublings, &parent->children);
+		list_add_tail(&pd->siblings, &parent->children);
 	}
 	list_add_tail(&pd->process_list_entry, &process_list);
 
