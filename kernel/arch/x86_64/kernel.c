@@ -16,6 +16,7 @@
 #include <process/process.h>
 #include <process/scheduler.h>
 #include <syscall.h>
+#include <spin.h>
 
 #define TESTTYPE(x) assert((x) / 8 == sizeof(u##x))
 void test_types(void) {
@@ -128,26 +129,34 @@ static __INIT void parse_madt(madt_t * tbl) {
     }
 }
 
+Spin spinA = SPIN_INIT;
+Spin spinB = SPIN_INIT;
+int ka, kb;
 void processB() {
 	int x = 1;
 	while (1) {
+		raw_spin_take(&spinB);
         sys_print_msg("B");
 		// sys_print_msg("B");
 		for (int i = 0; i < 65536 * 200; i++) 
 			;
 		x++;
+		raw_spin_give(&spinA);
 	}
 }
 
 void init_main() {
+	raw_spin_take(&spinB);
 	sys_print_msg("start init process");
 	sys_create_process(PROCESS_USER, processB);
 	int x = 1;
 	while (1) {
+		raw_spin_take(&spinA);
         sys_print_msg("A");
 		for (int i = 0; i < 65536 * 200; i++)
 			;
 		x++;
+		raw_spin_give(&spinB);
 	}
 }
 typedef struct {

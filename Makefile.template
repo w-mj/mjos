@@ -12,6 +12,7 @@ export MAKECMDGOALS
 
 clean: $(subdirs)
 	rm -f $(toclean)
+	@ rm -f compiler-file*.d
 
 build: $(subdirs) $(target)
 

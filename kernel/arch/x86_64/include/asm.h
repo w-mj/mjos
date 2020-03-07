@@ -195,6 +195,7 @@ static inline void relax() {
 	ASM("pause");
 }
 
+// 关中断，返回值指示调用int_lock前IF的状态
 static inline u32 int_lock() {
     u64 key;
     ASM("pushfq; cli; popq %0" : "=r"(key));
