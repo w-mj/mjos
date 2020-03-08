@@ -2,6 +2,7 @@
 #include <delog.h>
 #include <vsnprintf.h>
 #include <string.h>
+#include <asm.h>
 
 #define CHK(a, b, ok, fail) do {\
 	if ((a) == (b)) {\
@@ -18,7 +19,7 @@
 #define CASE(v, str) \
 	case v: if (str[0] != '\0') logi(" "str); break
 
-#define ELFMAGu32 (ELFMAG0 | (ELFMAG1 << 8) | (ELFMAG2 << 16) | (ELFMAG3 << 24))
+#define ELFMAGu32 (ELFMAG0 | (ELFMAG1 << 8)| (ELFMAG2 << 16) | (ELFMAG3 << 24))
 void parse_elf64(void *addr) {
 	Elf64_Ehdr *head = (Elf64_Ehdr *)addr;
 	logi("parse elf64 file");

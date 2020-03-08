@@ -40,27 +40,29 @@ ThreadDescriptor *create_thread(ProcessDescriptor *process, void *main) {
 	u64* page = phys_to_virt(process->cr3);
 	_sL(page[0]);
 	_sL(page[511]);
-	stack = stack + PAGESIZE;  // stack 指向栈的尾部，向下增长
-	sp0 = sp0 + PAGESIZE;
+	thread->rsp = stack + PAGESIZE;
+	thread->rsp0 = sp0  + PAGESIZE;
+	thread->cr3 = process->cr3;
+    thread->tid = process->threads_cnt;
+    thread->process = process;
 	if (process->type == PROCESS_KERNEL) {
-		thread->rsp = init_thread_stack(stack, main, KERNEL_CODE_DEC, KERNEL_DATA_DEC);
+		thread->rsp = init_kernel_thread_stack(stack, main);
 	} else {
-		u64 kcr3 = read_cr3();
-		u64 ucr3 = process->cr3;
-		u64 ip = 0xffffffff81016a5d;
-		_sL(page_translate(kcr3, ip));
-		_sL(page_translate(ucr3, ip));
-		write_cr3(ucr3);  // 切换成用户页表
-		thread->rsp = init_thread_stack(stack, main, USER_CODE_DEC, USER_DATA_DEC);
-		write_cr3(kcr3);
+	    thread->rsp = init_user_thread_stack(thread, main);
+		// u64 kcr3 = read_cr3();
+		// u64 ucr3 = process->cr3;
+		// u64 ip = 0xffffffff81016a5d;
+		// _sL(page_translate(kcr3, ip));
+		// _sL(page_translate(ucr3, ip));
+		// write_cr3(ucr3);  // 切换成用户页表
+		// thread->rsp = init_thread_stack(stack, main, USER_CODE_DEC, USER_DATA_DEC);
+		// write_cr3(kcr3);
 	}
 	thread->rsp0 = sp0;
 	if (process->shared_mem == NULL) {
 	    process->shared_mem = sp0 - PAGESIZE;   // 内核栈的高部分是共享内存空间
 	}
-	thread->cr3 = process->cr3;
-	thread->tid = process->threads_cnt;
-	thread->process = process;
+
 	process->threads_cnt++;
 	list_init(&thread->next);
 	list_add_tail(&thread->next, &process->threads);

@@ -119,10 +119,9 @@ syscall_stub:
 	pushq %r11
 	pushq %rbp
 
-    movq  %gs:(current), %rbp
-    movq  %rsp, (%rbp)      // 备份用户栈
-	movq  0x08(%rbp), %rsp  // 切换至内核栈
-	movq  $kernel_pml4, %rax
+    // movq  %gs:(current), %rbp
+    // movq  %rsp, (%rbp)      // 备份用户栈
+	// movq  0x08(%rbp), %rsp  // 切换至内核栈
 	movq  $syscall_tbl, %rax
 	movq  (%rax, %r9, 8), %rax
 	call  * %rax  // 系统调用例程的返回值会放在rax里
@@ -133,7 +132,7 @@ syscall_stub:
 	//movq  %rcx,  %cs
 	// swapgs
     // popq  %rbx
-    movq  (%rbp), %rsp   // 恢复用户栈
+    // movq  (%rbp), %rsp   // 恢复用户栈
 	popq  %rbp
 	popfq
 	// retq
@@ -240,4 +239,26 @@ init_thread_stack:
 	movq  %rsp, %rax  // 当前栈指针作为返回值
 
 	movq  %r11, %rsp  // 恢复栈指针
-	retq  
+	retq
+
+
+// void *init_user_thread_stack(ThreadDescriptor *thread, void *main);
+GLOBAL_FUNC(init_user_thread_stack)
+init_user_thread_stack:
+    movq  %rsp, %r9
+    movq  %cr3, %r10
+    movq  (%rdi), %rsp
+    movq  0x10(%rdi), %rax
+    movq  %rax, %cr3
+    pushq $USER_DATA_DEC
+    pushq (%rdi)
+    pushfq
+    pushq $USER_CODE_DEC
+    pushq %rsi
+    pushq $0
+    save_regs
+    movq  %rsp, %rax
+    movq  %r10, %cr3
+    movq  %r9,  %rsp
+    ret
+

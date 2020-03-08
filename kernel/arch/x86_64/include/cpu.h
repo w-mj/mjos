@@ -18,9 +18,15 @@ void *calc_thiscpu_addr(void * ptr);
 #define thiscpu_var(var)    (* thiscpu_ptr(var))
 
 #include <process/process.h>
+#include "arch.h"
+
 void prepare_switch(ThreadDescriptor *prev, ThreadDescriptor *next);
 // 初始化线程栈，传入栈地址和线程的入口地址
 void *init_thread_stack(void *sp, void *main, u32 cs, u32 ss);
+static inline void *init_kernel_thread_stack(void *sp, void *main) {
+    return init_thread_stack(sp, main, KERNEL_CODE_DEC, KERNEL_DATA_DEC);
+}
+void *init_user_thread_stack(ThreadDescriptor *thread, void *main);
 void thread_switch();
 
 void set_rsp0(u64);

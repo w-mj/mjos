@@ -612,3 +612,20 @@ u64 create_user_page() {
 	return pml_phy;
 }
 
+void copy_page(u64 top, u64 to, u64 from, int level) {
+    u64 *to_vir = phys_to_virt(to);
+    u64 *from_vir = phys_to_virt(from);
+    for (int i = 0; i < 512; i++) {
+        if (! PRESENT(from_vir[i]))
+            continue;
+        if (level == 1) {
+            to_vir[i] = from_vir[i];
+        } else {
+            pfn_t new_page = kernel_page_alloc(PG_KERNEL);
+            u64 new_phy = new_page << PAGEOFFSET;
+            to_vir[i] = mk_page_entry(new_page, MMU_US| MMU_P| MMU_RW);
+            copy_page(top, new_phy,from_vir[i] & MMU_ADDR, level - 1);
+        }
+    }
+}
+
