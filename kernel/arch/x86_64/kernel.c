@@ -17,6 +17,7 @@
 #include <process/scheduler.h>
 #include <syscall.h>
 #include <spin.h>
+#include <vsnprintf.h>
 
 #define TESTTYPE(x) assert((x) / 8 == sizeof(u##x))
 void test_types(void) {
@@ -131,9 +132,15 @@ static __INIT void parse_madt(madt_t * tbl) {
 
 Spin spinA = SPIN_INIT;
 Spin spinB = SPIN_INIT;
-int ka, kb;
 void processB() {
 	int x = 1;
+	relax();
+	sys_send_message(0, "123", 3);
+    sys_send_message(0, "123", 3);
+    sys_send_message(0, "133", 3);
+    sys_send_message(0, "123", 3);
+	while(1)
+	    relax();
 	while (1) {
 		raw_spin_take(&spinB);
         sys_print_msg("B");
@@ -148,13 +155,15 @@ void processB() {
 void init_main() {
 	raw_spin_take(&spinB);
 	sys_print_msg("start init process");
-	sys_create_process(PROCESS_USER, processB);
-	// char buf[10];
-	// while(1) {
-    //     int size = sys_read_message(buf);
-    //     buf[size] = 0;
-    //     sys_print_msg(buf);
-	// }
+	pid_t pid = sys_create_process(PROCESS_USER, processB);
+    char buf[10];
+    snprintf(buf, 10, "pid=%d", pid);
+	sys_print_msg(buf);
+	while(1) {
+        int size = sys_read_message(buf);
+        buf[size] = 0;
+        sys_print_msg(buf);
+	}
 	int x = 1;
 	while (1) {
 		raw_spin_take(&spinA);

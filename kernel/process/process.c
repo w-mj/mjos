@@ -58,9 +58,8 @@ ThreadDescriptor *create_thread(ProcessDescriptor *process, void *main) {
 		// thread->rsp = init_thread_stack(stack, main, USER_CODE_DEC, USER_DATA_DEC);
 		// write_cr3(kcr3);
 	}
-	thread->rsp0 = sp0;
 	if (process->shared_mem == NULL) {
-	    process->shared_mem = sp0 - PAGESIZE;   // 内核栈的高部分是共享内存空间
+	    process->shared_mem = sp0;   // 内核栈的低部分是共享内存空间
 	}
 
 	process->threads_cnt++;
@@ -108,7 +107,7 @@ pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main) {
 
 ProcessDescriptor *get_process(u16 pid) {
 	ListEntry *c;
-	_si(pid);
+	// _si(pid);
 	foreach(c, process_list) {
 		ProcessDescriptor *pd = list_entry(c, ProcessDescriptor, process_list_entry);
 		if (pd->pid == pid)

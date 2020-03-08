@@ -18,4 +18,17 @@ int strncmp(const char *s1, const char *s2, size_t n) {
 		return 0;
 	return *s1 - *s2;
 }
-
+/*
+void memcpy(char *dst, const char*src, _u16 size) {
+    while (size--) {
+        *dst = *src;
+        dst++;
+        src++;
+    }
+}
+void memset(char *ptr, char value, _u16 num) {
+    while (num--) {
+        *ptr++ = value;
+    }
+}
+*/

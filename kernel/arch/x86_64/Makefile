@@ -1,5 +1,5 @@
 
-srclist := boot.S copy64.S atomic.S kernel.c
+srclist := boot.S atomic.S kernel.c copy64.S
 target  := x86_64.obj
 subdirs := driver init
 

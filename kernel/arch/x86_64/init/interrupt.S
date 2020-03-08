@@ -117,7 +117,6 @@ syscall_stub:
 	swapgs
     pushq %rcx
 	pushq %r11
-	pushq %rbp
 
     // movq  %gs:(current), %rbp
     // movq  %rsp, (%rbp)      // 备份用户栈
@@ -133,7 +132,6 @@ syscall_stub:
 	// swapgs
     // popq  %rbx
     // movq  (%rbp), %rsp   // 恢复用户栈
-	popq  %rbp
 	popfq
 	// retq
 	// popq %r11
@@ -206,7 +204,7 @@ load_tid_next:
 	movq    0x10(%rdi), %rax        // rax = cr3
 	movq    %rax, %cr3              // 换新线程页表
 4:
-    testl   $3, 0x88(%rsp)          // (15 + 2)* 8 = 0x88
+    testl   $3, 0x88(%rsp)          // (15 + 3 - 1)* 8 = 0x88
     jz      3f
     swapgs
     // movw    $USER_DATA_DEC, %ax
