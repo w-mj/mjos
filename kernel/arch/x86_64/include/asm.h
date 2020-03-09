@@ -2,14 +2,31 @@
 #include <types.h>
 #define asm __asm__ 
 #define ASM asm volatile
+#define DEFINE_IN(n, suffix)                            \
+static inline u ## n in ## n (u16 p) {                  \
+    u ## n x;                                           \
+    ASM("in" suffix " %1, %0" : "=a"(x) : "Nd"(p));     \
+    return x;                                           \
+}
+#define DEFINE_OUT(n, suffix)                           \
+static inline void out ## n (u##n x, u16 p) {         \
+    ASM("out" suffix " %0, %1" :: "a"(x), "Nd"(p));     \
+}
 
+DEFINE_IN (8,  "b")     // in8
+DEFINE_IN (16, "w")     // in16
+DEFINE_IN (32, "l")     // in32
+DEFINE_OUT(8,  "b")     // out8
+DEFINE_OUT(16, "w")     // out16
+DEFINE_OUT(32, "l")     // out32
+/*
 #define DEFINE_OUT(n, suffix) \
 static inline void out##n(u##n v, u16 port) {\
 	asm volatile("out"#suffix" %0,%1" : : "a" (v), "dN" (port)); \
-} 
+}
 #define DEFINE_IN(n, suffix)\
 static inline u##n in##n(u16 port) { \
-	u8 v; \
+	u##n v; \
 	asm volatile("in"#suffix" %1,%0" : "=a" (v) : "dN" (port)); \
 	return v; \
 } \
@@ -20,7 +37,7 @@ DEFINE_IN (32, l)
 DEFINE_OUT(8,  b)
 DEFINE_OUT(16, w)
 DEFINE_OUT(32, l)
-
+*/
 #define DEFINE_READ(n) \
 static inline u##n read##n (void * p) {\
     return *((u##n volatile *) p); \

@@ -34,15 +34,19 @@ static __INIT void store_acpi_tbl(acpi_tbl_t * tbl) {
 	// _sL(tbl);
     switch (tbl->signature) {
     case SIG_MADT:
+        logd("find madt table");
         acpi_madt = (madt_t *) tbl;
         break;
     case SIG_MCFG:
+        logd("find mcfg table");
         acpi_mcfg = (mcfg_t *) tbl;
         break;
     case SIG_HPET:
+        logd("find hpet table");
         acpi_hpet = (hpet_t *) tbl;
         break;
     case SIG_FADT:
+        logd("find fadt table");
         acpi_fadt = (fadt_t *) tbl;
         break;
     default:

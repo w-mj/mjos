@@ -18,6 +18,7 @@
 #include <syscall.h>
 #include <spin.h>
 #include <vsnprintf.h>
+#include <driver.h>
 
 #define TESTTYPE(x) assert((x) / 8 == sizeof(u##x))
 void test_types(void) {
@@ -210,7 +211,11 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	scheduler_init();
 	
 	loapic_dev_init();
+	ioapic_all_init();
+	pci_probe_all();
+
     ASM("sti");
+    while(1);
 
     logi("System init finish");
 	// parse_elf64(&elf_addr);

@@ -142,7 +142,7 @@ __INIT void ioapic_dev_add(madt_ioapic_t * tbl) {
 
 __INIT void ioapic_int_override(madt_int_override_t * tbl) {
     if (tbl->source_irq < 16) {
-		logd("set io int irq:%d flg:%d", tbl->global_irq | 0x80, tbl->inti_flags);
+		logd("set io int irq:%d, girq: %d, sirq: %d, flg:%d", tbl->global_irq | 0x80, tbl->global_irq, tbl->source_irq, tbl->inti_flags);
         irq_to_gsi[tbl->source_irq] = tbl->global_irq | 0x80;
         gsi_to_flg[tbl->global_irq] = tbl->inti_flags;
     }
@@ -164,9 +164,10 @@ __INIT void ioapic_all_init() {
 
     for (int i = 0; i < ioapic_count; ++i) {
         u8 * base = (u8 *) phys_to_virt(ioapic_devs[i].addr);
-        u32  ver  = ioapic_read(base, IOAPIC_VER);
+        u32  ver  = ioapic_read(base, IOAPIC_VER); // 读取ioapic版本，高
         ioapic_devs[i].base   = base;
         ioapic_devs[i].rednum = (ver >> 16) & 0xff;
+        logi("init ioapic %d, version %x, int num: %d", i, ver &0xff, ioapic_devs[i].rednum + 1);
 
         int gsi = 0;
         if (i == 0) {
