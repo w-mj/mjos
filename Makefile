@@ -49,19 +49,28 @@ iso: build
 	grub-mkrescue -o $(ISOFILE) $(ISODIR) 
 
 QEMU := qemu-system-x86_64
-QEMUFLAGS := -m 16385 -smp 4 -cdrom $(ISOFILE) -vga vmware -serial stdio -boot order=d
+QEMUFLAGS := -m 16385 -smp 4 -cdrom $(ISOFILE) -vga vmware -serial stdio -boot order=d \
+ 			 -drive id=disk,file=disk.img,if=none \
+ 			 -device ahci,id=ahci \
+ 			 -device ide-drive,drive=disk,bus=ahci.0
 
-run: iso
+run: iso disk
 	- ps aux | grep $(QEMU) | sed -n "1, 1p" | awk '{print $$2}' | xargs -I {} kill -9 {}
 	$(QEMU) $(QEMUFLAGS)
 
-debug: iso
+debug: iso disk
 	- ps aux | grep $(QEMU) | sed -n "1, 1p" | awk '{print $$2}' | xargs -I {} kill -9 {}
 	$(QEMU) -S -gdb tcp::4444 $(QEMUFLAGS)
 
-debugbackground: iso
+debugbackground: iso disk
 	- ps aux | grep $(QEMU) | sed -n "1, 1p" | awk '{print $$2}' | xargs -I {} kill -9 {}
 	$(QEMU) -S -gdb tcp::4444 $(QEMUFLAGS) &
 
 dump: build
 	objdump -S -d kernel/kernel.elf > dump.txt
+
+disk: disk.img
+
+disk.img:
+	dd if=/dev/zero of=disk.img bs=1024 count=1024
+	mkfs.ext2 disk.img

@@ -18,7 +18,7 @@
 #include <syscall.h>
 #include <spin.h>
 #include <vsnprintf.h>
-#include <driver.h>
+#include <driver/pci.h>
 
 #define TESTTYPE(x) assert((x) / 8 == sizeof(u##x))
 void test_types(void) {

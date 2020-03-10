@@ -290,13 +290,13 @@ static void write_new_kernel_page_table() {
 	addr = 0;
 	// 低16M全部直接映射
 	while (addr < 16 * (1 << 20)) {
-		page_table_set_entry(newmp, addr, addr + 7, true);
+		page_table_set_entry(newmp, addr, addr| MMU_P| MMU_RW| MMU_US| MMU_PCD| MMU_PWT, true);
 		addr += PAGESIZE;
 	}
 	addr = 0xbfee0000;  // 3G
 	// 3G - 4G　PCI映射区直接映射
 	while (addr < (u64)4 * (1 << 30)) {
-		page_table_set_entry(newmp, addr, addr | MMU_P | MMU_RW | MMU_US, true);
+		page_table_set_entry(newmp, addr, addr| MMU_P |MMU_RW| MMU_US| MMU_PCD| MMU_PWT, true);
 		addr += PAGESIZE;
 	}
 	// 构建内核代码数据页表

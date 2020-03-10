@@ -2,6 +2,8 @@
 #include <asm.h>
 #include <delog.h>
 #include <acpi.h>
+#include <driver/pci.h>
+#include <driver/ahci.h>
 
 
 #define PCI_ADDR    0x0cf8
@@ -53,6 +55,14 @@ static void pci_check_func(u8 bus, u8 dev, u8 func) {
             logd("pci detected IDE controller");
             // ata_probe(bus, dev, func)
             break;
+        case 0x0106:
+            if (prog == 1) {
+                logd("pci detected SATA AHCI controller");
+                ahci_init(bus, dev, func);
+            } else {
+                logd("pci detected SATA controller %d", prog);
+            }
+            break;
         case 0x0200:        // ethernet controller
             logd("pci detected ethernet controller");
             break;
@@ -77,7 +87,7 @@ static void pci_check_func(u8 bus, u8 dev, u8 func) {
             // handle_pci_bridge(bus, dev, func);
             break;
         default:
-            // logd("unknown pci device 0x%x, prog if %d.", ccode, prog);
+            logd("unknown pci device 0x%04x, prog if %d.", ccode, prog);
             break;
     }
 }

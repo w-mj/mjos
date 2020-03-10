@@ -1,5 +1,5 @@
 
-srclist := pci.c
+srclist := pci.c ahci.c
 target  := driver.obj
 subdirs :=
 
