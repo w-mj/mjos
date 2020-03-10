@@ -31,6 +31,7 @@ endif
 TEMPLATEFILE := $(CURDIR)/Makefile.template
 export CC CPP AR OBJCOPY LD NM CFLAGS TEMPLATEFILE ARCH
 # PARAMS  :=  DEBUG=$(DEBUG) ARCH=$(ARCH) CC=$(CC) CPP=$(CPP) AR=$(AR) OBJCOPY=$(OBJCOPY)
+all: build
 
 build:
 	$(MAKE) -C kernel build
