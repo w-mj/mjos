@@ -1,5 +1,6 @@
 #pragma once
 #include <types.h>
+#include <base.h>
 
 typedef volatile struct tagHBA_PORT {
     u32  clb;		// 0x00, command list base address, 1K-byte aligned
@@ -21,7 +22,7 @@ typedef volatile struct tagHBA_PORT {
     u32  fbs;		// 0x40, FIS-based switch control
     u32  rsv1[11];	// 0x44 ~ 0x6F, Reserved
     u32  vendor[4];	// 0x70 ~ 0x7F, vendor specific
-} HBA_PORT;
+} __PACKED HBA_PORT;
 
 typedef volatile struct tagHBA_MEM {
     // 0x00 - 0x2B, Generic Host Control
@@ -45,7 +46,7 @@ typedef volatile struct tagHBA_MEM {
 
     // 0x100 - 0x10FF, Port control registers
     HBA_PORT	ports[1];	// 1 ~ 32
-} HBA_MEM;
+} __PACKED HBA_MEM;
 
 typedef enum
 {
@@ -91,7 +92,7 @@ typedef struct tagFIS_REG_H2D
 
     // DWORD 4
     u8   rsv1[4];	// Reserved
-} FIS_REG_H2D;
+} __PACKED FIS_REG_H2D;
 
 typedef struct tagFIS_REG_D2H
 {
@@ -101,7 +102,7 @@ typedef struct tagFIS_REG_D2H
     u8   pmport:4;    // Port multiplier
     u8   rsv0:2;      // Reserved
     u8   i:1;         // Interrupt bit
-    u8   rsv1:1;      // Reserved
+    u8   n:1;         // Notification bit
 
     u8   status;      // Status register
     u8   error;       // Error register
@@ -125,7 +126,7 @@ typedef struct tagFIS_REG_D2H
 
     // DWORD 4
     u8   rsv4[4];     // Reserved
-} FIS_REG_D2H;
+} __PACKED FIS_REG_D2H;
 
 typedef struct tagFIS_DATA
 {
@@ -139,7 +140,7 @@ typedef struct tagFIS_DATA
 
     // DWORD 1 ~ N
     u32  data[1];	// Payload
-} FIS_DATA;
+} __PACKED FIS_DATA;
 
 typedef struct tagFIS_PIO_SETUP
 {
@@ -176,7 +177,7 @@ typedef struct tagFIS_PIO_SETUP
     // DWORD 4
     u16  tc;		// Transfer count
     u8   rsv4[2];	// Reserved
-} FIS_PIO_SETUP;
+} __PACKED FIS_PIO_SETUP;
 
 typedef struct tagFIS_DMA_SETUP
 {
@@ -207,7 +208,7 @@ typedef struct tagFIS_DMA_SETUP
     //DWORD 6
     u32  resvd;          //Reserved
 
-} FIS_DMA_SETUP;
+}__PACKED FIS_DMA_SETUP;
 
 typedef u64 FIS_DEV_BITS;
 typedef volatile struct tagHBA_FIS
@@ -232,7 +233,7 @@ typedef volatile struct tagHBA_FIS
 
     // 0xA0
     u8    	rsv[0x100-0xA0];
-} HBA_FIS;
+}__PACKED HBA_FIS;
 
 typedef struct tagHBA_CMD_HEADER
 {
@@ -260,7 +261,7 @@ typedef struct tagHBA_CMD_HEADER
 
     // DW4 - 7
     u32  rsv1[4];	// Reserved
-} HBA_CMD_HEADER;
+}__PACKED HBA_CMD_HEADER;
 
 typedef struct tagHBA_PRDT_ENTRY
 {
@@ -272,7 +273,7 @@ typedef struct tagHBA_PRDT_ENTRY
     u32  dbc:22;		// Byte count, 4M max
     u32  rsv1:9;		// Reserved
     u32  i:1;		// Interrupt on completion
-} HBA_PRDT_ENTRY;
+}__PACKED HBA_PRDT_ENTRY;
 
 typedef struct tagHBA_CMD_TBL
 {
@@ -287,4 +288,4 @@ typedef struct tagHBA_CMD_TBL
 
     // 0x80
     HBA_PRDT_ENTRY	prdt_entry[1];	// Physical region descriptor table entries, 0 ~ 65535
-} HBA_CMD_TBL;
+}__PACKED HBA_CMD_TBL;

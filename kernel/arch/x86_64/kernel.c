@@ -19,6 +19,8 @@
 #include <spin.h>
 #include <vsnprintf.h>
 #include <driver/pci.h>
+#include <fs/ext2_stru.h>
+#include <driver/ahci.h>
 
 #define TESTTYPE(x) assert((x) / 8 == sizeof(u##x))
 void test_types(void) {
@@ -26,6 +28,9 @@ void test_types(void) {
 	TESTTYPE(16);
 	TESTTYPE(32);
 	TESTTYPE(64);
+	HBA_FIS *fis = (HBA_FIS *)0;
+	_sx(&fis->pad0);
+	assert(&fis->psfis == 0x20);
 }
 
 char map[4096] = {0};
@@ -214,8 +219,25 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	ioapic_all_init();
 	pci_probe_all();
 
-    ASM("sti");
+	ioapic_gsi_unmask(ioapic_irq_to_gsi(1));
+    ioapic_gsi_unmask(ioapic_irq_to_gsi(16));
+    ioapic_gsi_unmask(ioapic_irq_to_gsi(17));
+    ioapic_gsi_unmask(ioapic_irq_to_gsi(18));
+    ioapic_gsi_unmask(ioapic_irq_to_gsi(19));
+
+    ext2_sb *sb = kmalloc_s(sizeof(ext2_sb));
+    bool t = sata_read(sata,2, 0, 2, virt_to_phys(sb));
+    if (t == false)
+        loge("read sata error");
+    if (sb->magic == 0xEF53) {
+        logd("ext2 success");
+        _sa(sb, 1024);
+    } else {
+        logd("Ext2 fail");
+    }
+
     while(1);
+    ASM("sti");
 
     logi("System init finish");
 	// parse_elf64(&elf_addr);

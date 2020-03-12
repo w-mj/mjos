@@ -213,7 +213,7 @@ static void page_table_set_entry(u64 pmltop, u64 page_table_entry, u64 value, bo
 				// }
 
 				// 自动分配页框
-				pmle = pml[pmli] = (frame_alloc(PG_KERNEL) << PAGEOFFSET) + 7;
+				pmle = pml[pmli] = (frame_alloc(PG_KERNEL) << PAGEOFFSET)|MMU_P| MMU_US| MMU_RW|MMU_PCD| MMU_PWT ;
 				// logd("auto alloc frame %llx %llx", VIRTUAL(pmle), pmle);
 								page_table_set_entry(pmltop, (u64)VIRTUAL(pmle), pmle, true);
 				heap_end += PAGESIZE;
@@ -224,7 +224,7 @@ static void page_table_set_entry(u64 pmltop, u64 page_table_entry, u64 value, bo
 	}
 	pml = (u64 *)VIRTUAL(pml); // 物理页框号转换为虚拟地址
 	u16 pml1i = PMLOFFSET(page_table_entry, 1);
-	pml[pml1i] = value;
+	pml[pml1i] = value | MMU_PCD| MMU_PWT;
 }
 
 static inline u64 mk_virtual(int *frames) {
