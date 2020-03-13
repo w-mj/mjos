@@ -187,11 +187,11 @@ int find_cmdslot(HBA_PORT *port)
     _sL(fis->sdbfis);} \
     _ss("=======FIS END=========="); \
 } while(0)
-bool sata_read(HBA_PORT *port, u32 startl, u32 starth, u32 count, u8 *buf)
+bool sata_read(HBA_PORT *port, u32 startl, u32 starth, u32 count, u64 buf)
 {
     assert(port != NULL);
-    print_port(port);
-    print_fis(port->fb, port->fbu);
+    // print_port(port);
+    // print_fis(port->fb, port->fbu);
     port->ie = (u32) -1;	// 打开中断
     // port->is = (u32) -1;	// Clear pending interrupt bits
     int spin = 0; // Spin lock timeout counter
@@ -211,7 +211,7 @@ bool sata_read(HBA_PORT *port, u32 startl, u32 starth, u32 count, u8 *buf)
         cmdheader->ctbau = 0;
     }
 
-    volatile HBA_CMD_TBL *cmdtbl = (HBA_CMD_TBL*)phys_to_virt(cmdheader->ctba);
+    HBA_CMD_TBL *cmdtbl = (HBA_CMD_TBL*)phys_to_virt(cmdheader->ctba);
 
     memset(cmdtbl, 0, sizeof(HBA_CMD_TBL) +
                       (cmdheader->prdtl-1)*sizeof(HBA_PRDT_ENTRY));
@@ -261,7 +261,7 @@ bool sata_read(HBA_PORT *port, u32 startl, u32 starth, u32 count, u8 *buf)
         return false;
     }
     port->ie = 1;
-    _sx(port->is);
+    // _sx(port->is);
     port->ci |= 1<<slot;	// Issue command
 
     // Wait for completion
@@ -271,10 +271,6 @@ bool sata_read(HBA_PORT *port, u32 startl, u32 starth, u32 count, u8 *buf)
         // in the PxIS port field as well (1 << 5)
         if ((port->ci & (1<<slot)) == 0)
             break;
-        else {
-            int a;
-            a = 100;
-        }
         if (port->is & HBA_PxIS_TFES)	// Task file error
         {
             logd("Read disk error\n");
@@ -291,8 +287,8 @@ bool sata_read(HBA_PORT *port, u32 startl, u32 starth, u32 count, u8 *buf)
     if (port->serr != 0) {
         loge("ERR");
     }
-    print_fis(port->fb, port->fbu);
-    print_port(port);
+    // print_fis(port->fb, port->fbu);
+    // print_port(port);
 
     return true;
 }

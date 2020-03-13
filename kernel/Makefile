@@ -1,6 +1,6 @@
 
-subdirs := misc arch memory process driver
-srclist := syscall.c spin.c
+subdirs := misc arch memory process driver syscall
+srclist := spin.c init.c
 binfile := kernel.bin
 elffile := kernel.elf
 mapfile := kernel.map

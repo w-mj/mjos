@@ -10,15 +10,17 @@
 #define CALL       ASM("syscall")
 #define RET        ASM("leaveq; retq"); return 0
 
-#define SYS_CALL_0(n, name, ret) \
-	static inline ret name() {\
+#define SYS_CALL_0(n, name) \
+    int do_##name(); \
+	static inline ret sys_##name() {\
 		PREPARE(n); \
 		CALL;	    \
 		RET;        \
 	}
 
 #define SYS_CALL_1(n, name, t1) \
-	static inline int name(t1 v1) { \
+    int do_##name(t1);  \
+	static inline int sys_##name(t1 v1) { \
 		PREPARE(n); \
 		PARAM1(v1); \
 		CALL;       \
@@ -26,7 +28,8 @@
 	} 
 
 #define SYS_CALL_2(n, name, t1, t2) \
-	static inline int name(t1 v1, t2 v2) {\
+    int do_##name(t1, t2);  \
+	static inline int sys_##name(t1 v1, t2 v2) {\
 		PREPARE(n); \
 		PARAM1(v1); \
 		PARAM2(v2); \
@@ -35,7 +38,8 @@
 	}
 
 #define SYS_CALL_3(n, name, t1, t2, t3) \
-	static inline int name(t1 v1, t2 v2, t3 v3) {\
+    int do_##name(t1, t2, t3);  \
+	static inline int sys_##name(t1 v1, t2 v2, t3 v3) {\
 		PREPARE(n); \
 		PARAM1(v1); \
 		PARAM2(v2); \
@@ -45,7 +49,8 @@
 	}
 
 #define SYS_CALL_4(n, name, t1, t2, t3, t4) \
-	static inline int name(t1 v1, t2 v2, t3 v3, t4 v4) {\
+    int do_##name(t1, t2, t3, t4);  \
+	static inline int sys_##name(t1 v1, t2 v2, t3 v3, t4 v4) {\
 		PREPARE(n); \
 		PARAM1(v1); \
 		PARAM2(v2); \
@@ -57,7 +62,8 @@
 
 
 #define SYS_CALL_5(n, name, t1, t2, t3, t4, t5) \
-	static inline int name(t1 v1, t2 v2, t3 v3, t4 v4, t5 v5) {\
+    int do_##name(t1, t2, t3, t4, t5);  \
+	static inline int sys_##name(t1 v1, t2 v2, t3 v3, t4 v4, t5 v5) {\
 		PREPARE(n); \
 		PARAM1(v1); \
 		PARAM2(v2); \
@@ -69,7 +75,14 @@
 	}
 
 
-SYS_CALL_1(1, sys_print_msg, char *)
-SYS_CALL_2(2, sys_create_process, ProcessType, void *)
-SYS_CALL_3(3, sys_send_message, pid_t, const char *, int)
-SYS_CALL_1(4, sys_read_message, char *)
+SYS_CALL_1(1, print_msg, char *)
+SYS_CALL_2(2, create_process, ProcessType, void *)
+SYS_CALL_3(3, send_message, pid_t, const char *, int)
+SYS_CALL_1(4, read_message, char *)
+SYS_CALL_1(5, func_register, int)
+
+enum {
+    SYS_FUNC_PRINTMSG = 0,
+    SYS_FUNC_END
+};
+

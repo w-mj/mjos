@@ -117,6 +117,6 @@ ProcessDescriptor *get_process(u16 pid) {
 	return NULL;
 }
 
-pid_t do_sys_create_process(ProcessType type, void *main) {
+int do_create_process(ProcessType type, void *main) {
     return create_process(thiscpu_var(current)->process, type, main);
 }

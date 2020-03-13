@@ -136,55 +136,7 @@ static __INIT void parse_madt(madt_t * tbl) {
     }
 }
 
-Spin spinA = SPIN_INIT;
-Spin spinB = SPIN_INIT;
-void processB() {
-	int x = 1;
-	relax();
-	sys_send_message(0, "123", 3);
-    sys_send_message(0, "123", 3);
-    sys_send_message(0, "133", 3);
-    sys_send_message(0, "123", 3);
-	while(1)
-	    relax();
-	while (1) {
-		raw_spin_take(&spinB);
-        sys_print_msg("B");
-		// sys_print_msg("B");
-		for (int i = 0; i < 65536 * 200; i++) 
-			;
-		x++;
-		raw_spin_give(&spinA);
-	}
-}
-
-void init_main() {
-	raw_spin_take(&spinB);
-	sys_print_msg("start init process");
-	pid_t pid = sys_create_process(PROCESS_USER, processB);
-    char buf[10];
-    snprintf(buf, 10, "pid=%d", pid);
-	sys_print_msg(buf);
-	while(1) {
-        int size = sys_read_message(buf);
-        buf[size] = 0;
-        sys_print_msg(buf);
-	}
-	int x = 1;
-	while (1) {
-		raw_spin_take(&spinA);
-        sys_print_msg("A");
-		for (int i = 0; i < 65536 * 200; i++)
-			;
-		x++;
-		raw_spin_give(&spinB);
-	}
-}
-typedef struct {
-	int a;
-	ListEntry entry;
-} Node;
-
+void init_main();
 void load_tid_next(ThreadDescriptor *);
 extern void *elf_addr;
 extern u64 _bss_end;
@@ -219,7 +171,7 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	ioapic_all_init();
 	pci_probe_all();
 
-	ioapic_gsi_unmask(ioapic_irq_to_gsi(1));
+	// ioapic_gsi_unmask(ioapic_irq_to_gsi(1));
     ioapic_gsi_unmask(ioapic_irq_to_gsi(16));
     ioapic_gsi_unmask(ioapic_irq_to_gsi(17));
     ioapic_gsi_unmask(ioapic_irq_to_gsi(18));
@@ -231,12 +183,11 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
         loge("read sata error");
     if (sb->magic == 0xEF53) {
         logd("ext2 success");
-        _sa(sb, 1024);
     } else {
         logd("Ext2 fail");
     }
+    kfree_s(sizeof(ext2_sb), sb);
 
-    while(1);
     ASM("sti");
 
     logi("System init finish");
@@ -244,7 +195,7 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	// die();
 	// ASM("movq $0x12, %r11");
 	// ASM("int $15");
-	pid_t pid = create_process(NULL, PROCESS_USER, init_main);
+	pid_t pid = create_process(NULL, PROCESS_KERNEL, init_main);
 
 	ProcessDescriptor *pd = get_process(pid);
 	// assert(pd->cr3 == read_cr3());

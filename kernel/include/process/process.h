@@ -54,6 +54,4 @@ pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main);
 ThreadDescriptor *create_thread(ProcessDescriptor *process, void *main);
 ProcessDescriptor *get_process(pid_t pid);
 
-pid_t do_sys_create_process(ProcessType, void *);
-
 void parse_elf64(void *);
