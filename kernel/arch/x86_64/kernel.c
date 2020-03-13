@@ -29,8 +29,7 @@ void test_types(void) {
 	TESTTYPE(32);
 	TESTTYPE(64);
 	HBA_FIS *fis = (HBA_FIS *)0;
-	_sx(&fis->pad0);
-	assert(&fis->psfis == 0x20);
+	assert((u64)&fis->psfis == 0x20);
 }
 
 char map[4096] = {0};

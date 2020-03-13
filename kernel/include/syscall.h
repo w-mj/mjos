@@ -1,7 +1,17 @@
 #include <asm.h>
 #include <process/process.h>
+#include <delog.h>
 
-#define PREPARE(n) ASM("movq $"#n", %r9")
+#define PREPARE(n) ASM("movq $"#n", %r9"); \
+    do {\
+        int cs;\
+        ASM("mov %%cs, %0": "=r"(cs)); \
+        if ((cs & 0x3) == 0) { \
+            loge("sys call shall not be called in kernel mode."); \
+            while (1); \
+            return -1; \
+        } \
+    } while(0)
 #define PARAM1(v)  ASM("movq %0, %%rdi" :: "rm"(v))
 #define PARAM2(v)  ASM("movq %0, %%rsi" :: "rm"(v))
 #define PARAM3(v)  ASM("movq %0, %%rdx" :: "rm"(v))
