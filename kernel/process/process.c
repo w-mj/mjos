@@ -31,16 +31,45 @@ static u16 find_usable_pid() {
 	return (u16)-1;
 }
 
+static bool process_mem_chk(ListEntry *entry, void *pfn) {
+    MemList *mem = list_entry(entry, MemList, next);
+    return mem->page == *(pfn_t*)pfn;
+}
+
+void add_to_mem_list(ProcessDescriptor *process, pfn_t pfn, void *addr) {
+    MemList *mem = kmalloc_s(sizeof(MemList));
+    list_init(&mem->next);
+    mem->page = pfn;
+    mem->addr = addr;
+    list_add(&mem->next, &process->mem_list);
+}
+
+void remove_from_mem_list(ProcessDescriptor *process, pfn_t pfn) {
+    ListEntry *e = list_find(&process->mem_list, &pfn, process_mem_chk);
+    if (e == NULL) {
+        loge("pfn %d is not in process %d's mem list", pfn, process->pid);
+        return;
+    }
+    MemList *mem = list_entry(e, MemList, next);
+    kfree_s(sizeof(MemList), mem);
+}
+
 ThreadDescriptor *create_thread(ProcessDescriptor *process, void *main) {
 	logd("create thread %d for pid %d", process->threads_cnt, process->pid);
 	ThreadDescriptor *thread = kmalloc_s(sizeof(ThreadDescriptor));
 	_sL(process->cr3);
-	void *stack = normal_page_alloc(NULL, process->cr3);
-	void *sp0 = pfn_to_virt(kernel_page_alloc(PG_KERNEL));
-	u64* page = phys_to_virt(process->cr3);
-	_sL(page[0]);
-	_sL(page[511]);
+	pfn_t pfn;
+	void *stack = normal_page_alloc(&pfn, process->cr3);
+	add_to_mem_list(process, pfn, stack);
+	pfn = kernel_page_alloc(PG_KERNEL);
+	void *sp0 = pfn_to_virt(pfn);
+    add_to_mem_list(process, pfn, sp0);
+//	u64* page = phys_to_virt(process->cr3);
+//	_sL(page[0]);
+//	_sL(page[511]);
 	thread->rsp = stack + PAGESIZE;
+	thread->stack = thread->rsp;
+	thread->stack_length = 1;
 	thread->rsp0 = sp0  + PAGESIZE;
 	thread->cr3 = process->cr3;
     thread->tid = process->threads_cnt;
@@ -64,7 +93,8 @@ ThreadDescriptor *create_thread(ProcessDescriptor *process, void *main) {
 
 	process->threads_cnt++;
 	list_init(&thread->next);
-	list_add_tail(&thread->next, &process->threads);
+	list_init(&thread->sibling);
+	list_add(&thread->sibling, &process->threads);
 	add_thread_to_running(thread);
 	return thread;
 }
@@ -90,6 +120,7 @@ pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main) {
 	list_init(&pd->children);
 	list_init(&pd->siblings);
 	list_init(&pd->process_list_entry);
+	list_init(&pd->mem_list);
 	if (parent != NULL) {
 		list_add_tail(&pd->siblings, &parent->children);
 	}
@@ -97,7 +128,7 @@ pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main) {
 
 	// 用户进程需要复制页表
 	if (type == PROCESS_USER) {
-		pd->cr3 = create_user_page();  // 分配新的用户四级页表
+		pd->cr3 = create_user_page(pd);  // 分配新的用户四级页表
 	} else {
 		pd->cr3 = read_cr3();
 	}
@@ -119,4 +150,50 @@ ProcessDescriptor *get_process(u16 pid) {
 
 int do_create_process(ProcessType type, void *main) {
     return create_process(thiscpu_var(current)->process, type, main);
+}
+
+void destroy_process(ProcessDescriptor *process) {
+    ListEntry *c;
+    foreach (c, process->mem_list) {
+        MemList *mem = list_entry(c, MemList, next);
+        frame_release(mem->page);
+        // 这里释放的主要是进程的页表，由于页表本身即将被释放，因此在页表中解除这些页的映射并无意义
+        // normal_page_release(mem->addr, process->cr3);
+        kfree_s(sizeof(MemList), mem);
+    }
+    kfree_s(sizeof(ProcessDescriptor), process);
+}
+
+void destroy_thread(ThreadDescriptor *thread) {
+    logd("destroy thread %d:%d", thread->process->type, thread->tid);
+    ProcessDescriptor *process = thread->process;
+    void *st = thread->stack;
+    int sz = thread->stack_length;
+    while (sz--) {  // 释放用户页
+    	st -= PAGESIZE;
+    	pfn_t pfn = virt_to_pfn(st);
+    	remove_from_mem_list(process, pfn);
+        normal_page_release(st, thread->cr3);
+    }
+    // rsp0 rsp0值永远不变，每次进入中断都用一个空的内核栈
+    if (process->shared_mem != thread->rsp0) {
+		void *kst = thread->rsp0 - PAGESIZE;
+		pfn_t kpg = virt_to_pfn(kst);
+        remove_from_mem_list(process, kpg);
+        kernel_page_release(kpg);
+	}
+	process->threads_cnt -= 1;
+	list_remove(&thread->sibling);
+	remove_thread_from_running(thread);
+	if (process->threads_cnt == 0) {
+		destroy_process(process);
+	}
+}
+
+int do_quit_thread() {
+    ThreadDescriptor *thread = thiscpu_var(current);
+    destroy_thread(thread);
+    logi("thread quit");
+    while (1);
+    return 0;
 }

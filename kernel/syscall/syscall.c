@@ -30,6 +30,7 @@ void *syscall_tbl[256] = {
         do_create_process,
         do_send_message,
         do_read_message,
-        do_func_register
+        do_func_register,
+        do_quit_thread,
 };
 

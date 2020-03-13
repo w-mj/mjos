@@ -8,7 +8,7 @@ typedef struct _ListEntry {
 #define list_entry(ptr, type, member) container_of(ptr, type, member)
 
 #define foreach(c, list) \
-	for(c = list.next; c != &list; c = c->next)
+	for(c = (list).next; c != &(list); c = c->next)
 
 #define LIST_INIT ((ListEntry){NULL, NULL})
 
@@ -56,4 +56,22 @@ static inline ListEntry *list_pop_head(ListEntry *head) {
 	ListEntry *to_return = head->next;
 	list_remove(to_return);
 	return to_return;
+}
+
+typedef bool (EquFunc)(ListEntry*, void*);
+static inline ListEntry *list_find(ListEntry *head, void *target, EquFunc func) {
+	ListEntry *c;
+	foreach(c, *head) {
+		if (func(c, target))
+			return c;
+	}
+	return NULL;
+}
+
+static inline bool list_remove_item(ListEntry *head, void *target, EquFunc func) {
+	ListEntry *e = list_find(head, target, func);
+	if (e == NULL)
+		return false;
+	list_remove(e);
+	return true;
 }

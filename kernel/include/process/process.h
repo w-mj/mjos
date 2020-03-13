@@ -18,6 +18,12 @@ typedef enum {
 
 struct __ProcessDescriber;
 
+typedef struct __MemList {
+	pfn_t page;
+	void *addr;
+	ListEntry next;
+} MemList;
+
 typedef struct {
 	void *rsp;
 	void *rsp0;
@@ -27,7 +33,10 @@ typedef struct {
 	ThreadState state;
 	struct __ProcessDescriber *process;
 	ListEntry next;   // 用于调度队列
+	ListEntry sibling;  // 兄弟线程
 	int tid;
+	void *stack;  // 栈顶地址
+	int stack_length;  // 栈长度(单位：页）
 } ThreadDescriptor;
 
 
@@ -44,6 +53,7 @@ typedef struct __ProcessDescriber {
 	char *shared_mem;
 	Spin shared_mem_read_lock;
 	Spin shared_mem_write_lock;
+	ListEntry mem_list;
 } ProcessDescriptor;
 
 extern ThreadDescriptor *current;
@@ -55,3 +65,8 @@ ThreadDescriptor *create_thread(ProcessDescriptor *process, void *main);
 ProcessDescriptor *get_process(pid_t pid);
 
 void parse_elf64(void *);
+
+
+int do_quit_thread();
+void add_to_mem_list(ProcessDescriptor *process, pfn_t pfn, void *addr);
+void remove_from_mem_list(ProcessDescriptor *process, pfn_t pfn);

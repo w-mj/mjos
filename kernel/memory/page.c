@@ -518,8 +518,9 @@ void *normal_page_alloc(pfn_t *pn, u64 pml4) {
 	return vir;
 }
 
-void normal_page_release(void *addr) {
+void normal_page_release(void *addr, u64 pml4) {
 	pfn_t fn = virt_to_pfn(addr);
+	page_table_set_entry(pml4, (u64)addr, 0, false);
 	frame_release(fn);
 }
 static inline u64 mk_page_entry(pfn_t frame, u64 flags) {
@@ -535,13 +536,20 @@ static inline u64 mk_page_entry(pfn_t frame, u64 flags) {
 // 即占用四级页表的最后一项和三级页表的最后两项
 // PCI 空间从bfee0000到4G
 // 从[0,2,511,224]到[0,3,511,511]
-u64 create_user_page() {
+u64 create_user_page(ProcessDescriptor *process) {
 	pfn_t pml          = kernel_page_alloc(PG_KERNEL);
     pfn_t pml_0        = kernel_page_alloc(PG_KERNEL);
     pfn_t pml_511      = kernel_page_alloc(PG_KERNEL);
     pfn_t pml_0_0      = kernel_page_alloc(PG_KERNEL);
     pfn_t pml_0_2      = kernel_page_alloc(PG_KERNEL);
     pfn_t pml_0_2_511  = kernel_page_alloc(PG_KERNEL);
+
+    add_to_mem_list(process, pml, VIRTUAL(pml));
+    add_to_mem_list(process, pml_0, VIRTUAL(pml));
+    add_to_mem_list(process, pml_511, VIRTUAL(pml));
+    add_to_mem_list(process, pml_0_0, VIRTUAL(pml));
+    add_to_mem_list(process, pml_0_2, VIRTUAL(pml));
+    add_to_mem_list(process, pml_0_2_511, VIRTUAL(pml));
 
 	u64  pml_phy         = pml << PAGEOFFSET;
 	u64  pml_0_phy       = pml_0 << PAGEOFFSET;

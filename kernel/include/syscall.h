@@ -22,7 +22,7 @@
 
 #define SYS_CALL_0(n, name) \
     int do_##name(); \
-	static inline ret sys_##name() {\
+	static inline int sys_##name() {\
 		PREPARE(n); \
 		CALL;	    \
 		RET;        \
@@ -90,6 +90,7 @@ SYS_CALL_2(2, create_process, ProcessType, void *)
 SYS_CALL_3(3, send_message, pid_t, const char *, int)
 SYS_CALL_1(4, read_message, char *)
 SYS_CALL_1(5, func_register, int)
+SYS_CALL_0(6, quit_thread)
 
 enum {
     SYS_FUNC_PRINTMSG = 0,

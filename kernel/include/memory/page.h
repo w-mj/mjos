@@ -49,7 +49,7 @@ void kernel_pages_release(pfn_t p, int n);
 // 分配一个自由映射页，返回映射好的虚拟地址
 // pn: 返回分配的物理页框
 void *normal_page_alloc(pfn_t *pn, u64 pml4);
-void normal_page_release(void *addr);
+void normal_page_release(void *addr, u64 pml4);
 
 // 通过页表转换找到虚拟地址对应的物理地址
 // PML 第四级页表的物理地址
@@ -98,4 +98,4 @@ void  pglist_free_all (PageList *list);
 void *find_virtual_addr(u64 pml4);
 // 为用户进程创建页表
 // ret：页表的物理地址（cr3）
-u64   create_user_page();
+u64   create_user_page(ProcessDescriptor *process);

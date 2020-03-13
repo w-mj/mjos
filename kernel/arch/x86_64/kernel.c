@@ -187,8 +187,6 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
     }
     kfree_s(sizeof(ext2_sb), sb);
 
-    ASM("sti");
-
     logi("System init finish");
 	// parse_elf64(&elf_addr);
 	// die();
@@ -200,7 +198,7 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	// assert(pd->cr3 == read_cr3());
 	ListEntry *thread_list_entry = pd->threads.next;
 	assert(thread_list_entry != &pd->threads);
-	ThreadDescriptor *thread = list_entry(thread_list_entry, ThreadDescriptor, next);
+	ThreadDescriptor *thread = list_entry(thread_list_entry, ThreadDescriptor, sibling);
 	assert(thread->process == pd); // 启动init进程
 	thiscpu_var(current) = thread;
 	set_rsp0((u64) thread->rsp0);

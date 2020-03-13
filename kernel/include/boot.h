@@ -4,6 +4,7 @@
 #include <arch.h>
 #include <process/process.h>
 #include <delog.h>
+#include <cpu.h>
 
 
 #define ABSOLUTE(x) (((u64)(x) - ((u64)KERNEL_VMA)) + ((u64)KERNEL_LMA))
@@ -27,8 +28,8 @@ static inline usize virt_to_phys(void * va) {
 	} else if (IS_VIRT_PCI(v)) {
 		return v;
 	}
-	assert(current != NULL);
-	return page_translate(current->cr3, v);
+	assert(thiscpu_var(current) != NULL);
+	return page_translate(thiscpu_var(current)->cr3, v);
 }
 
 static inline void * phys_to_virt(usize pa) {

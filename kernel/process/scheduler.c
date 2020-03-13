@@ -15,6 +15,11 @@ void add_thread_to_running(ThreadDescriptor *thread) {
 	list_add(&thread->next, &running_threads);
 }
 
+void remove_thread_from_running(ThreadDescriptor *thread) {
+	thread->state = THREAD_STOPPED;
+	list_remove(&thread->next);
+}
+
 #define plist \
 	_sL(&running_threads); \
 	_sL(running_threads.next); \

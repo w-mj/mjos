@@ -239,6 +239,9 @@ init_thread_stack:
 	movq  %r11, %rsp  // 恢复栈指针
 	retq
 
+quit_thread_stub:
+    movq  $6, %r9
+    syscall
 
 // void *init_user_thread_stack(ThreadDescriptor *thread, void *main);
 GLOBAL_FUNC(init_user_thread_stack)
@@ -248,6 +251,8 @@ init_user_thread_stack:
     movq  (%rdi), %rsp
     movq  0x10(%rdi), %rax
     movq  %rax, %cr3
+    pushq $quit_thread_stub   // main返回时执行退出线程
+    movq  %rsp, (%rdi)
     pushq $USER_DATA_DEC
     pushq (%rdi)
     pushfq
