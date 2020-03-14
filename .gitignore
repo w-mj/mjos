@@ -27,3 +27,5 @@ cscope.*
 .ccls-cache/
 .idea/
 cmake-build-*/
+elfpiggy.S
+userprocesses.c
