@@ -1,5 +1,4 @@
 #include <syscall.h>
-#include <string.h>
 #include <console.h>
 #include <serial.h>
 #include <delog.h>
@@ -42,6 +41,8 @@ void user_process2() {
 
 void init_main() {
     logi("start init process");
+    parse_elf64(user_processes[0]);
+    die();
     ASM("sti");
     // sys_print_msg("lalala");
     do_create_process(PROCESS_USER, user_process);

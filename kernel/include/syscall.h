@@ -7,7 +7,7 @@
         int cs;\
         ASM("mov %%cs, %0": "=r"(cs)); \
         if ((cs & 0x3) == 0) { \
-            loge("sys call shall not be called in kernel mode."); \
+            _ss("sys call shall not be called in kernel mode."); \
             while (1); \
             return -1; \
         } \
@@ -85,7 +85,7 @@
 	}
 
 
-SYS_CALL_1(1, print_msg, char *)
+SYS_CALL_1(1, print_msg, const char *)
 SYS_CALL_2(2, create_process, ProcessType, void *)
 SYS_CALL_3(3, send_message, pid_t, const char *, int)
 SYS_CALL_1(4, read_message, char *)
@@ -96,4 +96,3 @@ enum {
     SYS_FUNC_PRINTMSG = 0,
     SYS_FUNC_END
 };
-

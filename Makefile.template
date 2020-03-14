@@ -21,8 +21,16 @@ $(target): $(objlist) $(subobjs)
 
 $(subobjs): $(subdirs)
 
-%.o: % %.d
+%.c.o: %.c %.c.d
 	$(CC) $(CFLAGS) $(INCFLAG) $(DEPGEN) -o $@ $<
+	@ mv -f $(basename $@).t $(basename $@).d
+
+%.S.o: %.S %.S.d
+	$(CC) $(CFLAGS) $(INCFLAG) $(DEPGEN) -o $@ $<
+	@ mv -f $(basename $@).t $(basename $@).d
+
+%.cpp.o: %.cpp %.cpp.d
+	$(CPP) $(CPPFLAGS) $(INCFLAG) $(DEPGEN) -o $@ $<
 	@ mv -f $(basename $@).t $(basename $@).d
 
 $(subdirs): FORCE

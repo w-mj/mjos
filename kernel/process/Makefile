@@ -1,6 +1,14 @@
 
-srclist := process.c scheduler.c elf.c elfpiggy.S ipc.c
+srclist := process.c scheduler.c elf.c ipc.c elfpiggy.S userprocesses.c
 target  := process.obj
 subdirs :=
 
 include $(TEMPLATEFILE)
+
+elfpiggy.S: mkelf
+userprocesses.c: mkelf
+
+mkelf: mkuser.cpp
+	g++ mkuser.cpp -o mkuser.out && ./mkuser.out
+
+toclean += mkuser elfpiggy.S userprocesses.c

@@ -20,6 +20,7 @@ ISOFILE :=  $(OUTDIR)/$(NAME).iso
 CFLAGS  :=  -c -std=c11 -DKERNEL -DARCH=$(ARCH)
 CFLAGS  +=  -Wall -Wextra -Werror=implicit 
 CFLAGS  +=  -ffreestanding -ffunction-sections -fdata-sections
+CPPFLAGS:=  -c -std=c++17 -nolibc -nostdlib -fno-builtin
 ifeq ($(DEBUG), 1)
 	CFLAGS  +=  -g -DDEBUG
 else
@@ -29,14 +30,25 @@ endif
 
 
 TEMPLATEFILE := $(CURDIR)/Makefile.template
-export CC CPP AR OBJCOPY LD NM CFLAGS TEMPLATEFILE ARCH
+export CC CPP AR OBJCOPY LD NM CFLAGS TEMPLATEFILE ARCH CPPFLAGS
 # PARAMS  :=  DEBUG=$(DEBUG) ARCH=$(ARCH) CC=$(CC) CPP=$(CPP) AR=$(AR) OBJCOPY=$(OBJCOPY)
+
+userdirs := fs
+
 all: build
 
-build:
+build: kernel $(userdirs)
+
+kernel: $(userdirs) FORCE
 	$(MAKE) -C kernel build
 
-clean:
+$(userdirs): FORCE
+	$(MAKE) -C $@ build
+
+FORCE:
+
+
+clean: $(userdirs)
 	$(MAKE) -C kernel clean
 	rm -rf $(ISOFILE)
 	rm -f $(ISODIR)/boot/$(NAME).bin

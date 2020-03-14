@@ -137,7 +137,7 @@ static __INIT void parse_madt(madt_t * tbl) {
 
 void init_main();
 void load_tid_next(ThreadDescriptor *);
-extern void *elf_addr;
+// extern void *elf_addr;
 extern u64 _bss_end;
 __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	console_initialize();

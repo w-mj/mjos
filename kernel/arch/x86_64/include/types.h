@@ -13,7 +13,7 @@ typedef _u32 size_t;
 typedef _i32 ptrdiff_t;
 typedef char _c;
 typedef _c* _s;
-typedef void* _p;
+typedef unsigned char* _p;
 typedef unsigned long addr_t;
 typedef _u64 usize;
 

@@ -18,7 +18,7 @@ INCFLAG := $(addprefix -I, $(INCLIST))
 
 include arch/$(ARCH)/Makefile.config
 
-export INCLIST CFLAGS INCFILE
+export INCLIST CFLAGS INCFILE CPPFLAGS
 
 build: $(subdirs) $(binfile) $(symfile)
 

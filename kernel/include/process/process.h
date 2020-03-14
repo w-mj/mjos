@@ -65,7 +65,7 @@ ThreadDescriptor *create_thread(ProcessDescriptor *process, void *main);
 ProcessDescriptor *get_process(pid_t pid);
 
 void parse_elf64(void *);
-
+extern void *user_processes[];
 
 int do_quit_thread();
 void add_to_mem_list(ProcessDescriptor *process, pfn_t pfn, void *addr);

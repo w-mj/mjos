@@ -7,7 +7,7 @@
 
 pid_t sysfunc_tbl[256] = {};
 
-int do_print_msg(char *msg) {
+int do_print_msg(const char *msg) {
     if (sysfunc_tbl[SYS_FUNC_PRINTMSG] == 0) {
         loge("system function print message is not registered");
         return -1;
