@@ -14,7 +14,7 @@ static ListEntry process_list;
 
 void process_init() {
 	logd("init process");
-	pid_bitmap = pfn_to_virt(kernel_page_alloc(PG_KERNEL));
+	pid_bitmap = (u8*)pfn_to_virt(kernel_page_alloc(PG_KERNEL));
 	memset(pid_bitmap, 0, PAGESIZE);
 	list_init(&process_list);
 }
@@ -37,7 +37,7 @@ static bool process_mem_chk(ListEntry *entry, void *pfn) {
 }
 
 void add_to_mem_list(ProcessDescriptor *process, pfn_t pfn, void *addr) {
-    MemList *mem = kmalloc_s(sizeof(MemList));
+    MemList *mem = (MemList *)kmalloc_s(sizeof(MemList));
     list_init(&mem->next);
     mem->page = pfn;
     mem->addr = addr;
@@ -56,7 +56,7 @@ void remove_from_mem_list(ProcessDescriptor *process, pfn_t pfn) {
 
 ThreadDescriptor *create_thread(ProcessDescriptor *process, void *main) {
 	logd("create thread %d for pid %d", process->threads_cnt, process->pid);
-	ThreadDescriptor *thread = kmalloc_s(sizeof(ThreadDescriptor));
+	ThreadDescriptor *thread = (ThreadDescriptor*) kmalloc_s(sizeof(ThreadDescriptor));
 	_sL(process->cr3);
 	pfn_t pfn;
 	void *stack = normal_page_alloc(&pfn, process->cr3);
@@ -88,7 +88,7 @@ ThreadDescriptor *create_thread(ProcessDescriptor *process, void *main) {
 		// write_cr3(kcr3);
 	}
 	if (process->shared_mem == NULL) {
-	    process->shared_mem = sp0;   // 内核栈的低部分是共享内存空间
+	    process->shared_mem = (char *)sp0;   // 内核栈的低部分是共享内存空间
 	}
 
 	process->threads_cnt++;
@@ -107,7 +107,7 @@ pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main) {
 	}
 	logd("create process %d", pid);
 
-	ProcessDescriptor *pd = kmalloc_s(sizeof(ProcessDescriptor));
+	ProcessDescriptor *pd = (ProcessDescriptor*)kmalloc_s(sizeof(ProcessDescriptor));
 	pd->pid = pid;
 	pd->type = type;
 	pd->parent = parent;

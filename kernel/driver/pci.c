@@ -84,7 +84,7 @@ static void pci_check_func(u8 bus, u8 dev, u8 func) {
         case 0x0604:        // PCI-to-PCI bridge
         case 0x0609:
             logd("pci bridge");
-            // handle_pci_bridge(bus, dev, func);
+            handle_pci_bridge(bus, dev, func);
             break;
         default:
             logd("unknown pci device 0x%04x, prog if %d.", ccode, prog);

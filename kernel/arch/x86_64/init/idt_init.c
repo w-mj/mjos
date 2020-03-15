@@ -57,7 +57,7 @@ void idt_init() {
 			set_id(i, ((u64)(&interrupt_stub_entry)) + i * entry_size);
 		}
 		for (int i = 0; i < 256; i++) {
-			isr_tbl[i] = interrupt_stub;
+			isr_tbl[i] = (void*)interrupt_stub;
 		}
 	}
 	struct IDTR idtr;

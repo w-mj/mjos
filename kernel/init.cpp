@@ -1,8 +1,11 @@
+extern "C" {
 #include <syscall.h>
 #include <console.h>
 #include <serial.h>
 #include <delog.h>
 #include <cpu.h>
+void init_main();
+}
 
 void process_print_message() {
     logd("start print message process");
@@ -41,12 +44,12 @@ void user_process2() {
 
 void init_main() {
     logi("start init process");
-    parse_elf64(user_processes[0]);
-    die();
+    // parse_elf64(user_processes[0]);
+    // die();
     ASM("sti");
     // sys_print_msg("lalala");
-    do_create_process(PROCESS_USER, user_process);
-    do_create_process(PROCESS_USER, user_process2);
-    do_create_process(PROCESS_KERNEL, process_print_message);
-    while (1);
+    do_create_process(PROCESS_USER, (void*)user_process);
+    do_create_process(PROCESS_USER, (void*)user_process2);
+    do_create_process(PROCESS_KERNEL, (void*)process_print_message);
+    while (true);
 }

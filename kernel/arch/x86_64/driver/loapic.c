@@ -230,10 +230,10 @@ __INIT void loapic_dev_init() {
 
     // set default isr functions
     if (0 == loapic_tmr_hz) {
-        isr_tbl[VECNUM_RESCHED ] = loapic_resched_proc;
-        isr_tbl[VECNUM_FLUSHMMU] = loapic_flushmmu_proc;
-        isr_tbl[VECNUM_SPURIOUS] = loapic_svr_proc;
-        isr_tbl[VECNUM_TIMER   ] = loapic_timer_proc;
+        isr_tbl[VECNUM_RESCHED ] = (void*)loapic_resched_proc;
+        isr_tbl[VECNUM_FLUSHMMU] = (void*)loapic_flushmmu_proc;
+        isr_tbl[VECNUM_SPURIOUS] = (void*)loapic_svr_proc;
+        isr_tbl[VECNUM_TIMER   ] = (void*)loapic_timer_proc;
         loapic_tmr_hz = calibrate_freq();
 		_si(loapic_tmr_hz);
     }

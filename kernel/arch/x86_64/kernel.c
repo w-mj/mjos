@@ -176,7 +176,7 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
     ioapic_gsi_unmask(ioapic_irq_to_gsi(18));
     ioapic_gsi_unmask(ioapic_irq_to_gsi(19));
 
-    ext2_sb *sb = kmalloc_s(sizeof(ext2_sb));
+    ext2_sb *sb = (ext2_sb*)kmalloc_s(sizeof(ext2_sb));
     bool t = sata_read(sata,2, 0, 2, virt_to_phys(sb));
     if (t == false)
         loge("read sata error");
@@ -192,7 +192,7 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	// die();
 	// ASM("movq $0x12, %r11");
 	// ASM("int $15");
-	pid_t pid = create_process(NULL, PROCESS_KERNEL, init_main);
+	pid_t pid = create_process(NULL, PROCESS_KERNEL, (void*)init_main);
 
 	ProcessDescriptor *pd = get_process(pid);
 	// assert(pd->cr3 == read_cr3());

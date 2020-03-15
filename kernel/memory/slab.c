@@ -25,7 +25,7 @@ void cache_add_slab(CacheDescriptor *cache) {
 	frame->inuse = 0;
 	pglist_push_tail(&cache->partial, page);
 	cache->partial_cnt += 1;
-	u8 *addr = VIRTUAL(page << PAGEOFFSET);
+	u8 *addr = (u8*)VIRTUAL(page << PAGEOFFSET);
 	for (u16 i = 0; i < obj_cnt - 1; i++) {
 		*(u16*)(addr + i * cache->obj_size) = (i + 1) * cache->obj_size;
 	}

@@ -1,6 +1,6 @@
 
 subdirs := misc arch memory process driver syscall
-srclist := spin.c init.c
+srclist := spin.c init.cpp
 binfile := kernel.bin
 elffile := kernel.elf
 mapfile := kernel.map
@@ -35,9 +35,16 @@ $(subdirs): FORCE
 
 $(subobjs): $(subdirs)
 
-
-%.o: % %.d
+%.c.o: %.c %.c.d
 	$(CC) $(CFLAGS) $(INCFLAG) $(DEPGEN) -o $@ $<
+	@ mv -f $(basename $@).t $(basename $@).d
+
+%.S.o: %.S %.S.d
+	$(CC) $(CFLAGS) $(INCFLAG) $(DEPGEN) -o $@ $<
+	@ mv -f $(basename $@).t $(basename $@).d
+
+%.cpp.o: %.cpp %.cpp.d
+	$(CPP) $(CPPFLAGS) $(INCFLAG) $(DEPGEN) -o $@ $<
 	@ mv -f $(basename $@).t $(basename $@).d
 
 $(binfile): $(elffile)

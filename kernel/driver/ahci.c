@@ -60,8 +60,8 @@ void ahci_init(u8 bus, u8 dev, u8 fun) {
         if (_chk_bit(hba_mem->pi, i)) {
             int dt = check_type(&hba_mem->ports[i]);
             switch (dt) {
-                case AHCI_DEV_SATA:
-                    logd("SATA drive found at port %d", i);
+                case AHCI_DEV_SATA: {
+                            logd("SATA drive found at port %d", i);
                     HBA_PORT *port = &hba_mem->ports[i];
                     _sx(port->cmd);
                     u32 sctl = port->sctl;
@@ -70,10 +70,11 @@ void ahci_init(u8 bus, u8 dev, u8 fun) {
 //                    for (int i = 0; i < 65536 * 10; i++)
 //                        ;
                     u32 ssts = port->ssts;
-                    logd("SATA status: %x, %x, %x", 0xf&(ssts>>8), 0xf&(ssts>>4), 0xf&ssts);
-                    logd("SATA speed limit %x", 0xf & (sctl >> 4));
+                            logd("SATA status: %x, %x, %x", 0xf & (ssts >> 8), 0xf & (ssts >> 4), 0xf & ssts);
+                            logd("SATA speed limit %x", 0xf & (sctl >> 4));
                     sata = port;
                     break;
+                }
                 case AHCI_DEV_SATAPI:
                     logd("SATAPI drive found at port %d", i);
                     break;

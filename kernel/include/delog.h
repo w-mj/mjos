@@ -54,10 +54,13 @@ void _wmj_delog(_I type, ...);
 _I print_bin(_s str, _I size, _u8 *p, _I len);
 
 #include <console.h>
+#include <string.h>
+extern _c __log_prefix[16];
 #define logi(...) do { \
 	_u8 c = console_getcolor(); \
 	console_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK)); \
-	_log_info("[INFO] "__VA_ARGS__); \
+	memcpy(__log_prefix, "[INFO] ", 8); \
+	_log_info(__VA_ARGS__); \
 	console_setcolor(c); \
 } while(0)
 
@@ -66,14 +69,16 @@ _I print_bin(_s str, _I size, _u8 *p, _I len);
 #define logw(...) do { \
 	_u8 c = console_getcolor(); \
 	console_setcolor(vga_entry_color(VGA_COLOR_LIGHT_BLUE, VGA_COLOR_BLACK)); \
-	_log_info("[WARRING] "__VA_ARGS__); \
+	memcpy(__log_prefix, "[WARR] ", 8); \
+	_log_info(__VA_ARGS__); \
 	console_setcolor(c); \
 } while(0)
 
 #define loge(...) do { \
 	_u8 c = console_getcolor(); \
 	console_setcolor(vga_entry_color(VGA_COLOR_RED, VGA_COLOR_BLACK)); \
-	_log_info("[ERROR] "__VA_ARGS__); \
+	memcpy(__log_prefix, "[ERROR] ", 9); \
+	_log_info(__VA_ARGS__); \
 	console_setcolor(c); \
 } while(0)
 

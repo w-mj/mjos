@@ -33,7 +33,7 @@ void load_gdtr(void *);
 void gdt_init() {
 	if (cpu_activated == 0) {
 		logi("gdt init");
-		gdt = early_kmalloc((6 + cpu_count() * 2) * sizeof(u64));
+		gdt = (u64*)early_kmalloc((6 + cpu_count() * 2) * sizeof(u64));
 		gdt[0] = 0;   // dummy
 		gdt[1] = 0x00a0980000000000UL;  // kernel code
 		gdt[2] = 0x00c0920000000000UL;  // kernel data

@@ -11,6 +11,7 @@ static _I inited = 0;
 #define MSG_SIZE 4096
 
 static _I msgsize = MSG_SIZE;
+_c __log_prefix[16] = {0};
 static _c ms_buf[MSG_SIZE];
 static _s ms_msg = ms_buf;
 #define _initMSG() do {ms_msg = ms_buf; ms_buf[0] = 0; msgsize = MSG_SIZE; } while (0)
@@ -171,6 +172,7 @@ _print_debug_CON:
 void _wmj_delog(_I type, ...) {
     va_list params;
     va_start(params, type);
+    int i;
 
     if (type == _INIT_INFO_DELOG) {
         // _s dbgname, logname;
@@ -191,7 +193,14 @@ void _wmj_delog(_I type, ...) {
             print_debug(params);
             break;
         case _LOG_INFO_DELOG:
+            i = 0;
+            while (__log_prefix[i] != 0) {
+                *ms_msg = __log_prefix[i];
+                ms_msg++;
+                i++;
+            }
             fmt_vstr(ms_msg, msgsize, params);
+            __log_prefix[0] = 0;
             break;
     }
 

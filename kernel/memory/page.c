@@ -112,7 +112,7 @@ u64 page_translate(u64 pml, u64 vir) {
 			die();
 		}
 		pml = PTENTRYADDR(pmle);
-		_sL(pmle);
+//		_sL(pmle);
 		level--;
 	}
 	return pml | (vir & 0xfff);
@@ -239,7 +239,7 @@ void *find_virtual_addr(u64 pml4) {
 	int level = 4;
 	int pml_cursor[5] = {0};
 	u64 *pml_addr[5] = {0};
-	pml_addr[level] = phys_to_virt(pml4);
+	pml_addr[level] = (u64*)phys_to_virt(pml4);
 	do {
 		// 初始化4级页表的虚拟地址
 		while (level > 1) {
@@ -251,7 +251,7 @@ void *find_virtual_addr(u64 pml4) {
 					return (void*)addr;
 				return NULL;
 			}
-			pml_addr[level - 1] = phys_to_virt(entry & MMU_ADDR);
+			pml_addr[level - 1] = (u64*)phys_to_virt(entry & MMU_ADDR);
 			level--;
 		}
 		// 遍历最低级页表，此处level == 1
@@ -559,12 +559,12 @@ u64 create_user_page(ProcessDescriptor *process) {
     u64  pml_0_2_511_phy = pml_0_2_511 << PAGEOFFSET;
 	// _sL(pml4_phy);
 	// _sL(pml3_phy);
-	u64 *pml_vir         = phys_to_virt(pml_phy);
-    u64 *pml_0_vir       = phys_to_virt(pml_0_phy);
-    u64 *pml_511_vir     = phys_to_virt(pml_511_phy);
-    u64 *pml_0_0_vir     = phys_to_virt(pml_0_0_phy);
-    u64 *pml_0_2_vir     = phys_to_virt(pml_0_2_phy);
-    u64 *pml_0_2_511_vir = phys_to_virt(pml_0_2_511_phy);
+	u64 *pml_vir         = (u64*)phys_to_virt(pml_phy);
+    u64 *pml_0_vir       = (u64*)phys_to_virt(pml_0_phy);
+    u64 *pml_511_vir     = (u64*)phys_to_virt(pml_511_phy);
+    u64 *pml_0_0_vir     = (u64*)phys_to_virt(pml_0_0_phy);
+    u64 *pml_0_2_vir     = (u64*)phys_to_virt(pml_0_2_phy);
+    u64 *pml_0_2_511_vir = (u64*)phys_to_virt(pml_0_2_511_phy);
 
 	memset(pml_vir        , 0, PAGESIZE);
     memset(pml_0_vir      , 0, PAGESIZE);
@@ -573,17 +573,17 @@ u64 create_user_page(ProcessDescriptor *process) {
     memset(pml_0_2_vir    , 0, PAGESIZE);
     memset(pml_0_2_511_vir, 0, PAGESIZE);
 
-	u64 *kernel_pml_vir         = phys_to_virt(kernel_pml4);
+	u64 *kernel_pml_vir         = (u64*)phys_to_virt(kernel_pml4);
 	u64  kernel_pml_0_phy       = kernel_pml_vir[0] & MMU_ADDR;
-	u64 *kernel_pml_0_vir       = phys_to_virt(kernel_pml_0_phy);
+	u64 *kernel_pml_0_vir       = (u64*)phys_to_virt(kernel_pml_0_phy);
     u64  kernel_pml_511_phy     = kernel_pml_vir[511] & MMU_ADDR;
-    u64 *kernel_pml_511_vir     = phys_to_virt(kernel_pml_511_phy);
+    u64 *kernel_pml_511_vir     = (u64*)phys_to_virt(kernel_pml_511_phy);
 	u64  kernel_pml_0_0_phy     = kernel_pml_0_vir[0] & MMU_ADDR;
-	u64 *kernel_pml_0_0_vir     = phys_to_virt(kernel_pml_0_0_phy);
+	u64 *kernel_pml_0_0_vir     = (u64*)phys_to_virt(kernel_pml_0_0_phy);
 	u64  kernel_pml_0_2_phy     = kernel_pml_0_vir[2] & MMU_ADDR;
-	u64 *kernel_pml_0_2_vir     = phys_to_virt(kernel_pml_0_2_phy);
+	u64 *kernel_pml_0_2_vir     = (u64*)phys_to_virt(kernel_pml_0_2_phy);
 	u64  kernel_pml_0_2_511_phy = kernel_pml_0_2_vir[511] & MMU_ADDR;
-	u64 *kernel_pml_0_2_511_vir = phys_to_virt(kernel_pml_0_2_511_phy);
+	u64 *kernel_pml_0_2_511_vir = (u64*)phys_to_virt(kernel_pml_0_2_511_phy);
 
     pml_vir[0]     = mk_page_entry(pml_0, MMU_US | MMU_P | MMU_RW);
     pml_0_vir[0]   = mk_page_entry(pml_0_0, MMU_US | MMU_P | MMU_RW);
@@ -621,8 +621,8 @@ u64 create_user_page(ProcessDescriptor *process) {
 }
 
 void copy_page(u64 top, u64 to, u64 from, int level) {
-    u64 *to_vir = phys_to_virt(to);
-    u64 *from_vir = phys_to_virt(from);
+    u64 *to_vir = (u64*)phys_to_virt(to);
+    u64 *from_vir =(u64*) phys_to_virt(from);
     for (int i = 0; i < 512; i++) {
         if (! PRESENT(from_vir[i]))
             continue;

@@ -45,7 +45,7 @@ void kmalloc_init() {
 }
 
 void *kmalloc_s(size_t size) {
-	logd("kmalloc %d", size);
+//	logd("kmalloc %d", size);
 	CacheDescriptor *cache = get_kmalloc_cache(size);
 	if (cache == NULL) {
 		loge("kmalloc too large %d", size);
@@ -55,7 +55,7 @@ void *kmalloc_s(size_t size) {
 }
 
 void kfree_s(size_t size, void *addr) {
-	logd("kfree %d %llx", size, addr);
+//	logd("kfree %d %llx", size, addr);
 	CacheDescriptor *cache = get_kmalloc_cache(size);
 	if (cache == NULL) {
 		loge("kmalloc too large %d", size);

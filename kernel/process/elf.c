@@ -7,17 +7,17 @@
 #define CHK(a, b, ok, fail) do {\
 	if ((a) == (b)) {\
 		if (ok[0] != '\0') {\
-			logi(" "ok); \
+			logi(" %s", ok); \
 		} \
 	} else {\
 		if (fail[0] != '\0') {\
-			logw(" "fail); \
+			logw(" %s", fail); \
 		} \
-		goto out; \
+		return; \
 	} }while(0)
 
 #define CASE(v, str) \
-	case v: if (str[0] != '\0') logi(" "str); break
+	case v: if (str[0] != '\0') logi(" %s", str); break
 
 #define ELFMAGu32 (ELFMAG0 | (ELFMAG1 << 8)| (ELFMAG2 << 16) | (ELFMAG3 << 24))
 void parse_elf64(void *addr) {
@@ -123,6 +123,5 @@ void parse_elf64(void *addr) {
 				sec->sh_link, sec->sh_info, sec->sh_entsize, type, flags);
 	}
 
-out:
 	return;
 }
