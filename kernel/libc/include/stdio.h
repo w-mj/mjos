@@ -9,7 +9,7 @@ extern "C" {
 
 size_t snprintf (char *, size_t, const char *, ...);
 size_t vsnprintf (char *, size_t, const char *, va_list);
-
+int asprintf (char **, const char *, ...);
 
 #ifdef __cplusplus
 }

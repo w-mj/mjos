@@ -40,7 +40,6 @@ extern "C" {
 
 #define _Inext(pI, i) ((pI) + (i))->_next
 
-#define nullptr NULL
 #define null NULL
 
 #define TYPE(x)                 __typeof__(x)

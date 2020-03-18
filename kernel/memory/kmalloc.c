@@ -63,3 +63,16 @@ void kfree_s(size_t size, void *addr) {
 	}
 	cache_obj_release(cache, addr);
 }
+
+void *kmalloc(size_t size) {
+    size = size + sizeof(u32);
+    void *ptr = kmalloc_s(size);
+    *(u32 *)ptr = size;
+    return ptr + sizeof(u32);
+}
+
+void kfree(void *ptr) {
+    ptr = ptr - sizeof(u32);
+    u32 size = *(u32 *) ptr;
+    kfree_s(size, ptr);
+}

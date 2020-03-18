@@ -9,6 +9,8 @@ void kmalloc_init();
 void *kmalloc_s(size_t size);
 void kfree_s(size_t size, void *addr);
 
+void *kmalloc(size_t size);
+void kfree(void *ptr);
 #ifdef __cplusplus
 }
 #endif

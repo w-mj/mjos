@@ -1,6 +1,6 @@
 
 
-srclist := vsnprintf.c
+srclist := vsnprintf.c asprintf.c
 target  := stdio.obj
 subdirs :=
 

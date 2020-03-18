@@ -37,7 +37,11 @@ def_type(16)
 def_type(32)
 def_type(64)
 
-#define NULL 0
+#ifndef __cplusplus
+#define NULL ((void*)0)
+#else
+#define NULL nullptr
+#endif
 
 typedef u32 pfn_t;
 typedef u16 pid_t;

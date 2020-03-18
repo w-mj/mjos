@@ -165,7 +165,7 @@ void destroy_process(ProcessDescriptor *process) {
 }
 
 void destroy_thread(ThreadDescriptor *thread) {
-    logd("destroy thread %d:%d", thread->process->type, thread->tid);
+    logd("destroy thread %d:%d", thread->process->pid, thread->tid);
     ProcessDescriptor *process = thread->process;
     void *st = thread->stack;
     int sz = thread->stack_length;
