@@ -1,5 +1,5 @@
 
-srclist := delog.c string.c vsnprintf.c
+srclist := delog.c
 target  := misc.obj
 subdirs := 
 

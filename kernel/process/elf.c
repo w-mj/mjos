@@ -1,6 +1,6 @@
 #include <process/elf.h>
 #include <delog.h>
-#include <vsnprintf.h>
+#include <stdio.h>
 #include <string.h>
 #include <asm.h>
 

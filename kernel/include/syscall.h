@@ -1,3 +1,7 @@
+#pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <asm.h>
 #include <process/process.h>
 #include <delog.h>

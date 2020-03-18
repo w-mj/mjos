@@ -17,7 +17,7 @@
 #include <process/scheduler.h>
 #include <syscall.h>
 #include <spin.h>
-#include <vsnprintf.h>
+#include <stdio.h>
 #include <driver/pci.h>
 #include <fs/ext2_stru.h>
 #include <driver/ahci.h>

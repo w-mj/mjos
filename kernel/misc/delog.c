@@ -2,7 +2,7 @@
 #include <console.h>
 #include <serial.h>
 #include <base.h>
-#include <vsnprintf.h>
+#include <stdio.h>
 #include <ctype.h>
 
 #define _chkPOSINFO(type) ((type) & _POS_INFOBITS)

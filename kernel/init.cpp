@@ -1,11 +1,9 @@
-extern "C" {
 #include <syscall.h>
 #include <console.h>
 #include <serial.h>
 #include <delog.h>
 #include <cpu.h>
-void init_main();
-}
+extern "C" void init_main();
 
 void process_print_message() {
     logd("start print message process");

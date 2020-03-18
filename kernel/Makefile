@@ -1,5 +1,5 @@
 
-subdirs := misc arch memory process driver syscall
+subdirs := misc arch memory process driver syscall libc
 srclist := spin.c init.cpp
 binfile := kernel.bin
 elffile := kernel.elf
@@ -12,7 +12,7 @@ subobjs := $(foreach d, $(subdirs), $(addsuffix .obj, $(d)/$(d)))
 objlist := $(subobjs) $(objs)
 
 DEPGEN   =  -MT $@ -MMD -MP -MF $(basename $@).t
-INCLIST := $(CURDIR)/include $(CURDIR)/arch/$(ARCH)/include
+INCLIST := $(CURDIR)/include $(CURDIR)/arch/$(ARCH)/include $(CURDIR)/libc/include
 LFLAGS  := -nostdlib -lgcc -T arch/$(ARCH)/linker.ld -Wl,-Map=$(mapfile),--gc-sections
 INCFLAG := $(addprefix -I, $(INCLIST))
 
