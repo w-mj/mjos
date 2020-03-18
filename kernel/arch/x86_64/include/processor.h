@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <types.h>
 #include <base.h>
 #include <boot.h>
@@ -46,3 +50,7 @@ typedef struct __Regs Regs;
 struct __ThreadInfo {
 	Regs regs;
 };
+
+#ifdef __cplusplus
+}
+#endif

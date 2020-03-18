@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #define CFG_BOOT_STACK_SIZE     0x4000
 #define CFG_INT_STACK_SIZE      0x4000
@@ -15,3 +19,7 @@
 #define CFG_WORK_QUEUE_SIZE     64
 #define CFG_SYS_CLOCK_RATE      50
 #define CFG_TASK_TIMESLICE      10
+
+#ifdef __cplusplus
+}
+#endif

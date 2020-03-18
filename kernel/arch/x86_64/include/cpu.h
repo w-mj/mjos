@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <base.h>
 
 extern int cpu_installed;
@@ -30,3 +34,6 @@ void *init_user_thread_stack(ThreadDescriptor *thread, void *main);
 void thread_switch();
 
 void set_rsp0(u64);
+#ifdef __cplusplus
+}
+#endif

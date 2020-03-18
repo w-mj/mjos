@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <types.h>
 #include <list.h>
 #include <biosreg.h>
@@ -70,3 +74,7 @@ extern void *user_processes[];
 int do_quit_thread();
 void add_to_mem_list(ProcessDescriptor *process, pfn_t pfn, void *addr);
 void remove_from_mem_list(ProcessDescriptor *process, pfn_t pfn);
+
+#ifdef __cplusplus
+}
+#endif

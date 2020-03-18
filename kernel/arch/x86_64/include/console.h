@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <types.h>
 
 
@@ -37,3 +41,7 @@ static inline _u8 vga_entry_color(enum Color fg, enum Color bg) {
 static inline _u16 vga_entry(unsigned char uc, _u8 color) {
 	return (_u16) uc | (_u16) color << 8;
 }
+
+#ifdef __cplusplus
+}
+#endif

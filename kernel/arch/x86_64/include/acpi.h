@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <acpi_structure.h>
 #include <base.h>
 
@@ -10,3 +14,7 @@ extern hpet_t *acpi_hpet; // 固定acpi描述符表
 
 __INIT void acpi_tbl_init();
 
+
+#ifdef __cplusplus
+}
+#endif

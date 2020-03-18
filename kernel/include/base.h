@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #define _getva_T_(P, params, _T_) do {P = (_T_)va_arg(params, _T_); }while(0)
 #define _getva_S(s, params) _getva_T_(s, params, _s)
@@ -89,3 +93,7 @@ static inline void *_container_of(void *ptr, size_t offset) {
 #define offsetof(TYPE, MEMBER) ((size_t) (u64)&((TYPE *)0)->MEMBER)
 
 #define repet(x) for (int _ = 0; _ < (x); _++)
+
+#ifdef __cplusplus
+}
+#endif

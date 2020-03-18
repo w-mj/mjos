@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <types.h>
 #include <multiboot.h>
 #include <arch.h>
@@ -58,3 +62,7 @@ static inline pfn_t virt_to_pfn(void *addr) {
 }
 
 
+
+#ifdef __cplusplus
+}
+#endif

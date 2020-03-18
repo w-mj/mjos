@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <types.h>
 
 size_t strlen(const char *);
@@ -9,3 +13,7 @@ void memset(void *ptr, char value, _u16 num);
 
 #include "vsnprintf.h"
 
+
+#ifdef __cplusplus
+}
+#endif

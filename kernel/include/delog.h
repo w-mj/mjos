@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <types.h>
 #include <stdarg.h>
@@ -88,3 +92,7 @@ extern _c __log_prefix[16];
 		__asm__ volatile("hlt") ; \
 	} \
 } while(0)
+
+#ifdef __cplusplus
+}
+#endif

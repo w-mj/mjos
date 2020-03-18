@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <types.h>
 #define asm __asm__ 
 #define ASM asm volatile
@@ -224,3 +228,7 @@ static inline void int_unlock(u32 key) {
         ASM("sti");
     }
 }
+
+#ifdef __cplusplus
+}
+#endif

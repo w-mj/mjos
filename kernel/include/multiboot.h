@@ -278,3 +278,7 @@ struct multiboot_apm_info
 #endif /* ! MULTIBOOT_HEADER */
 
 
+
+#ifdef __cplusplus
+}
+#endif

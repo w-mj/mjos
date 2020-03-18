@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <types.h>
 #include <asm.h>
 
@@ -20,3 +24,7 @@ i64 atomic64_cas(i64 * p, i64 x, i64 y);
 #define atomic_inc(p)       atomic64_inc((i64 *) p)
 #define atomic_dec(p)       atomic64_dec((i64 *) p)
 #define atomic_cas(p, x, y) atomic64_cas((i64 *) p, (i64) x, (i64) y)
+
+#ifdef __cplusplus
+}
+#endif

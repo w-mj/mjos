@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <list.h>
 #include <memory/page.h>
 
@@ -17,3 +21,7 @@ void *cache_obj_alloc(CacheDescriptor *cache);
 void cache_obj_release(CacheDescriptor *cache, void *addr);
 
 #define NOOBJ (u16)(-1)
+
+#ifdef __cplusplus
+}
+#endif

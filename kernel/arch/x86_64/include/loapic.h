@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <base.h>
 
@@ -26,3 +30,7 @@ __INIT void loapic_dev_init();   // requires: interrupt
 __INIT void loapic_emit_init(int cpu);
 __INIT void loapic_emit_sipi(int cpu, int vec);
 
+
+#ifdef __cplusplus
+}
+#endif

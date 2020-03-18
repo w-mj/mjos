@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #define isalnum(x)  (isalpha(x) || isdigit(x))
 #define isalpha(x)  (isupper(x) || islower(x))
@@ -22,3 +26,7 @@
 
 #define toupper(x)  ((x) & 0xDF)
 #define tolower(x)  ((x) | 0x20)
+
+#ifdef __cplusplus
+}
+#endif

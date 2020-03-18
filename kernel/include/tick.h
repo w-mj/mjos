@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <types.h>
 #include <list.h>
 typedef int (* wdog_proc_t) (void * a1, void * a2, void * a3, void * a4);
@@ -27,3 +31,7 @@ extern usize tick_get  ();
 extern void  tick_delay(int ticks);
 
 
+
+#ifdef __cplusplus
+}
+#endif

@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #ifdef __ASSEMBLY__
 #define _AC(X,Y)	X
@@ -11,3 +15,7 @@
 
 #define _BITUL(x)	(_AC(1,UL) << (x))
 #define _BITULL(x)	(_AC(1,ULL) << (x))
+
+#ifdef __cplusplus
+}
+#endif

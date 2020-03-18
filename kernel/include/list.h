@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <base.h>
 
 typedef struct _ListEntry {
@@ -75,3 +79,6 @@ static inline bool list_remove_item(ListEntry *head, void *target, EquFunc func)
 	list_remove(e);
 	return true;
 }
+#ifdef __cplusplus
+}
+#endif

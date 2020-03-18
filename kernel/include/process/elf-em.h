@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 /* These constants define the various ELF target machines */
 #define EM_NONE		0
@@ -54,3 +58,7 @@
 #define EM_S390_OLD	0xA390
 /* Also Panasonic/MEI MN10300, AM33 */
 #define EM_CYGNUS_MN10300 0xbeef
+
+#ifdef __cplusplus
+}
+#endif

@@ -163,3 +163,7 @@
 
 #endif /* _UAPI_ASM_X86_PROCESSOR_FLAGS_H */
 
+
+#ifdef __cplusplus
+}
+#endif

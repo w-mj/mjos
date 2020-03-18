@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <types.h>
 #include <boot.h>
 #include <list.h>
@@ -99,3 +103,7 @@ void *find_virtual_addr(u64 pml4);
 // 为用户进程创建页表
 // ret：页表的物理地址（cr3）
 u64   create_user_page(ProcessDescriptor *process);
+
+#ifdef __cplusplus
+}
+#endif

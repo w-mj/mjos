@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #define GLOBAL_FUNC(name) \
     .global name; \
@@ -48,4 +52,8 @@
   .type name, @function; \
   END(name)
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

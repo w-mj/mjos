@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 typedef signed char _i8;
 typedef unsigned char _u8;
@@ -37,3 +41,7 @@ def_type(64)
 
 typedef u32 pfn_t;
 typedef u16 pid_t;
+
+#ifdef __cplusplus
+}
+#endif

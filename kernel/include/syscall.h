@@ -96,3 +96,7 @@ enum {
     SYS_FUNC_PRINTMSG = 0,
     SYS_FUNC_END
 };
+
+#ifdef __cplusplus
+}
+#endif

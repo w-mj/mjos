@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <types.h>
 #include <base.h>
 
@@ -289,3 +293,7 @@ typedef struct tagHBA_CMD_TBL
     // 0x80
     HBA_PRDT_ENTRY	prdt_entry[1];	// Physical region descriptor table entries, 0 ~ 65535
 }__PACKED HBA_CMD_TBL;
+
+#ifdef __cplusplus
+}
+#endif

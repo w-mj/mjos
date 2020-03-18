@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <types.h>
 
 struct biosregs {
@@ -63,3 +67,7 @@ typedef struct {
     u64 r15;
 } Regs;
 
+
+#ifdef __cplusplus
+}
+#endif

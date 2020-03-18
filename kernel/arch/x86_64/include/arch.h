@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 // 关于系统架构的一些定义
 
@@ -22,3 +26,7 @@
 #define DMA_END         0x0000000001000000UL
 #define NORMAL_START    0x0000000001000000UL
 #define NORMAL_END      0xffffffffffffffffUL
+
+#ifdef __cplusplus
+}
+#endif

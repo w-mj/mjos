@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <types.h>
 #include <base.h>
@@ -241,3 +245,7 @@ u32 FirmwareCtrl;
     address_structure_t X_GPE1Block;
 } __PACKED fadt_t;
 
+
+#ifdef __cplusplus
+}
+#endif

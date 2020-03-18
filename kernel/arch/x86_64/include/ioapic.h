@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <acpi.h>
 
@@ -14,3 +18,7 @@ __INIT void ioapic_dev_add(madt_ioapic_t * tbl);
 __INIT void ioapic_int_override(madt_int_override_t * tbl);
 __INIT void ioapic_all_init();
 
+
+#ifdef __cplusplus
+}
+#endif

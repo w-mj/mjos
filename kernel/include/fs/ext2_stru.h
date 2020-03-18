@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <types.h>
 typedef struct SuperBlock {
     u32 inodes_count; // 文件系统中Inode数量
@@ -46,3 +50,6 @@ typedef struct SuperBlock {
 
     u32 reserved[204]; /* Padding to the end of the block */
 } ext2_sb;
+#ifdef __cplusplus
+}
+#endif
