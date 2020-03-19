@@ -42,7 +42,7 @@ void user_process2() {
 }
 
 void init_main() {
-    std::cerr << "cout form " << "iostream" << std::endl;
+    // std::cerr << "cout form " << "iostream" << std::endl;
     logi("start init process");
     // parse_elf64(user_processes[0]);
     // die();

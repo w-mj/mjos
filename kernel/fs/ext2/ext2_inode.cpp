@@ -1,16 +1,16 @@
 #include "ext2_inode.h"
-#include "stat.h"
-#include "delog/delog.h"
-#include "mm/buf.h"
-#include <iostream>
-#include <cstring>
-#include <algorithm>
+#include "fs/stat.h"
+#include "delog.h"
+#include "memory/buf.h"
+#include <iostream.hpp>
+#include <string.h>
+#include <algorithm.hpp>
 using namespace EXT2;
 
 void EXT2_Inode::print() {
     using namespace std;
     cerr << "\nInode:  " << inode_n << endl;
-    cerr << "文件类型和访问权限 " << i->mode << mode_to_str(i->mode) << endl;
+    // cerr << "文件类型和访问权限 " << i->mode << mode_to_str(i->mode) << endl;
     cerr << "拥有者 " << i->uid << endl;
     cerr << "文件长度 " << i->size << endl;
     cerr << "最后一次访问时间 " << i->atime << endl;
@@ -97,7 +97,7 @@ _u32 EXT2_Inode::nth_block(_u32 n) {
 }
 
 void EXT2_Inode::write_inode() {
-    _dbg_log("inode %d, size %d", inode_n, i->size);
+    logd("inode %d, size %d", inode_n, i->size);
     _u32 inode_pos = ext2_fs->inode_to_pos(inode_n);
     MM::Buf buf(sizeof(EXT2::Inode));
     i->blocks = blocks * (ext2_fs->block_size / 512);
@@ -117,7 +117,7 @@ void EXT2_Inode::write_inode() {
     // _sa(buf.data, sizeof(EXT2::Inode));
     // ext2_fs->dev->read(buf, inode_pos, sizeof(EXT2::Inode));
     // _sa(buf.data, sizeof(EXT2::Inode));
-    _dbg_log("finish.");
+    logd("finish.");
 }
 
 void EXT2_Inode::dirty() {
@@ -194,9 +194,10 @@ EXT2_Inode::iterator EXT2_Inode::iterator::getInstance(EXT2_Inode *i, _u32 block
         it.indexs[2] = blocks / it.max_blocks[1];
         it.indexs[3] = blocks % it.max_blocks[1];
     } else {
-        _error(1);
+        // _error(1);
+        assert(0);
     }
-    _dbg_log("get instance %d, [%d, %d, %d, %d]", 
+    logd("get instance %d, [%d, %d, %d, %d]", 
         blocks, it.indexs[0], it.indexs[1], it.indexs[2], it.indexs[3]);
 
     return it;
@@ -210,7 +211,7 @@ EXT2_Inode::iterator::~iterator() {
 }
 
 void EXT2_Inode::iterator::load_buf(int t) {
-    _dbg_log("load buf level:%d indexs[%d,%d,%d,%d]", level, indexs[0], indexs[1], indexs[2], indexs[3]);
+    logd("load buf level:%d indexs[%d,%d,%d,%d]", level, indexs[0], indexs[1], indexs[2], indexs[3]);
     EXT2_FS *fs = inode->ext2_fs;
     while (t < level) {
         write_back();  // 在换页之前尝试将修改写入磁盘
@@ -219,11 +220,11 @@ void EXT2_Inode::iterator::load_buf(int t) {
             block_buf[t + 1] = new _u32[sub_blocks_in_block[level]];
         _si(new_block_pos);
         if (new_block_pos == 0 && !auto_alloc) {
-            _dbg_log("Reach iter end but not set auto alloc.");
+            logd("Reach iter end but not set auto alloc.");
             return;
         }
         if (new_block_pos == 0) {
-            _dbg_log("auto alloc data block");
+            logd("auto alloc data block");
             // 如果没有下一个数据块，则分配一个
             new_block_pos = fs->alloc_block();
             block_buf[t][indexs[t]] = new_block_pos;
@@ -242,7 +243,7 @@ void EXT2_Inode::iterator::load_buf(int t) {
 
 void EXT2_Inode::iterator::write_back() {
     if (dirty[0]) {
-        _dbg_log("write back 0");
+        logd("write back 0");
         memcpy(inode->i->block, block_buf[0], sizeof(_u32) * EXT2::N_BLOCKS);
         dirty[0] = false;
     }
@@ -250,7 +251,7 @@ void EXT2_Inode::iterator::write_back() {
     MM::Buf *buf=nullptr;
     for (int t = 1; t < 4; t++) {
         if (dirty[t]) {
-            _dbg_log("write back %d", t);
+            logd("write back %d", t);
             if (buf == nullptr)
                 buf = new MM::Buf(fs->block_size);
             _u32 pos = fs->block_to_pos(block_pos[t]);
@@ -283,7 +284,7 @@ EXT2_Inode::iterator& EXT2_Inode::iterator::operator++() {
         }
         if (t == 0) {
             level++;  // 大升级！
-            _error(level == 4);
+            assert(level != 4);
         }
         // 从t+1级开始重新设置页面
         // t级所指向的位置就是t+1级的地址
@@ -315,7 +316,7 @@ EXT2_Inode::iterator& EXT2_Inode::iterator::operator--() {
 bool
 EXT2_Inode::iterator::operator==(const iterator& ano) const {
     // return index_cnt == ano.index_cnt;
-    _error(inode != ano.inode);
+    assert(inode == ano.inode);
     if (ano.index_cnt != index_cnt || ano.level != level)
         return false;
     for (int i = 0; i < level; i++) {
@@ -335,7 +336,7 @@ int EXT2_Inode::iterator::operator*() {
         load_buf(0);
     int ans = block_buf[level][indexs[level]];
     if (ans == 0 && auto_alloc) {
-        _dbg_log("auto alloc data block");
+        logd("auto alloc data block");
         ans = inode->ext2_fs->alloc_block();
         block_buf[level][indexs[level]] = ans;
         dirty[level] = true;

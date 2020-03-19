@@ -75,7 +75,7 @@ ThreadDescriptor *create_thread(ProcessDescriptor *process, void *main) {
     thread->tid = process->threads_cnt;
     thread->process = process;
 	if (process->type == PROCESS_KERNEL) {
-		thread->rsp = init_kernel_thread_stack(stack, main);
+		thread->rsp = init_kernel_thread_stack(thread->rsp, main);
 	} else {
 	    thread->rsp = init_user_thread_stack(thread, main);
 		// u64 kcr3 = read_cr3();

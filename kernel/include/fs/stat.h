@@ -3,7 +3,7 @@
 //
 
 #ifndef OS_STAT_H
-
+#define OS_STAT_H
 
 #define S_IFMT  00170000
 #define S_IFSOCK 0140000
@@ -39,6 +39,33 @@
 #define S_IROTH 00004
 #define S_IWOTH 00002
 #define S_IXOTH 00001
-#define OS_STAT_H
 
+
+/*
+static inline std::string mode_to_str(_u16 mode) {
+    std::string ans;
+    if (S_ISLNK(mode)) ans += "LNK ";
+    if (S_ISREG(mode)) ans += "REG ";
+    if (S_ISDIR(mode)) ans += "DIR ";
+    if (S_ISCHR(mode)) ans += "CHR ";
+    if (S_ISBLK(mode)) ans += "BLK ";
+    if (S_ISFIFO(mode)) ans += "FIFO ";
+    if (S_ISSOCK(mode)) ans += "SOCK ";
+
+    ans += std::to_string((mode & S_IRWXU) >> 6);
+    ans += std::to_string((mode & S_IRWXG) >> 3);
+    ans += std::to_string((mode & S_IRWXO) >> 0);
+
+    return ans;
+}
+#include "bits.h"
+static inline std::string previlege_to_str(_u16 mode) {
+    std::string ans = "rwxrwxrwx";
+    for (_u16 i = 0; i < 9; i++) {
+        if (_chk_bit(mode, 8 - i) == 0)
+            ans[i] = '-';
+    }
+    return ans;
+}
+*/
 #endif //OS_STAT_H

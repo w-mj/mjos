@@ -6,13 +6,14 @@
 #include <stddef.h>
 
 void *memcpy(void *dst, const void *src, size_t size) {
-    void *t = dst;
+    char *s1 = (char *)dst;
+    char *s2 = (char *)src;
     while (size--) {
-        *dst = *src;
-        dst++;
-        src++;
+        *s1= *s2;
+        s1++;
+        s2++;
     }
-    return t;
+    return dst;
 }
 
 void *memmove(void *dst, const void *src, size_t size) {
@@ -20,10 +21,10 @@ void *memmove(void *dst, const void *src, size_t size) {
 }
 
 void *memset(void *ptr, char value, size_t num) {
-    void *t = ptr;
+    char *t = (char *)ptr;
     while(num--) {
-        *ptr = value;
-        ptr++;
+        *t= value;
+        t++;
     }
-    return t;
+    return ptr;
 }

@@ -5,6 +5,7 @@
 #include <iostream.hpp>
 #include <console.h>
 #include <serial.h>
+#include <stdio.h>
 
 using namespace std;
 
@@ -33,4 +34,10 @@ ostream &ostream::operator<<(const char * s) {
 
 ostream &ostream::operator<<(const string & str) {
     return (*this)<<str.c_str();
+}
+
+ostream &ostream::operator<<(int a) {
+    char buf[128];
+    snprintf(buf, 128, "%d", a);
+    return (*this) << buf;
 }

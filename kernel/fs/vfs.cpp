@@ -1,11 +1,12 @@
 #include "../include/fs/vfs.h"
-#include "delog/delog.h"
-#include "delog/common.h"
-#include "stat.h"
-#include <string>
-#include <sstream>
-#include <stack>
-#include <vector>
+#include "delog.h"
+#include "fs/stat.h"
+#include <string.h>
+#include <vector.hpp>
+//#include <sstream>
+//#include <stack>
+#include <string.hpp>
+#include <list.hpp>
 
 using namespace VFS;
 
@@ -64,18 +65,19 @@ DEntry *DEntry::get_path(const NameI *namei, std::string* fname) {
 }
 
 std::string DEntry::printed_path() {
-    std::stack<std::string> st;
-    std::stringstream ss;
-    VFS::DEntry *t = this;
-    while (t != t->parent) {
-        st.push(t->name);
-        t = t->parent;
-    }
-    while (!st.empty()) {
-        ss << "/" << st.top();
-        st.pop();
-    }
-    return ss.str();
+    return "NOT IMPLEMENTED";
+//    std::stack<std::string> st;
+//    std::stringstream ss;
+//    VFS::DEntry *t = this;
+//    while (t != t->parent) {
+//        st.push(t->name);
+//        t = t->parent;
+//    }
+//    while (!st.empty()) {
+//        ss << "/" << st.top();
+//        st.pop();
+//    }
+//    return ss.str();
 }
 
 File *DEntry::open(const std::string& name) {
@@ -109,7 +111,7 @@ NameI::~NameI() {
 
 
 void VFS::File::close() {
-    _dbg_log("delete this");
+    logd("delete this");
     delete this;  // 恶魔操作
 }
 

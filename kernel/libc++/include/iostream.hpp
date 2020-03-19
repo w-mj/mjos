@@ -16,6 +16,7 @@ public:
     explicit ostream(int fno);
     ostream &operator <<(const char *);
     ostream &operator <<(const string &);
+    ostream &operator <<(int);
 };
 
 extern ostream cout;

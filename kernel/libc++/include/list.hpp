@@ -32,8 +32,11 @@ public:
     };
 
     void clear() {
-        for (_Wrapper *x : (*this)) {
-            delete x;
+        _Wrapper *cur = head.next;
+        while (cur != &head) {
+            _Wrapper *t = cur->next;
+            delete cur;
+            cur = t;
         }
     }
 
@@ -46,8 +49,9 @@ public:
     }
 
     void remove(T data) {
-        for (_Wrapper *x: (*this)) {
-            if (x == data) {
+        for (auto iter = begin(); iter != end(); iter++) {
+            _Wrapper *x = iter._current;
+            if (x->data == data) {
                 x->prev->next = x->next;
                 x->next->prev = x->prev;
                 delete x;
@@ -56,15 +60,19 @@ public:
         }
     }
 
+    T front() {
+        return head.next->data;
+    }
+
     T operator[] (int index) {
-        for (_Wrapper *x: (*this)) {
-            if (index == 0)
-                return x->data;
-            index--;
-        }
+        auto iter = begin();
+        for (; iter != end() && index; iter++, index--)
+            ;
+        return iter._current->data;
     }
 
     class iterator  {
+    friend class list;
     private:
         _Wrapper* _current;
     public:

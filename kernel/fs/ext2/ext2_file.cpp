@@ -1,6 +1,7 @@
 #include "ext2_file.h"
-#include <cstring>
-#include "delog/delog.h"
+#include <string.h>
+#include <delog.h>
+#include <algorithm.hpp>
 using namespace EXT2;
 
 
@@ -11,7 +12,7 @@ EXT2_File::EXT2_File(EXT2_DEntry *d, EXT2_Inode *i) {
     type = d->type;
     pos = 0;
     size = i->size;
-    _dbg_log("打开文件");
+    logd("打开文件");
     _si(size);
 }
 
@@ -24,7 +25,7 @@ EXT2_File::EXT2_File(EXT2_DEntry *d) {
     type = d->type;
     pos = 0;
     size = d->ext2_inode->size;
-    _dbg_log("打开文件");
+    logd("打开文件");
     _si(size);
 }
 
@@ -45,7 +46,7 @@ int EXT2_File::seek(int pos, int whence) {
             this->pos = pos;
             break;
         default:
-            _error_s(whence, "Unknow whence");
+            loge("Unknow whence %d", whence);
     }
     _si(this->pos);
     return this->pos;
@@ -118,9 +119,9 @@ void EXT2_File::resize(_u32 new_size) {
     EXT2_FS *fs = ext2_fs;
     _u32 current_block = ext2_inode->blocks;
     _u32 target_block = new_size / fs->block_size + (new_size % fs->block_size > 0);
-    _dbg_log("resize from %d to %d", current_block, target_block);
+    logd("resize from %d to %d", current_block, target_block);
     if (target_block == current_block) {
-        _dbg_log("do not alloc size form %d to %d", size, new_size);
+        logd("do not alloc size form %d to %d", size, new_size);
         size = new_size;
         ext2_inode->size = new_size;
         ext2_inode->write_inode();

@@ -56,7 +56,7 @@ void print_sys_info(void) {
 		// const multiboot_module_t *mod_addr = (multiboot_module_t*)mbi->mods_addr;
 		// for (u32 i = 0; i < mbi->mods_count; i++) {
 		// 	logi("boot mods %d: %s", i, mod_addr[i].cmdline);
-		// }		
+		// }
 		logi("mods_count: %d", mbi->mods_count);
 		logi("mods_addr:  %d", mbi->mods_addr);
 	}
@@ -80,11 +80,11 @@ void print_sys_info(void) {
 				(unsigned long) mmap < mbi->mmap_addr + mbi->mmap_length;
 				mmap = (multiboot_memory_map_t *)((unsigned long ) mmap + mmap->size + sizeof(mmap->size)))
 			logi(" size: 0x%x, base_addr: 0x%x%08x, length: 0x%x%08x, type: 0x%x",
-					(unsigned) mmap->size, 
-					(unsigned) (mmap->addr >> 32), 
+					(unsigned) mmap->size,
+					(unsigned) (mmap->addr >> 32),
 					(unsigned) (mmap->addr & 0xffffffff),
-					(unsigned) (mmap->len >> 32), 
-					(unsigned) (mmap->len & 0xffffffff), 
+					(unsigned) (mmap->len >> 32),
+					(unsigned) (mmap->len & 0xffffffff),
 					(unsigned) mmap->type);
 	}
 	if (mbi->flags & MULTIBOOT_INFO_DRIVE_INFO) {
@@ -163,29 +163,29 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	page_init((void*)(u64)multiboot_info->mmap_addr, multiboot_info->mmap_length);
 	mem_pool_init();
 	kmalloc_init();
+
+    loapic_dev_init();
+    ioapic_all_init();
+    pci_probe_all();
 	process_init();
 	scheduler_init();
-	
-	loapic_dev_init();
-	ioapic_all_init();
-	pci_probe_all();
 
 	// ioapic_gsi_unmask(ioapic_irq_to_gsi(1));
-    ioapic_gsi_unmask(ioapic_irq_to_gsi(16));
-    ioapic_gsi_unmask(ioapic_irq_to_gsi(17));
-    ioapic_gsi_unmask(ioapic_irq_to_gsi(18));
-    ioapic_gsi_unmask(ioapic_irq_to_gsi(19));
+//    ioapic_gsi_unmask(ioapic_irq_to_gsi(16));
+//    ioapic_gsi_unmask(ioapic_irq_to_gsi(17));
+//    ioapic_gsi_unmask(ioapic_irq_to_gsi(18));
+//    ioapic_gsi_unmask(ioapic_irq_to_gsi(19));
 
-    ext2_sb *sb = (ext2_sb*)kmalloc_s(sizeof(ext2_sb));
-    bool t = sata_read(sata,2, 0, 2, virt_to_phys(sb));
-    if (t == false)
-        loge("read sata error");
-    if (sb->magic == 0xEF53) {
-        logd("ext2 success");
-    } else {
-        logd("Ext2 fail");
-    }
-    kfree_s(sizeof(ext2_sb), sb);
+    // ext2_sb *sb = (ext2_sb*)kmalloc_s(sizeof(ext2_sb));
+    // bool t = sata_read(sata,2, 0, 2, virt_to_phys(sb));
+//    if (t == false)
+//        loge("read sata error");
+//    if (sb->magic == 0xEF53) {
+//        logd("ext2 success");
+//    } else {
+//        logd("Ext2 fail");
+//    }
+//    kfree_s(sizeof(ext2_sb), sb);
 
     logi("System init finish");
 	// parse_elf64(&elf_addr);
@@ -202,6 +202,17 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	assert(thread->process == pd); // 启动init进程
 	thiscpu_var(current) = thread;
 	set_rsp0((u64) thread->rsp0);
+	// 0x0xffffffff8101d3fa
+	// 0xffffd8
+	// 0x1000008
+	usize t;
+	t = virt_to_phys(0xffffffff8101d3fa);
+	_sL(t);
+    t = virt_to_phys(0xffffd8);
+    _sL(t);
+    t = virt_to_phys(0x1000000);
+    _sL(t);
+    while (1);
     load_tid_next(thread);
 
 	die();

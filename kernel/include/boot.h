@@ -26,7 +26,8 @@ u64 page_translate(u64, u64);
 static inline usize virt_to_phys(void * va) {
 	u64 v = (u64)va;
 	if (IS_VIRT_KERNEL(v)) {
-		return ABSOLUTE(v);
+		u64 t = ABSOLUTE(v);
+		return t;
 	} else if (IS_VIRT_DMA(v)) {
 		return v;
 	} else if (IS_VIRT_PCI(v)) {

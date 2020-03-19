@@ -40,14 +40,51 @@ string::~string() {
 }
 
 bool string::operator==(const char * s1) const {
-    return strncmp(data, s1, size) == 0;
+    return strncmp(data, s1, len) == 0;
 }
 
 size_t string::size() const {
-    return size;
+    return len;
 }
 
 bool string::operator!=(const char *s1) const {
-    return ! this->operator==(s1);
+    return !((*this) == s1);
 }
 
+bool string::operator==(const string &ano) const {
+    return (*this) == ano.data;
+}
+
+bool string::operator!=(const string &ano) const {
+    return !((*this) == ano);
+}
+
+string string::substr(size_t s, size_t len) const{
+    return string(data + s, len);
+}
+
+char& string::operator[](int i) {
+    return data[i];
+}
+
+char string::operator[](int i) const {
+    return data[i];
+}
+
+
+#include <vector.hpp>
+std::vector<std::string> split(const std::string& s, char sp) {
+    size_t i = 0, l = 0;
+    std::vector<std::string> res;
+    while (i < s.size()) {
+        if (s[i] == sp) {
+            if (i != l)
+                res.push_back(s.substr(l, i - l));
+            l = i + 1;
+        }
+        i++;
+    }
+    if (i != l)
+        res.push_back(s.substr(l, i - l));
+    return res;
+}

@@ -1,13 +1,13 @@
 #include "ext2_fs.h"
-#include "mm/buf.h"
-#include "delog/delog.h"
-#include "stat.h"
-#include "bits.h"
+#include "memory/buf.h"
+#include "delog.h"
+#include "fs/stat.h"
+#include "base.h"
 
-#include <cstring>
-#include <iostream>
+#include <string.h>
+#include <iostream.hpp>
 
-#include <cmath>
+#include <math.h>
 using namespace EXT2;
 
 EXT2_FS::EXT2_FS(Dev::BlockDevice* dev): FS(dev) {
@@ -187,7 +187,7 @@ void EXT2_FS::write_super() {
         dev->write(buf, block_to_pos(super_pos), sizeof(SuperBlock));
         super_pos += sb->blocks_per_group;
     }
-    _d_end();
+    // _d_end();
 }
 
 void EXT2_FS::write_gdt() {
@@ -205,7 +205,7 @@ void EXT2_FS::write_gdt() {
         dev->write(buf, block_to_pos(super_pos), sizeof(GroupDescriptor));
         super_pos += sb->blocks_per_group;
     }
-    _d_end();
+    // _d_end();
 }
 
 EXT2_GD *EXT2_FS::get_inode_group(_u32 inode_n) {

@@ -1,8 +1,9 @@
 #include "ext2_group_descriptor.h"
 #include "ext2_disk_stru.h"
-#include "bits.h"
-#include "delog/delog.h"
-#include <cstring>
+#include "base.h"
+#include "delog.h"
+#include <string.h>
+#include <algorithm.hpp>
 using namespace EXT2;
 
 
@@ -51,7 +52,7 @@ _u32 EXT2_GD::alloc_inode() {
     get_inode_bitmap();
     for (_u32 i = 0; i < fs->block_size; i++) {
         if (inode_bitmap[i] != (_u8)0xff) {
-            int t = lowest_0(inode_bitmap[i]);
+            int t = std::lowest_0(inode_bitmap[i]);
             _set_bit(inode_bitmap[i], t);
             // inode_bitmap[i] |= _BITS_SIZE(t);
             gd->free_inodes_count--; 
@@ -67,7 +68,7 @@ _u32 EXT2_GD::alloc_block() {
     get_block_bitmap();
     for (_u32 i = 0; i < fs->block_size; i++) {
         if (block_bitmap[i] != (_u8)0xff) {
-            int t = lowest_0(block_bitmap[i]);
+            int t = std::lowest_0(block_bitmap[i]);
             _set_bit(block_bitmap[i], t);
             // block_bitmap[i] |= _BITS_SIZE(t);
             gd->free_blocks_count--;       
@@ -84,7 +85,7 @@ void EXT2_GD::release_inode(_u32 inode_n) {
     _u32 which_byte = inode_n / 8;
     _u32 which_bit = inode_n % 8;
     if (_chk_bit(inode_bitmap[which_byte], which_bit) == 0) {
-        _error_s("inode %d is not in used.", inode_n);
+        loge("inode %d is not in used.", inode_n);
     }
     _clr_bit(inode_bitmap[which_byte], which_bit);
     gd->free_inodes_count++;
@@ -98,7 +99,7 @@ void EXT2_GD::release_block(_u32 block_n) {
     _u32 which_byte = block_n / 8;
     _u32 which_bit = block_n % 8;
     if (_chk_bit(block_bitmap[which_byte], which_bit) == 0) {
-        _error_s("block %d is not in used.", block_n);
+        loge("block %d is not in used.", block_n);
     }
     _clr_bit(block_bitmap[which_byte], which_bit);
     gd->free_blocks_count++;
