@@ -65,14 +65,31 @@ void kfree_s(size_t size, void *addr) {
 }
 
 void *kmalloc(size_t size) {
-    size = size + sizeof(u32);
+    size = size + sizeof(size_t);
     void *ptr = kmalloc_s(size);
-    *(u32 *)ptr = size;
-    return ptr + sizeof(u32);
+    *(size_t*)ptr = size;
+    return ptr + sizeof(size_t);
 }
 
 void kfree(void *ptr) {
-    ptr = ptr - sizeof(u32);
-    u32 size = *(u32 *) ptr;
+    ptr = ptr - sizeof(size_t);
+    size_t size = *(size_t*) ptr;
     kfree_s(size, ptr);
+}
+
+void *krealloc(void *ptr, size_t size) {
+    size = size + sizeof(size_t);
+    ptr = ptr - sizeof(size_t);
+    size_t old_size = *(size_t*)ptr;
+    CacheDescriptor *old_cache = get_kmalloc_cache(old_size);
+    CacheDescriptor *new_cache = get_kmalloc_cache(size);
+    if (old_cache == new_cache) {
+        *(size_t*)ptr = size;
+        return ptr + sizeof(size_t);
+    }
+    void* new_ptr = kmalloc_s(size);
+    memcpy(new_ptr, ptr, old_size);
+    *(size_t*) new_ptr = size;
+    kfree_s(old_size, ptr);
+    return new_ptr + sizeof(size_t);
 }

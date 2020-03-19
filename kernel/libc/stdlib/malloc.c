@@ -14,10 +14,7 @@ void *calloc(size_t num, size_t size) {
 
 
 void *realloc(void *addr, size_t size) {
-    void *naddr = malloc(size);
-    memcpy(naddr, addr, size);
-    free(addr);
-    return naddr;
+    return krealloc(addr, size);
 }
 
 void free(void *addr) {
