@@ -18,6 +18,8 @@ void *realloc(void *addr, size_t size) {
 }
 
 void free(void *addr) {
+    if (addr == NULL)
+        return;
     kfree(addr);
 }
 

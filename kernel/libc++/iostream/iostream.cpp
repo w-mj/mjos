@@ -2,7 +2,7 @@
 // Created by wmj on 3/19/20.
 //
 
-#include <iostream.h>
+#include <iostream.hpp>
 #include <console.h>
 #include <serial.h>
 
@@ -29,4 +29,8 @@ ostream &ostream::operator<<(const char * s) {
     }
     console_setcolor(color);
     return *this;
+}
+
+ostream &ostream::operator<<(const string & str) {
+    return (*this)<<str.c_str();
 }

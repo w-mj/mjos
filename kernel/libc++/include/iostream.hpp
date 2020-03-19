@@ -3,7 +3,9 @@
 //
 
 #ifndef OS_OSTREAM_H
-#define OS_IOSTREAM_H
+#define OS_OSTREAM_H
+
+#include <string.hpp>
 
 namespace std {
 
@@ -11,8 +13,9 @@ class ostream {
 private:
     int fno;
 public:
-    ostream(int fno);
+    explicit ostream(int fno);
     ostream &operator <<(const char *);
+    ostream &operator <<(const string &);
 };
 
 extern ostream cout;

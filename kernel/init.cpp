@@ -3,7 +3,7 @@
 #include <serial.h>
 #include <delog.h>
 #include <cpu.h>
-#include <iostream.h>
+#include <iostream.hpp>
 extern "C" void init_main();
 
 void process_print_message() {

@@ -1,5 +1,5 @@
 
-subdirs := misc arch memory process driver syscall libc libc++
+subdirs := misc arch memory process driver syscall libc libc++ fs
 srclist := spin.c init.cpp
 binfile := kernel.bin
 elffile := kernel.elf
