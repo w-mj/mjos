@@ -30,7 +30,11 @@ $(subobjs): $(subdirs)
 	@ mv -f $(basename $@).t $(basename $@).d
 
 %.cpp.o: %.cpp %.cpp.d
-	$(CPP) $(CPPFLAGS) $(INCFLAG) $(DEPGEN) -o $@ $<
+	$(CXX) $(CXXFLAGS) $(INCFLAG) $(DEPGEN) -o $@ $<
+	@ mv -f $(basename $@).t $(basename $@).d
+
+%.cc.o: %.cc %.cc.d
+	$(CXX) $(CXXFLAGS) $(INCFLAG) $(DEPGEN) -o $@ $<
 	@ mv -f $(basename $@).t $(basename $@).d
 
 $(subdirs): FORCE

@@ -9,7 +9,7 @@ ISODIR  :=  $(OUTDIR)/iso
 TOOLCHAIN_BASE := /usr/local/x86_64-elf-gcc/bin/# To make clion happy
 
 CC      :=  $(TOOLCHAIN_BASE)$(ARCH)-elf-gcc
-CPP     :=  $(TOOLCHAIN_BASE)$(ARCH)-elf-g++
+CXX     :=  $(TOOLCHAIN_BASE)$(ARCH)-elf-g++
 AR      :=  $(TOOLCHAIN_BASE)$(ARCH)-elf-ar
 OBJCOPY :=  $(TOOLCHAIN_BASE)$(ARCH)-elf-objcopy
 LD      :=  $(TOOLCHAIN_BASE)$(ARCH)-elf-ld
@@ -20,7 +20,7 @@ ISOFILE :=  $(OUTDIR)/$(NAME).iso
 CFLAGS  :=  -c -std=c11 -DKERNEL -DARCH=$(ARCH)
 CFLAGS  +=  -Wall -Wextra -Werror=implicit 
 CFLAGS  +=  -ffreestanding -ffunction-sections -fdata-sections
-CPPFLAGS:=  -c -std=c++17 -nolibc -nostdlib -fno-builtin
+CXXFLAGS:=  -c -std=c++17 -ffreestanding -ffunction-sections -fdata-sections
 ifeq ($(DEBUG), 1)
 	CFLAGS  +=  -g -DDEBUG
 else
@@ -30,8 +30,7 @@ endif
 
 
 TEMPLATEFILE := $(CURDIR)/Makefile.template
-export CC CPP AR OBJCOPY LD NM CFLAGS TEMPLATEFILE ARCH CPPFLAGS
-# PARAMS  :=  DEBUG=$(DEBUG) ARCH=$(ARCH) CC=$(CC) CPP=$(CPP) AR=$(AR) OBJCOPY=$(OBJCOPY)
+export CC CXX AR OBJCOPY LD NM CFLAGS TEMPLATEFILE ARCH CXXFLAGS
 
 userdirs := fs
 

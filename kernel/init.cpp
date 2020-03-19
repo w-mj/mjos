@@ -3,6 +3,7 @@
 #include <serial.h>
 #include <delog.h>
 #include <cpu.h>
+#include <iostream.h>
 extern "C" void init_main();
 
 void process_print_message() {
@@ -41,6 +42,7 @@ void user_process2() {
 }
 
 void init_main() {
+    std::cerr << "cout form " << "iostream" << std::endl;
     logi("start init process");
     // parse_elf64(user_processes[0]);
     // die();

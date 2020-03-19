@@ -475,7 +475,7 @@ pfn_t kernel_pages_alloc(int n, PageState state) {
 	assert(state == PG_KERNEL || state == PG_POOL);
 	// 分配n个页面，此处应该加锁，后期使用buddy优化
 	pfn_t p = frame_alloc(state);
-	logd("alloc kernel %d page pfn:%d", n, p);
+	// logd("alloc kernel %d page pfn:%d", n, p);
 	u64 psys = p << PAGEOFFSET;
 	page_table_set_entry(kernel_pml4, (u64)VIRTUAL(psys), psys + 7, true);
 	n -= 1;
