@@ -1,8 +1,10 @@
 #include "ext2_dentry.h"
 #include "ext2_file.h"
+#include "stat.h"
 #include <delog.h>
 #include <string.h>
 #include <memory/buf.h>
+#include <time.h>
 
 using namespace EXT2;
 EXT2_DEntry::EXT2_DEntry(EXT2_FS* fs1, VFS::DEntry* parent1, 
@@ -103,7 +105,7 @@ static inline int cal_name_len(int s) {
 }
 
 void EXT2_DEntry::write_children() {
-    _error(type != VFS::Directory);
+    assert(type == VFS::Directory);
     DirEntry new_disk_entry[1];
     EXT2_File parent_body(this, this->ext2_inode);
     _u32 all_length = 0;
@@ -125,16 +127,16 @@ void EXT2_DEntry::write_children() {
         parent_body.write((char *)new_disk_entry, new_disk_entry->rec_len);
         // new_disk_entry->name = de->name.c_str();
     }
-    _d_end();
+    // _d_end();
 }
 
 VFS::DEntry* EXT2_DEntry::mkdir(const std::string& new_name) {
-    _error(type != VFS::Directory);
+    assert(type == VFS::Directory);
     EXT2_GD *new_dir_gd = nullptr;
     _u32 new_i_n = ext2_fs->alloc_inode(&new_dir_gd);
     new_dir_gd->get_gd()->used_dirs_count++;
     _u32 new_b_n = ext2_fs->alloc_block();
-    // _dbg_log("分配节点");
+    // logd("分配节点");
     // MM::Buf buf(1024);
     // ext2_fs->dev->read(buf, ext2_fs->inode_to_pos(new_i_n - 1), 1024);
     // _sa(buf.data, 1024);
@@ -194,11 +196,11 @@ VFS::DEntry* EXT2_DEntry::mkdir(const std::string& new_name) {
 }
 
 VFS::DEntry *EXT2_DEntry::create(const std::string& name) {
-    _error(type != VFS::Directory);
+    assert(type == VFS::Directory);
     _pos();
     inflate();
     _u32 new_i_n = ext2_fs->alloc_inode();
-    _error(new_i_n == 0);
+    assert(new_i_n != 0);
     EXT2::Inode *new_disk_i = new EXT2::Inode();
     // _sp(*new_disk_i);
     new_disk_i->mode = S_IFREG | S_IRUSR | S_IWUSR  | S_IROTH | S_IRGRP;
@@ -232,8 +234,8 @@ VFS::File *EXT2_DEntry::get_file() {
 }
 
 void EXT2_DEntry::unlink(VFS::DEntry *d) {
-    _dbg_log("unlink sub current %d, del %d.", inode_n, d->inode_n);
-    _error(type != VFS::Directory);
+    logd("unlink sub current %d, del %d.", inode_n, d->inode_n);
+    assert(type == VFS::Directory);
     load_children();
     if (d->type == VFS::Directory) {
         ext2_inode->nlink--;  // 降低自己的引用链接
@@ -245,13 +247,13 @@ void EXT2_DEntry::unlink(VFS::DEntry *d) {
     children.remove(d);
     delete d;
     write_children();
-    _dbg_log("unlink sub current %d, del %d. finish", inode_n, d->inode_n);
+    logd("unlink sub current %d, del %d. finish", inode_n, d->inode_n);
 }
 
 
 void EXT2_DEntry::unlink() {
     inflate();
-    _dbg_log("ulink %d ref cnt: %d type: %d.", inode_n, ext2_inode->nlink, type);
+    logd("ulink %d ref cnt: %d type: %d.", inode_n, ext2_inode->nlink, type);
     if (ext2_inode->nlink == 0)
         return;
 
@@ -270,12 +272,12 @@ void EXT2_DEntry::unlink() {
         ext2_fs->write_super();
     }
     ext2_inode->write_inode();
-    _dbg_log("ulink %d ref cnt: %d type: %d. finish", inode_n, ext2_inode->nlink, type);
+    logd("ulink %d ref cnt: %d type: %d. finish", inode_n, ext2_inode->nlink, type);
 }
 
 void EXT2_DEntry::unlink_children() {
-    _dbg_log("unlink chlidren current %d, del", inode_n);
-    _error(type != VFS::Directory);
+    logd("unlink chlidren current %d, del", inode_n);
+    assert(type == VFS::Directory);
     load_children();
     _pos();
     for (auto d: children) {
@@ -293,7 +295,7 @@ void EXT2_DEntry::unlink_children() {
     ext2_inode->write_inode();
     ext2_fs->write_gdt();
     write_children();
-    _dbg_log("unlink chlidren current %d. finish", inode_n);
+    logd("unlink chlidren current %d. finish", inode_n);
 }
 
 VFS::DEntry *EXT2_DEntry::link(DEntry *tar, const std::string& s) {
@@ -370,12 +372,12 @@ VFS::DEntry *EXT2_DEntry::symlink(DEntry *file, const std::string& new_name) {
     new_entry->inode->size = path.size();
     new_entry->ext2_inode->write_inode();
     write_children();
-    _d_end();
+    // _d_end();
     return new_entry;
 }
 
 VFS::DEntry *EXT2_DEntry::follow() {
-    _dbg_log("start");
+    logd("start");
     inflate();
     char buf[inode->size];
     if (inode->size <= 60) {
@@ -389,7 +391,7 @@ VFS::DEntry *EXT2_DEntry::follow() {
     VFS::NameI *path = VFS::NameI::from_str(std::string(buf, inode->size));
     VFS::DEntry *ans = parent->get_child(path);
     delete path;
-    _d_end();
+    // _d_end();
     return ans;
 }
 

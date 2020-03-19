@@ -9,8 +9,8 @@
 
 namespace MM{
 class Buf {
-    _u8 *data = nullptr;
 public:
+    _u8 *data = nullptr;
     Buf(_u32 size) {
         data = new _u8[size];
     }

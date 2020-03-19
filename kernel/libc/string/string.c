@@ -18,6 +18,16 @@ int strncmp(const char *s1, const char *s2, size_t n) {
 		return 0;
 	return *s1 - *s2;
 }
+
+char *strcpy(char *dst, const char *src) {
+    char *t = dst;
+    while (*src) {
+        *dst = *src;
+        dst++;
+        src++;
+    }
+    return t;
+}
 /*
 void memcpy(char *dst, const char*src, _u16 size) {
     while (size--) {
