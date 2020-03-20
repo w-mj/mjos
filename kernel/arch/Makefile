@@ -1,5 +1,4 @@
 
-target  := arch.obj
 subdirs := $(ARCH)
 
 build: $(subdirs)

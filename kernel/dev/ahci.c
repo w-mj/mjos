@@ -1,5 +1,5 @@
-#include <driver/ahci.h>
-#include <driver/pci.h>
+#include <dev/ahci.h>
+#include <dev/pci.h>
 #include <types.h>
 #include <delog.h>
 #include <base.h>

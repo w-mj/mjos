@@ -2,8 +2,8 @@
 #include <asm.h>
 #include <delog.h>
 #include <acpi.h>
-#include <driver/pci.h>
-#include <driver/ahci.h>
+#include <dev/pci.h>
+#include <dev/ahci.h>
 
 
 #define PCI_ADDR    0x0cf8

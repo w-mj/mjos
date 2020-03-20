@@ -1,6 +1,5 @@
 
 srclist := delog.c
-target  := misc.obj
-subdirs := 
+subdirs :=
 
 include $(TEMPLATEFILE)

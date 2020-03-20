@@ -1,9 +1,5 @@
 
 srclist := boot.S atomic.S kernel.c
-target  := x86_64.obj
-subdirs := driver init
-
-INCLIST += $(CURDIR)/include
-export INCLIST
+subdirs := dev init
 
 include $(TEMPLATEFILE)

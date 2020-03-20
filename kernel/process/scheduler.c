@@ -49,5 +49,6 @@ bool schedule() {
 		thiscpu_var(current) = next;
 		set_rsp0((u64) next->rsp0);
 	}
+	thread_switch();
 	return true;
 }

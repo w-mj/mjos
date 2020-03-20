@@ -18,9 +18,9 @@
 #include <syscall.h>
 #include <spin.h>
 #include <stdio.h>
-#include <driver/pci.h>
+#include <dev/pci.h>
 #include <fs/ext2_stru.h>
-#include <driver/ahci.h>
+#include <dev/ahci.h>
 
 #define TESTTYPE(x) assert((x) / 8 == sizeof(u##x))
 void test_types(void) {

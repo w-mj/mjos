@@ -1,6 +1,5 @@
 
 srclist := process.c scheduler.c elf.c ipc.c elfpiggy.S userprocesses.c
-target  := process.obj
 subdirs :=
 
 include $(TEMPLATEFILE)

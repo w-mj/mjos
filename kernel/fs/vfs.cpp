@@ -1,4 +1,4 @@
-#include "../include/fs/vfs.h"
+#include "fs/vfs.h"
 #include "delog.h"
 #include "fs/stat.h"
 #include <string.h>
