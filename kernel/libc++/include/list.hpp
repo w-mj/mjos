@@ -5,6 +5,7 @@
 #ifndef OS_LIST_H
 #define OS_LIST_H
 
+
 #include <stddef.h>
 namespace std {
 
@@ -21,7 +22,7 @@ private:
     _Wrapper head;
     size_t _size = 0;
 public:
-
+    class iterator;
     list() = default;
     ~list() {
         clear();
@@ -40,15 +41,15 @@ public:
         }
     }
 
-    void push_back(T data) {
-        auto *w = new _Wrapper(data);
-        w->next = &head;
-        w->prev = head.prev;
-        head.prev->next = w;
-        head.prev = w;
+    void push_back(const T& data) {
+        insert(end(), data);
     }
 
-    void remove(T data) {
+    void push_front(const T& data) {
+        insert(begin(), data);
+    }
+
+    void remove(const T& data) {
         for (auto iter = begin(); iter != end(); iter++) {
             _Wrapper *x = iter._current;
             if (x->data == data) {
@@ -58,6 +59,55 @@ public:
                 return;
             }
         }
+    }
+
+    // 从from移动到to前面
+    // 相当于
+    // auto value = *from;
+    // erase(from);
+    // insert(to, value);
+    void move(const iterator &from, const iterator &to) {
+        if (from == to) {
+            return;
+        }
+        _Wrapper *from_wrapper = from._current;
+        _Wrapper *to_wrapper   = to._current;
+        // 断开from的连接
+        if (from_wrapper->next != nullptr) {
+            from_wrapper->prev = from_wrapper->next->prev;
+        }
+        if (from_wrapper->prev != nullptr) {
+            from_wrapper->next = from_wrapper->prev->next;
+        }
+        // 将from插入to前面
+        from_wrapper->prev = to_wrapper->prev;
+        from_wrapper->next = to_wrapper;
+        to_wrapper->prev->next = from_wrapper;
+        to_wrapper->prev = from_wrapper;
+    }
+
+    void erase(const iterator& iter) {
+        if (iter._current == &head) {
+            return;
+        }
+        _Wrapper *wrapper = iter._current;
+        wrapper->prev->next = wrapper->next;
+        wrapper->next->prev = wrapper->prev;
+        iter._current = wrapper->next;
+        delete wrapper;
+    }
+
+    // 在iter的前面插入
+    void insert(const iterator& iter, const T& data) {
+        auto *wrapper = new _Wrapper(data);
+        auto *behind = iter._current;
+        iterator new_iter(wrapper);
+        move(new_iter, iter);
+//        wrapper->next = behind;
+//        wrapper->prev = behind->prev;
+//        behind->prev->next = wrapper;
+//        behind->prev = wrapper;
+        _size++;
     }
 
     T front() {
@@ -76,7 +126,7 @@ public:
     private:
         _Wrapper* _current;
     public:
-        iterator(_Wrapper *_current) {
+        explicit iterator(_Wrapper *_current) {
             this->_current = _current;
         }
         iterator &operator++() {
@@ -87,8 +137,11 @@ public:
             _current = _current->next;
             return *this;
         }
-        bool operator!=(const iterator &ano) {
+        bool operator!=(const iterator &ano) const {
             return _current != ano._current;
+        }
+        bool operator==(const iterator &ano) const {
+            return ! this->operator!=(ano);
         }
         T operator*() {
             return _current->data;

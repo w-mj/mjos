@@ -3,7 +3,7 @@
 #include "fs/stat.h"
 #include <delog.h>
 #include <string.h>
-#include <memory/buf.h>
+#include <memory/buf.hpp>
 #include <time.h>
 
 using namespace EXT2;

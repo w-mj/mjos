@@ -5,6 +5,8 @@
 #ifndef OS_ALGORITHM_H
 #define OS_ALGORITHM_H
 
+#include <function.hpp>
+
 namespace std {
     template <typename T>
     T min(T d1, T d2) {
@@ -51,6 +53,17 @@ namespace std {
 
     template<typename T> static inline _u8 highest_0(T n) {
         return highest_1(~n);
+    }
+
+
+    template <typename T, typename D>
+    T find_if(T begin, T end, function<bool(D)> pred) {
+        while (begin != end) {
+            if (pred(*begin)) {
+                return begin;
+            }
+            ++begin;
+        }
     }
 
 }

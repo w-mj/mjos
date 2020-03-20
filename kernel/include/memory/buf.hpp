@@ -2,8 +2,8 @@
 // Created by wmj on 3/19/20.
 //
 
-#ifndef OS_BUF_H
-#define OS_BUF_H
+#ifndef OS_BUF_HPP
+#define OS_BUF_HPP
 
 #include <types.h>
 
@@ -24,4 +24,4 @@ public:
 
 } // namespace Buf
 
-#endif //OS_BUF_H
+#endif //OS_BUF_HPP

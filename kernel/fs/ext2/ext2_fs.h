@@ -2,7 +2,7 @@
 
 #include "types.h"
 #include "fs/vfs.h"
-#include "dev/block_dev.h"
+#include "dev/block_dev.hpp"
 #include "ext2_disk_stru.h"
 #include "ext2_inode.h"
 #include "ext2_dentry.h"
