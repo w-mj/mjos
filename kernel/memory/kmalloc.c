@@ -39,7 +39,7 @@ static inline CacheDescriptor *get_kmalloc_cache(size_t size) {
 }
 
 void kmalloc_init() {
-	for (int i = 1; i < 14; i++) {
+	for (int i = 0; i < KMALLOC_CACHE_LENGTH; i++) {
 		cache_init(&kmalloc_cache[i], kmalloc_info[i].name, kmalloc_info[i].obj_size);
 	}
 }

@@ -162,6 +162,7 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 
 	page_init((void*)(u64)multiboot_info->mmap_addr, multiboot_info->mmap_length);
 	mem_pool_init();
+
 	kmalloc_init();
 
     loapic_dev_init();
@@ -205,14 +206,16 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	// 0x0xffffffff8101d3fa
 	// 0xffffd8
 	// 0x1000008
-	usize t;
-	t = virt_to_phys(0xffffffff8101d3fa);
-	_sL(t);
-    t = virt_to_phys(0xffffd8);
-    _sL(t);
-    t = virt_to_phys(0x1000000);
-    _sL(t);
-    while (1);
+//	usize tt;
+//	tt = virt_to_phys((void*)0xffffffff8101d3fa);
+//	_sL(tt);
+//	tt = page_translate(read_cr3(),0xffffffff8101d3fa);
+//	_sL(tt);
+//    tt = virt_to_phys((void*)0xffffd8);
+//    _sL(tt);
+//    tt = virt_to_phys((void*)0x1000000);
+//    _sL(tt);
+    // *(u64*)0x0ff0ffff8101d3fa = 1;
     load_tid_next(thread);
 
 	die();
