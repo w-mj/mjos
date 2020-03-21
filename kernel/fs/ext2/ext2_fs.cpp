@@ -1,5 +1,5 @@
 #include "ext2_fs.h"
-#include "memory/buf.h"
+#include "memory/buf.hpp"
 #include "delog.h"
 #include "fs/stat.h"
 #include "base.h"

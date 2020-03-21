@@ -1,7 +1,7 @@
 #include "ext2_inode.h"
 #include "fs/stat.h"
 #include "delog.h"
-#include "memory/buf.h"
+#include "memory/buf.hpp"
 #include <iostream.hpp>
 #include <string.h>
 #include <algorithm.hpp>

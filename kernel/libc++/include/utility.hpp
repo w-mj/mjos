@@ -9,9 +9,28 @@
 
 namespace std {
 
+    template <class _Ty>
     constexpr remove_reference_t <_Ty> &&move(_Ty &&_Arg) noexcept { // forward _Arg as movable
         return static_cast<remove_reference_t <_Ty> &&>(_Arg);
     }
+
+    template <class T>
+    inline T&& forward(typename std::remove_reference<T>::type& t) noexcept {
+        return static_cast<T&&>(t);
+    }
+
+    template <class T>
+    inline T&& forward(typename std::remove_reference<T>::type&& t) noexcept {
+        static_assert(!std::is_lvalue_reference<T>::value,
+                      "Can not forward an rvalue as an lvalue.");
+        return static_cast<T&&>(t);
+    }
+
+//    template<bool> // generic
+//    struct static_assert;
+
+//    template<>
+//    struct static_assert<true>{};
 }
 
 #endif //OS_UTILITY_HPP

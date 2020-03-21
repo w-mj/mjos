@@ -110,11 +110,15 @@ public:
         _size++;
     }
 
-    T front() {
+    T& front() {
         return head.next->data;
     }
 
-    T operator[] (int index) {
+    T& last() {
+        return head.prev->data;
+    }
+
+    T& operator[] (int index) {
         auto iter = begin();
         for (; iter != end() && index; iter++, index--)
             ;
@@ -133,8 +137,16 @@ public:
             _current = _current->next;
             return *this;
         }
+        iterator &operator--() {
+            _current = _current->prev;
+            return *this;
+        }
         const iterator &operator++(int) {
             _current = _current->next;
+            return *this;
+        }
+        const iterator &operator--(int) {
+            _current = _current->prev;
             return *this;
         }
         bool operator!=(const iterator &ano) const {

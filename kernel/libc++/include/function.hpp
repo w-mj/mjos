@@ -6,6 +6,7 @@
 #define OS_FUNCTION_HPP
 
 #include <utility.hpp>
+#include <memory.hpp>
 
 namespace std {
     template <typename T>
@@ -49,7 +50,7 @@ namespace std {
 
         // erase the type of any functor and store it into a char*
         // so the storage size should be obtained as well
-        std::unique_ptr<char[]> data_ptr;
+        char *data_ptr;
         size_t data_size;
     public:
         function()
@@ -71,7 +72,7 @@ namespace std {
                 , data_size(sizeof(Functor))
         {
             // copy the functor to internal storage
-            this->construct_f(this->data_ptr.get(), reinterpret_cast<char*>(&f));
+            this->construct_f(this->data_ptr, reinterpret_cast<char*>(&f));
         }
 
         // copy constructor
@@ -83,15 +84,16 @@ namespace std {
         {
             if (this->invoke_f) {
                 // when the source is not a null function, copy its internal functor
-                this->data_ptr.reset(new char[this->data_size]);
-                this->construct_f(this->data_ptr.get(), rhs.data_ptr.get());
+                this->data_ptr = new char[this->data_size];
+                this->construct_f(this->data_ptr, rhs.data_ptr);
             }
         }
 
         ~function()
         {
             if (data_ptr != nullptr) {
-                this->destroy_f(this->data_ptr.get());
+                this->destroy_f(this->data_ptr);
+                delete []data_ptr;
             }
         }
 
@@ -99,7 +101,7 @@ namespace std {
 
         R operator()(Args&&... args)
         {
-            return this->invoke_f(this->data_ptr.get(), std::forward<Args>(args)...);
+            return this->invoke_f(this->data_ptr, std::forward<Args>(args)...);
         }
     };
 }
