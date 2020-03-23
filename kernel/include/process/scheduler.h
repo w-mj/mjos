@@ -13,6 +13,8 @@ void scheduler_init();
 // 再在中断中紧接着调用thread_switch
 bool schedule();
 
+#define sched_yield() schedule()
+
 #ifdef __cplusplus
 }
 #endif

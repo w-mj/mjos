@@ -1,10 +1,11 @@
 #include <process/pthread.h>
 #include <atomic.h>
+#include <delog.h>
 
 static void* threadDataTable[64];
 static int freeEntry = 0;
 
-int pthread_key_create(pthread_key_t* key, void (*)(void*)) {
+int pthread_key_create(pthread_key_t* key, void (*f)(void*)) {
     assert(freeEntry < 64);
 
     *key = freeEntry;
@@ -28,7 +29,7 @@ int pthread_setspecific(pthread_key_t key, const void* data) {
     return 0;
 }
 
-int pthread_mutex_init(pthread_mutex_t* mutex, const pthread_mutexattr_t*) {
+int pthread_mutex_init(pthread_mutex_t* mutex, const pthread_mutexattr_t* attr) {
     *mutex = 0;
     return 0;
 }
@@ -43,10 +44,10 @@ int pthread_mutex_unlock(pthread_mutex_t* mutex) {
     return 0;
 }
 
-int pthread_cond_wait(pthread_cond_t*, pthread_mutex_t*) {
+int pthread_cond_wait(pthread_cond_t* cond, pthread_mutex_t* attr) {
     return 0;
 }
 
-int pthread_cond_signal(pthread_cond_t*) {
+int pthread_cond_signal(pthread_cond_t*cond) {
     return 0;
 }

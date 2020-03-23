@@ -9,6 +9,7 @@ extern "C" {
 
 struct FILE {
     int unused;
+    int fno;
 };
 
 extern struct FILE *stderr;
@@ -18,6 +19,12 @@ extern struct FILE *stdin;
 size_t snprintf (char *, size_t, const char *, ...);
 size_t vsnprintf (char *, size_t, const char *, va_list);
 int asprintf (char **, const char *, ...);
+
+int fprintf(struct FILE *f, const char * fmt, ...);
+#define printf(...) fprintf(stdout, __VA_ARGS__)
+
+void fprintf_init();
+
 
 #ifdef __cplusplus
 }

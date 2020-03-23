@@ -138,7 +138,7 @@ extern _Unwind_Reason_Code _Unwind_Backtrace (_Unwind_Trace_Fn, void *);
    or NULL if it cannot be found (e.g., because the function has no
    unwind info).  Note: there is not necessarily a one-to-one
    correspondence between source-level functions and procedures: some
-   functions don't have unwind-info and others are split into multiple
+   functions don't have unwind-info and others are split into multipl Port libgcc_ehe
    procedures.  */
 extern void *_Unwind_FindEnclosingFunction (void *);
 

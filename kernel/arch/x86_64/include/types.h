@@ -14,6 +14,7 @@ typedef signed long long _i64;
 typedef unsigned long long _u64;
 typedef _u32 _I;
 typedef long unsigned int size_t;
+typedef long int ssize_t;
 typedef _i32 ptrdiff_t;
 typedef char _c;
 typedef _c* _s;

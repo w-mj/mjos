@@ -137,6 +137,8 @@ static __INIT void parse_madt(madt_t * tbl) {
 
 void init_main();
 void load_tid_next(ThreadDescriptor *);
+void _init();
+void __libc_start_main();
 // extern void *elf_addr;
 extern u64 _bss_end;
 __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
@@ -193,6 +195,10 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	// die();
 	// ASM("movq $0x12, %r11");
 	// ASM("int $15");
+	__libc_start_main();  // 初始化libc和cxxrt
+    _init();
+
+
 	pid_t pid = create_process(NULL, PROCESS_KERNEL, (void*)init_main);
 
 	ProcessDescriptor *pd = get_process(pid);

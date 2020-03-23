@@ -30,22 +30,22 @@ namespace std {
                     (*it).cnt++;
                     return *it;
                 }
-                if (pool.size() < max_size) {
-                    _Wrapper wrapper;
-                    wrapper.data = fn(key);
-                    wrapper.key = key;
-                    wrapper.cnt = 1;
-                    pool.push_front(wrapper);
-                    return wrapper.data;
-                } else {
-                    auto end = pool.end();
-                    end--;
-                    (*end).data = fn(key);
-                    (*end).cnt = 0;
-                    (*end).key = key;
-                    pool.move(end, pool.begin());
-                    return (*end).data;
-                }
+            }
+            if (pool.size() < max_size) {
+                _Wrapper wrapper;
+                wrapper.data = fn(key);
+                wrapper.key = key;
+                wrapper.cnt = 1;
+                pool.push_front(wrapper);
+                return wrapper.data;
+            } else {
+                auto end = pool.end();
+                end--;
+                (*end).data = fn(key);
+                (*end).cnt = 0;
+                (*end).key = key;
+                pool.move(end, pool.begin());
+                return (*end).data;
             }
         }
     };

@@ -1,5 +1,5 @@
 
-srclist := memory.cpp
+srclist :=
 subdirs := iostream string
 
 include $(TEMPLATEFILE)
