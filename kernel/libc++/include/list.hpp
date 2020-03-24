@@ -121,12 +121,12 @@ public:
         return head.prev->data;
     }
 
-    T& operator[] (int index) {
-        auto iter = begin();
-        for (; iter != end() && index; iter++, index--)
-            ;
-        return iter._current->data;
-    }
+//    T& operator[] (int index) {
+//        auto iter = begin();
+//        for (; iter != end() && index; iter++, index--)
+//            ;
+//        return iter._current->data;
+//    }
 
     class iterator  {
     friend class list;

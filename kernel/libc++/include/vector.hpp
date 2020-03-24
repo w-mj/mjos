@@ -61,6 +61,9 @@ namespace std {
         size_t size() const {
             return item_size;
         }
+        T& front() {
+            return this->operator[](0);
+        }
 
         class iterator {
             T *cur;

@@ -24,7 +24,7 @@ namespace EXT2 {
         int inode_to_pos(int inode_n);
 
         SuperBlock* sb;
-        std::list<EXT2_GD*> gdt_list;
+        std::vector<EXT2_GD*> gdt_list;
 
         _u32 block_size;
         _u32 group_cnt;
