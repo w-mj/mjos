@@ -14,7 +14,7 @@ void free(void *addr);
 
 void abort();
 
-static inline int time(int a) {return 0;}
+int time(int a);
 
 
 long strtol (const char *__restrict s, char **__restrict ptr, int base);

@@ -2,13 +2,13 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include <types.h>
-typedef u32 pthread_key_t;
-typedef u32 pthread_mutex_t;
-typedef u32 pthread_cond_t;
-typedef u32 pthread_once_t;
-typedef u32 pthread_mutexattr_t;
+typedef i32 pthread_key_t;
+typedef i32 pthread_mutex_t;
+typedef i32 pthread_cond_t;
+typedef i32 pthread_once_t;
+typedef i32 pthread_mutexattr_t;
 
 int pthread_key_create(pthread_key_t *key, void (*)(void *));
 int pthread_once(pthread_once_t * control, void (*init)(void));

@@ -163,7 +163,7 @@ static char * fmt_number(char * buf, char * end, _u64 num, int base, _u32 flags,
 }
 
 // return the number of chars required, not counting the terminating null
-size_t vsnprintf(char * buf, size_t size, const char * fmt, va_list args) {
+int vsnprintf(char * buf, size_t size, const char * fmt, va_list args) {
     char * ptr = buf;
     char * end = ptr + size;
     if (end < ptr) {
@@ -356,7 +356,7 @@ size_t vsnprintf(char * buf, size_t size, const char * fmt, va_list args) {
     return (size_t) (ptr - buf);
 }
 
-size_t snprintf(char * buf, size_t size, const char * fmt, ...) {
+int snprintf(char * buf, size_t size, const char * fmt, ...) {
     va_list args;
     va_start(args, fmt);
     size_t num = vsnprintf(buf, size, fmt, args);
