@@ -1,14 +1,14 @@
 #pragma once
 
-#include "types.h"
-#include "fs/vfs.h"
-#include "dev/block_dev.hpp"
+#include "../../arch/x86_64/include/types.h"
+#include "vfs.h"
+#include "../dev/block_dev.hpp"
 #include "ext2_disk_stru.h"
 #include "ext2_inode.h"
 #include "ext2_dentry.h"
 #include "ext2_group_descriptor.h"
 
-#include <list.hpp>
+#include "../../libc++/include/list.hpp"
 namespace EXT2 {
 
     class EXT2_Inode;

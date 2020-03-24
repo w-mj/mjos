@@ -20,11 +20,13 @@ ISOFILE :=  $(OUTDIR)/$(NAME).iso
 CFLAGS  :=  -c -std=c11 -DKERNEL -DARCH=$(ARCH)
 CFLAGS  +=  -Wall -Wextra -Werror=implicit 
 CFLAGS  +=  -ffreestanding -ffunction-sections -fdata-sections
-CXXFLAGS:=  -c -std=c++17 -ffreestanding #-fno-exceptions
+CXXFLAGS:=  -c -std=c++17 -ffreestanding -fno-exceptions #-fno-rtti
 ifeq ($(DEBUG), 1)
 	CFLAGS  +=  -g -DDEBUG
+	CXXFLAGS  +=  -g -DDEBUG
 else
 	CFLAGS  +=  -g -DNDEBUG
+	CXXFLAGS  +=  -g -DDEBUG
 endif
 
 

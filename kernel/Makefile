@@ -20,7 +20,8 @@ uwind_obj := unwind-c.o  unwind-dw2-fde.o  unwind-dw2.o  unwind-sjlj.o
 objs    := $(addsuffix .o, $(srclist))
 deps    := $(addsuffix .d, $(srclist))
 subobjs := $(foreach d, $(subdirs), $(addsuffix .obj, $(d)/$(d)))
-objlist := $(crti_obj) $(crtbegin_obj) $(subobjs) $(objs) $(unwind_obj) $(crtend_obj) $(crtn_obj)
+# objlist := $(crti_obj) $(crtbegin_obj) $(subobjs) $(objs) $(unwind_obj) $(crtend_obj) $(crtn_obj)
+objlist := $(subobjs) $(objs)
 
 DEPGEN   =  -MT $@ -MMD -MP -MF $(basename $@).t
 INCLIST := $(CURDIR)/include $(CURDIR)/arch/$(ARCH)/include \
@@ -42,6 +43,7 @@ clean: $(subdirs)
 	rm -f $(objs)
 	rm -f $(deps)
 	rm -f $(crti_obj) $(crtn_obj)
+	@rm -f compile*.d
 
 $(subdirs): FORCE
 	$(MAKE) -C $@ $(MAKECMDGOALS)

@@ -18,6 +18,7 @@ public:
     string(const char *);
     string(const char *s, size_t cnt);
     string(const string&);
+    string &operator=(const string& ano);
     bool   operator==(const char *) const;
     bool   operator==(const string&) const;
     bool   operator!=(const char *) const;

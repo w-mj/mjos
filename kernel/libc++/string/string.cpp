@@ -15,6 +15,7 @@ void string::copy_str(const char *str, size_t len){
         len = strlen(str) + 1;
     data = new char[len];
     memcpy(data, str, len);
+    data[len] = 0;
     this->len = len;
 }
 
@@ -30,6 +31,8 @@ string::string(const char *s, size_t cnt) {
 string::string(const string& ano) {
     copy_str(ano.data);
 }
+
+
 
 const char *string::c_str() const {
     return data;
@@ -71,9 +74,13 @@ char string::operator[](int i) const {
     return data[i];
 }
 
+string &string::operator=(const string &ano) {
+    copy_str(ano.data, ano.size());
+}
+
 
 #include <vector.hpp>
-std::vector<std::string> split(const std::string& s, char sp) {
+std::vector<std::string> std::split(const std::string& s, char sp) {
     size_t i = 0, l = 0;
     std::vector<std::string> res;
     while (i < s.size()) {

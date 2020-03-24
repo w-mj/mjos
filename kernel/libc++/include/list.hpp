@@ -23,7 +23,10 @@ private:
     size_t _size = 0;
 public:
     class iterator;
-    list() = default;
+    list() {
+        head.next = &head;
+        head.prev = &head;
+    };
     ~list() {
         clear();
     }

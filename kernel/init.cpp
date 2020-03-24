@@ -3,7 +3,11 @@
 #include <serial.h>
 #include <delog.h>
 #include <cpu.h>
+#include <fs/vfs.h>
+#include <fs/ext2_fs.h>
 #include <iostream.hpp>
+#include <dev/sata_dev.hpp>
+
 extern "C" void init_main();
 
 void process_print_message() {
@@ -42,10 +46,20 @@ void user_process2() {
 }
 
 void init_main() {
-    // std::cerr << "cout form " << "iostream" << std::endl;
+    std::cout << "cout form " << "iostream" << std::endl;
     logi("start init process");
     // parse_elf64(user_processes[0]);
     // die();
+    Dev::SataDev dev;
+    EXT2::EXT2_FS fs(&dev);
+    auto root = fs.root;
+    root->load_children();
+    _si(root->children.size());
+    std::cout << root->name << std::endl;
+    for (auto x: root->children) {
+        std::cout << x->name << std::endl;
+    }
+    die();
     ASM("sti");
     // sys_print_msg("lalala");
     do_create_process(PROCESS_USER, (void*)user_process);

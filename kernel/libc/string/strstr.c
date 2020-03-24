@@ -2,7 +2,7 @@
 #include <string.h>
 
 // Function to implement strstr() function using KMP algorithm
-char* strstr_(const char* X, const char* Y)
+char* strstr(const char* X, const char* Y)
 {
     int m = strlen(X);
     int n = strlen(Y);

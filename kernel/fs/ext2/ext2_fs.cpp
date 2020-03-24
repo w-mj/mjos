@@ -1,4 +1,4 @@
-#include "ext2_fs.h"
+#include "fs/ext2_fs.h"
 #include "memory/buf.hpp"
 #include "delog.h"
 #include "fs/stat.h"
@@ -11,8 +11,9 @@
 using namespace EXT2;
 
 EXT2_FS::EXT2_FS(Dev::BlockDevice* dev): FS(dev) {
-    // mount();
+    mount();
     status = VFS::FS_unmounted;
+    printFS();
 }
 
 void EXT2_FS::printFS() {

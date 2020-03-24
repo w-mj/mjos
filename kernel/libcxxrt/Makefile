@@ -1,5 +1,13 @@
 
-srclist:= dynamic_cast.cc exception.cc guard.cc stdexcept.cc typeinfo.cc memory.cc auxhelper.cc libelftc_dem_gnu3.c
+srclist:= dynamic_cast.cc \
+		  guard.cc \
+		  stdexcept.cc \
+		  typeinfo.cc \
+		  memory.cc \
+		  auxhelper.cc \
+		  libelftc_dem_gnu3.c \
+		  # exception.cc \
+
 subdir :=
 
 CFLAGS += -D_GNU_SOURCE

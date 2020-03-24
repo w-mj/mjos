@@ -1,6 +1,6 @@
 #pragma once
 
-#include "types.h"
+#include "../../arch/x86_64/include/types.h"
 namespace EXT2
 {
     

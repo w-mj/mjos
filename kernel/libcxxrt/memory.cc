@@ -97,7 +97,8 @@ void* operator new(size_t size) BADALLOC
 		}
 		else
 		{
-			throw std::bad_alloc();
+		    return nullptr;
+			// throw std::bad_alloc();
 		}
 		mem = malloc(size);
 	}
@@ -108,13 +109,14 @@ void* operator new(size_t size) BADALLOC
 __attribute__((weak))
 void* operator new(size_t size, const std::nothrow_t &) NOEXCEPT
 {
-	try {
-		return :: operator new(size);
-	} catch (...) {
-		// nothrow operator new should return NULL in case of
-		// std::bad_alloc exception in new handler
-		return NULL;
-	}
+    return :: operator new (size);
+//	try {
+//		return :: operator new(size);
+//	} catch (...) {
+//		 nothrow operator new should return NULL in case of
+//		 std::bad_alloc exception in new handler
+//		return NULL;
+//	}
 }
 
 
@@ -135,13 +137,14 @@ void * operator new[](size_t size) BADALLOC
 __attribute__((weak))
 void * operator new[](size_t size, const std::nothrow_t &) NOEXCEPT
 {
-	try {
-		return ::operator new[](size);
-	} catch (...) {
-		// nothrow operator new should return NULL in case of
-		// std::bad_alloc exception in new handler
-		return NULL;
-	}
+    return ::operator new[](size);
+//	try {
+//		return ::operator new[](size);
+//	} catch (...) {
+//		 nothrow operator new should return NULL in case of
+//		 std::bad_alloc exception in new handler
+//		return NULL;
+//	}
 }
 
 

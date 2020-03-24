@@ -1,5 +1,5 @@
 #pragma once
-#include "fs/vfs.h"
+#include "vfs.h"
 #include "ext2_fs.h"
 
 namespace EXT2

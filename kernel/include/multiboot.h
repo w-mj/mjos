@@ -276,9 +276,3 @@ struct multiboot_apm_info
 #endif /* ! ASM_FILE */
 
 #endif /* ! MULTIBOOT_HEADER */
-
-
-
-#ifdef __cplusplus
-}
-#endif

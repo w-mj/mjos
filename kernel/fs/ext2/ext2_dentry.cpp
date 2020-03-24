@@ -1,5 +1,5 @@
-#include "ext2_dentry.h"
-#include "ext2_file.h"
+#include "fs/ext2_dentry.h"
+#include "fs/ext2_file.h"
 #include "fs/stat.h"
 #include <delog.h>
 #include <string.h>
