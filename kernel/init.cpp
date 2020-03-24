@@ -56,6 +56,9 @@ void init_main() {
     root->load_children();
     _si(root->children.size());
     std::cout << root->name << std::endl;
+//    for (auto x = root->children.begin(); x != root->children.end(); x++) {
+//        std::cout << (*x)->name << std::endl;
+//    }
     for (auto x: root->children) {
         std::cout << x->name << std::endl;
     }

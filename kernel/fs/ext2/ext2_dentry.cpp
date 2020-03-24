@@ -70,7 +70,8 @@ void EXT2_DEntry::load_children() {
                 //     sub->inode = inode;
                 //     sub->sync = 0;
                 // }
-                _si(temp_str->rec_len);
+                //_ss(temp_str->name);
+                // _si(temp_str->rec_len);
                 children.push_back(sub);
             //}
             // std::cout << sub->name << " " << sub->inode_n << std::endl;

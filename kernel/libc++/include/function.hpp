@@ -50,7 +50,7 @@ namespace std {
 
         // erase the type of any functor and store it into a char*
         // so the storage size should be obtained as well
-        char *data_ptr;
+        char *data_ptr = nullptr;
         size_t data_size;
     public:
         function()

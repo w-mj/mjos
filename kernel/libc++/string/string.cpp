@@ -75,7 +75,10 @@ char string::operator[](int i) const {
 }
 
 string &string::operator=(const string &ano) {
+//    if (&ano == this)
+//        return *this;
     copy_str(ano.data, ano.size());
+    return *this;
 }
 
 

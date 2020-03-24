@@ -158,8 +158,11 @@ public:
         bool operator==(const iterator &ano) const {
             return ! this->operator!=(ano);
         }
-        T operator*() {
+        T& operator*() {
             return _current->data;
+        }
+        T *operator->() {
+            return &_current->data;
         }
     };
     iterator begin() {
