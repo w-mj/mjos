@@ -1,5 +1,5 @@
-#include "fs/ext2_group_descriptor.h"
-#include "fs/ext2_disk_stru.h"
+#include "fs/ext2/ext2_group_descriptor.hpp"
+#include "fs/ext2/ext2_disk_stru.hpp"
 #include "base.h"
 #include "delog.h"
 #include <string.h>

@@ -19,7 +19,7 @@
 #include <spin.h>
 #include <stdio.h>
 #include <dev/pci.h>
-#include <fs/ext2_stru.h>
+#include <fs/ext2/ext2_stru.hpp>
 #include <dev/ahci.h>
 
 #define TESTTYPE(x) assert((x) / 8 == sizeof(u##x))

@@ -1,7 +1,7 @@
-#include "fs/ext2_fs.h"
+#include "fs/ext2/ext2_fs.hpp"
 #include "memory/buf.hpp"
 #include "delog.h"
-#include "fs/stat.h"
+#include "fs/stat.hpp"
 #include "base.h"
 
 #include <string.h>
@@ -11,9 +11,7 @@
 using namespace EXT2;
 
 EXT2_FS::EXT2_FS(Dev::BlockDevice* dev): FS(dev) {
-    mount();
     status = VFS::FS_unmounted;
-    printFS();
 }
 
 void EXT2_FS::printFS() {

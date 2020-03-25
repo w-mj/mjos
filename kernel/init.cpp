@@ -3,8 +3,8 @@
 #include <serial.h>
 #include <delog.h>
 #include <cpu.h>
-#include <fs/vfs.h>
-#include <fs/ext2_fs.h>
+#include <fs/vfs.hpp>
+#include <fs/ext2/ext2_fs.hpp>
 #include <iostream.hpp>
 #include <dev/sata_dev.hpp>
 
@@ -52,6 +52,7 @@ void init_main() {
     // die();
     Dev::SataDev dev;
     EXT2::EXT2_FS fs(&dev);
+    fs.mount();
     auto root = fs.root;
     root->load_children();
     _si(root->children.size());

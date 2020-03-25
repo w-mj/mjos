@@ -1,6 +1,6 @@
-#include "fs/vfs.h"
+#include "fs/vfs.hpp"
 #include "delog.h"
-#include "fs/stat.h"
+#include "fs/stat.hpp"
 #include <string.h>
 #include <vector.hpp>
 //#include <sstream>

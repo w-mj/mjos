@@ -1,6 +1,6 @@
 #pragma once
-#include "ext2_fs.h"
-#include "ext2_inode.h"
+#include "ext2_fs.hpp"
+#include "ext2_inode.hpp"
 
 namespace EXT2
 {

@@ -1,6 +1,6 @@
-#include "fs/ext2_dentry.h"
-#include "fs/ext2_file.h"
-#include "fs/stat.h"
+#include "fs/ext2/ext2_dentry.hpp"
+#include "fs/ext2/ext2_file.hpp"
+#include "fs/stat.hpp"
 #include <delog.h>
 #include <string.h>
 #include <memory/buf.hpp>

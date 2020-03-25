@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../../include/fs/ext2_fs.h"
+#include "fs/ext2/ext2_fs.hpp"
 #include "fs/vfs.h"
 #include "dev/mock_disk.h"
 #include "delog/delog.h"

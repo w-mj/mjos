@@ -1,9 +1,9 @@
 #pragma once
-#include "vfs.h"
-#include "ext2_fs.h"
-#include "ext2_dentry.h"
-#include "ext2_inode.h"
-#include "../../arch/x86_64/include/types.h"
+#include "fs/vfs.hpp"
+#include "ext2_fs.hpp"
+#include "ext2_dentry.hpp"
+#include "ext2_inode.hpp"
+#include "types.h"
 
 namespace EXT2 {
     class EXT2_FS;

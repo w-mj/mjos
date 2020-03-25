@@ -1,5 +1,5 @@
 #pragma once
-#include "ext2_fs.h"
+#include "ext2_fs.hpp"
 
 namespace EXT2 {
     class EXT2_GD {

@@ -2,8 +2,8 @@
 // Created by wmj on 3/19/20.
 //
 
-#ifndef OS_STAT_H
-#define OS_STAT_H
+#ifndef OS_STAT_HPP
+#define OS_STAT_HPP
 
 #define S_IFMT  00170000
 #define S_IFSOCK 0140000
@@ -68,4 +68,4 @@ static inline std::string previlege_to_str(_u16 mode) {
     return ans;
 }
 */
-#endif //OS_STAT_H
+#endif //OS_STAT_HPP

@@ -1,5 +1,5 @@
-#include "fs/ext2_inode.h"
-#include "fs/stat.h"
+#include "fs/ext2/ext2_inode.hpp"
+#include "fs/stat.hpp"
 #include "delog.h"
 #include "memory/buf.hpp"
 #include <iostream.hpp>

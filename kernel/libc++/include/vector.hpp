@@ -92,7 +92,6 @@ namespace std {
             return iterator(data + item_size);
         }
     };
-
 }
 
 #endif //OS_VECTOR_HPP
