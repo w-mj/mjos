@@ -2,7 +2,6 @@
 
 #include <types.h>
 #include <dev/block_dev.hpp>
-
 #include <list.hpp>
 #include <string.hpp>
 
@@ -175,3 +174,5 @@ namespace VFS
     _u8 mode_to_type(_u8 mode);
     
 }; // namespace VFS
+
+extern VFS::FS *root_fs;

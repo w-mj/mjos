@@ -95,6 +95,9 @@ SYS_CALL_3(3, send_message, pid_t, const char *, int)
 SYS_CALL_1(4, read_message, char *)
 SYS_CALL_1(5, func_register, int)
 SYS_CALL_0(6, quit_thread)
+SYS_CALL_1(7, open, const char *)
+SYS_CALL_3(8, read, int, char *, size_t)
+SYS_CALL_3(9, write, int, const char *, size_t)
 
 enum {
     SYS_FUNC_PRINTMSG = 0,

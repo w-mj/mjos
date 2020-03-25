@@ -4,6 +4,7 @@
 #include <cpu.h>
 #include <syscall.h>
 #include <string.h>
+#include <fs/syscall_handler.h>
 
 pid_t sysfunc_tbl[256] = {};
 
@@ -32,5 +33,8 @@ void *syscall_tbl[256] = {
         (void*)do_read_message,
         (void*)do_func_register,
         (void*)do_quit_thread,
+        (void*)do_open,
+        (void*)do_read,
+        (void*)do_write
 };
 

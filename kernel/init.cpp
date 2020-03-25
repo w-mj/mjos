@@ -50,10 +50,11 @@ void init_main() {
     logi("start init process");
     // parse_elf64(user_processes[0]);
     // die();
-    Dev::SataDev dev;
-    EXT2::EXT2_FS fs(&dev);
-    fs.mount();
-    auto root = fs.root;
+    auto dev = new Dev::SataDev;
+    auto fs = new EXT2::EXT2_FS(dev);
+    root_fs = fs;
+    fs->mount();
+    auto root = fs->root;
     root->load_children();
     _si(root->children.size());
     std::cout << root->name << std::endl;

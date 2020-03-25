@@ -20,6 +20,8 @@ extern "C" {
 #define CFG_SYS_CLOCK_RATE      50
 #define CFG_TASK_TIMESLICE      10
 
+#define CFG_PROCESS_FDS    128
+
 #ifdef __cplusplus
 }
 #endif

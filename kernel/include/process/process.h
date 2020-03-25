@@ -8,6 +8,8 @@ extern "C" {
 #include <biosreg.h>
 #include <spin.h>
 
+#include <config.h>
+
 typedef enum {
 	THREAD_RUNNING,
 	THREAD_INTERRUPTIBLE,
@@ -58,6 +60,7 @@ typedef struct __ProcessDescriber {
 	Spin shared_mem_read_lock;
 	Spin shared_mem_write_lock;
 	ListEntry mem_list;
+	void *fds[CFG_PROCESS_FDS];  // 打开的文件列表，每一个元素是一个指向VFS::File的指针
 } ProcessDescriptor;
 
 extern ThreadDescriptor *current;

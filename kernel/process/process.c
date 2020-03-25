@@ -115,6 +115,7 @@ pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main) {
 	pd->shared_mem = NULL;
 	pd->shared_mem_write_lock = SPIN_INIT;
 	pd->shared_mem_read_lock  = SPIN_INIT;
+	memset(pd->fds, 0, sizeof(pd->fds));
 	raw_spin_take(&pd->shared_mem_read_lock);
 	list_init(&pd->threads);
 	list_init(&pd->children);
