@@ -1,0 +1,73 @@
+//
+// Created by wmj on 3/25/20.
+//
+
+#include <fs/pipe/pipe.hpp>
+#include <memory/kmalloc.h>
+#include <algorithm.hpp>
+
+using namespace PIPE;
+
+PIPE_File::PIPE_File(int size): pipe_size(size) {
+    pipe = static_cast<char *>(kmalloc_s(size));
+    wpos = 0;
+    rpos = 0;
+};
+
+int PIPE_File::tell() {
+    return 0;
+}
+
+int PIPE_File::seek(int pos, int whence) {
+    return 0;
+}
+
+PIPE_File::~PIPE_File() {
+    close();
+//    kfree_s(pipe_size, pipe);
+//    pipe = nullptr;
+}
+
+int PIPE_File::read(char *buf, int len) {
+    if (empty() || len == 0)
+        return 0;
+    raw_spin_take(&spin);
+    // 读取的数据长度
+    int read_size = std::min(len, pipe_size - rpos, size());
+    memcpy(buf, pipe + rpos, read_size);
+    rpos = round(rpos + read_size);
+    raw_spin_give(&spin);
+    return read(buf + read_size, len - read_size) + read_size;
+}
+
+int PIPE_File::round(int a) {
+    return (a + pipe_size) % pipe_size;
+}
+
+bool PIPE_File::empty() {
+    return rpos == wpos;
+}
+
+bool PIPE_File::full() {
+    return round(wpos + 1) == rpos;
+}
+
+int PIPE_File::size() {
+    return round(wpos - pipe_size);
+}
+
+int PIPE_File::write(const char *data, int len) {
+    if (full() || len == 0)
+        return 0;
+    raw_spin_take(&spin);
+    int write_size = std::min(len, pipe_size - wpos, pipe_size - size() - 1);
+    memcpy(pipe + wpos, data, write_size);
+    wpos = round(wpos + write_size);
+    raw_spin_give(&spin);
+    return write(data + write_size, len - write_size) + write_size;
+}
+
+void PIPE_File::close() {
+    kfree_s(pipe_size, pipe);
+    pipe = nullptr;
+}
