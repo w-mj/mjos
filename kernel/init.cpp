@@ -46,7 +46,7 @@ void user_process2() {
 }
 
 void init_main() {
-    std::cout << "cout form " << "iostream" << std::endl;
+    os::cout << "cout form " << "iostream" << os::endl;
     logi("start init process");
     // parse_elf64(user_processes[0]);
     // die();
@@ -57,12 +57,12 @@ void init_main() {
     auto root = fs->root;
     root->load_children();
     _si(root->children.size());
-    std::cout << root->name << std::endl;
+    os::cout << root->name << os::endl;
 //    for (auto x = root->children.begin(); x != root->children.end(); x++) {
-//        std::cout << (*x)->name << std::endl;
+//        os::cout << (*x)->name << os::endl;
 //    }
     for (auto x: root->children) {
-        std::cout << x->name << std::endl;
+        os::cout << x->name << os::endl;
     }
     die();
     ASM("sti");

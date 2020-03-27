@@ -10,7 +10,7 @@
 #include <list.hpp>
 #include <pair.hpp>
 
-namespace std {
+namespace os {
     template <typename K, typename T>
     class LRU {
     public:

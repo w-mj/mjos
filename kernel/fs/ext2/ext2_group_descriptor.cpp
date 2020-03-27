@@ -52,7 +52,7 @@ _u32 EXT2_GD::alloc_inode() {
     get_inode_bitmap();
     for (_u32 i = 0; i < fs->block_size; i++) {
         if (inode_bitmap[i] != (_u8)0xff) {
-            int t = std::lowest_0(inode_bitmap[i]);
+            int t = os::lowest_0(inode_bitmap[i]);
             _set_bit(inode_bitmap[i], t);
             // inode_bitmap[i] |= _BITS_SIZE(t);
             gd->free_inodes_count--; 
@@ -68,7 +68,7 @@ _u32 EXT2_GD::alloc_block() {
     get_block_bitmap();
     for (_u32 i = 0; i < fs->block_size; i++) {
         if (block_bitmap[i] != (_u8)0xff) {
-            int t = std::lowest_0(block_bitmap[i]);
+            int t = os::lowest_0(block_bitmap[i]);
             _set_bit(block_bitmap[i], t);
             // block_bitmap[i] |= _BITS_SIZE(t);
             gd->free_blocks_count--;       

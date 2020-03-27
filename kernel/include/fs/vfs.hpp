@@ -35,12 +35,12 @@ namespace VFS
      */
     class NameI {
     public:
-        std::string name;
+        os::string name;
         NameI *next=nullptr, *prev=nullptr;
 
-        NameI(const std::string name, NameI *p=nullptr);
+        NameI(const os::string name, NameI *p=nullptr);
 
-        static NameI *from_str(const std::string &);
+        static NameI *from_str(const os::string &);
         ~NameI();
     };
 
@@ -58,17 +58,17 @@ namespace VFS
         DEntry* parent;
         _u8 type;
 
-        std::string name;
+        os::string name;
 
-        std::list<DEntry*> children;
+        os::list<DEntry*> children;
 
         virtual void inflate()=0;
         virtual void load_children()=0;
 
         // 在当前目录项创建文件夹
-        virtual VFS::DEntry* mkdir(const std::string& new_name)=0;
+        virtual VFS::DEntry* mkdir(const os::string& new_name)=0;
         // 在当前目录下创建空文件
-        virtual VFS::DEntry* create(const std::string& new_name)=0;
+        virtual VFS::DEntry* create(const os::string& new_name)=0;
         // 在当前目录下删除子项目，修改自己与子文件夹的引用关系
         virtual void unlink(DEntry*)=0;
         // 删除自己，释放空间，会由ulink(DEntry*)调用
@@ -78,24 +78,24 @@ namespace VFS
         // 判断一个目录是否为空
         virtual bool empty()=0; 
         // 在另一个目录项中创建自己的硬链接
-        virtual VFS::DEntry *link(DEntry *dir, const std::string& s="")=0;
+        virtual VFS::DEntry *link(DEntry *dir, const os::string& s="")=0;
         // 把自己移动到另一个目录中
-        virtual VFS::DEntry *move(DEntry *dir, const std::string& new_name="")=0;
+        virtual VFS::DEntry *move(DEntry *dir, const os::string& new_name="")=0;
         // 打开文件
         File *open();
         // 把自己复制到另一个文件夹中，新文件夹中文件的Entry
-        virtual VFS::DEntry *copy(DEntry *dir, const std::string& new_name="")=0;
+        virtual VFS::DEntry *copy(DEntry *dir, const os::string& new_name="")=0;
         // 在当前文件夹下创建另一个文件file的符号链接
-        virtual VFS::DEntry *symlink(DEntry *file, const std::string& new_name="")=0;
+        virtual VFS::DEntry *symlink(DEntry *file, const os::string& new_name="")=0;
         // 找到一个符号链接指向的文件
         virtual VFS::DEntry *follow()=0;
 
-        File *open(const std::string& name);
-        DEntry* get_child(const std::string& name);
+        File *open(const os::string& name);
+        DEntry* get_child(const os::string& name);
         DEntry* get_child(const NameI *namei, DEntry **path=nullptr);
-        DEntry *get_path(const NameI *namei, std::string* fname=nullptr);
+        DEntry *get_path(const NameI *namei, os::string* fname=nullptr);
 
-        std::string printed_path();
+        os::string printed_path();
 
 
         virtual ~DEntry() {}

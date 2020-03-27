@@ -7,7 +7,7 @@
 
 #include <type_traits.hpp>
 
-namespace std {
+namespace os {
     template<typename T>
     class unique_ptr {
     private:
@@ -17,7 +17,7 @@ namespace std {
             _ptr = &t;
         }
         unique_ptr(unique_ptr<T>&& ano) {
-            _ptr = std::move(ano._ptr);
+            _ptr = os::move(ano._ptr);
             ano._ptr = nullptr;
         }
         ~unique_ptr() {
@@ -25,7 +25,7 @@ namespace std {
         }
         unique_ptr<T>& operator=(unique_ptr<T>&& ano) {
             if (this == ano) return *this;
-            _ptr = std::move(ano._ptr);
+            _ptr = os::move(ano._ptr);
             ano._ptr = nullptr;
             return *this;
         }

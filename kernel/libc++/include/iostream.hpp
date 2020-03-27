@@ -7,7 +7,7 @@
 
 #include <string.hpp>
 
-namespace std {
+namespace os {
 
 class ostream {
 private:

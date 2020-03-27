@@ -7,7 +7,7 @@
 
 
 #include <stddef.h>
-namespace std {
+namespace os {
 
 template <class T>
 class list {

@@ -8,7 +8,7 @@
 using namespace EXT2;
 
 void EXT2_Inode::print() {
-    using namespace std;
+    using namespace os;
     cerr << "\nInode:  " << inode_n << endl;
     // cerr << "文件类型和访问权限 " << i->mode << mode_to_str(i->mode) << endl;
     cerr << "拥有者 " << i->uid << endl;

@@ -7,7 +7,7 @@
 
 #include <stddef.h>
 #include <vector.hpp>
-namespace std {
+namespace os {
 class string {
 private:
     char *data = nullptr;
@@ -31,7 +31,7 @@ public:
 
     ~string();
 };
-    std::vector<string> split(const string& s, char sp);
+    os::vector<string> split(const string& s, char sp);
 }
 
 

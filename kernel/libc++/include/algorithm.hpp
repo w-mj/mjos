@@ -7,7 +7,7 @@
 
 #include <function.hpp>
 
-namespace std {
+namespace os {
     template <typename T>
     T min(T d1, T d2) {
         if (d1 < d2)

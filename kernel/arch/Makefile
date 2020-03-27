@@ -7,6 +7,8 @@ build: $(subdirs)
 clean: $(subdirs)
 	rm -f $(target)
 
+test: $(subdirs)
+
 $(subdirs): FORCE
 	$(MAKE) -C $@ $(MAKECMDGOALS)
 

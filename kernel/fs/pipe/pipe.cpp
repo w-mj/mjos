@@ -33,7 +33,7 @@ int PIPE_File::read(char *buf, int len) {
         return 0;
     raw_spin_take(&spin);
     // 读取的数据长度
-    int read_size = std::min(len, pipe_size - rpos, size());
+    int read_size = os::min(len, pipe_size - rpos, size());
     memcpy(buf, pipe + rpos, read_size);
     rpos = round(rpos + read_size);
     raw_spin_give(&spin);
@@ -60,7 +60,7 @@ int PIPE_File::write(const char *data, int len) {
     if (full() || len == 0)
         return 0;
     raw_spin_take(&spin);
-    int write_size = std::min(len, pipe_size - wpos, pipe_size - size() - 1);
+    int write_size = os::min(len, pipe_size - wpos, pipe_size - size() - 1);
     memcpy(pipe + wpos, data, write_size);
     wpos = round(wpos + write_size);
     raw_spin_give(&spin);

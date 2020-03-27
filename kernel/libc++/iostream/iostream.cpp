@@ -7,10 +7,10 @@
 #include <serial.h>
 #include <stdio.h>
 
-using namespace std;
+using namespace os;
 
-ostream std::cout(0);
-ostream std::cerr(2);
+ostream os::cout(0);
+ostream os::cerr(2);
 
 ostream::ostream(int fno) {
     this->fno = fno;

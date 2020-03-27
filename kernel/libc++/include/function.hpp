@@ -8,7 +8,7 @@
 #include <utility.hpp>
 #include <memory.hpp>
 
-namespace std {
+namespace os {
     template <typename T>
     class function;
 
@@ -27,7 +27,7 @@ namespace std {
         template <typename Functor>
         static R invoke_fn(Functor* fn, Args&&... args)
         {
-            return (*fn)(std::forward<Args>(args)...);
+            return (*fn)(os::forward<Args>(args)...);
         }
 
         template <typename Functor>
@@ -101,7 +101,7 @@ namespace std {
 
         R operator()(Args&&... args)
         {
-            return this->invoke_f(this->data_ptr, std::forward<Args>(args)...);
+            return this->invoke_f(this->data_ptr, os::forward<Args>(args)...);
         }
     };
 }

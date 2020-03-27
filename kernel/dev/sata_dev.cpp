@@ -10,16 +10,16 @@
 #include <algorithm.hpp>
 
 constexpr int SECTOR_SIZE = 512;
-std::LRU<int, char *> *pool = nullptr;
+os::LRU<int, char *> *pool = nullptr;
 _u32 Dev::SataDev::read(MM::Buf &buf, _u32 pos, _u32 size) {
-    // static std::LRU<int, char *> pool(10, [](int k) {return new char[SECTOR_SIZE];});
+    // static os::LRU<int, char *> pool(10, [](int k) {return new char[SECTOR_SIZE];});
 //     static char *temp = NULL;
 //    if (temp == NULL) {
 //        temp = static_cast<char *>(malloc(SECTOR_SIZE));
 //    }
     if (pool == nullptr) {
         // FIXME: 搞定了静态对象的初始化之后把pool改成静态对象
-        pool = new std::LRU<int, char *>(10,
+        pool = new os::LRU<int, char *>(10,
                 [](int k){return new char[SECTOR_SIZE];},
                 [](int k, char *cache) {delete []cache;},
                 [](int k, char *cache, bool dirty) {
@@ -38,7 +38,7 @@ _u32 Dev::SataDev::read(MM::Buf &buf, _u32 pos, _u32 size) {
             // 只有这个缓存是第一次访问才读取磁盘
             sata_read(sata, l32(sector), h32(sector), 1, virt_to_phys(temp));
         }
-        u32 read_this = std::min(size, SECTOR_SIZE - wasted);
+        u32 read_this = os::min(size, SECTOR_SIZE - wasted);
         memcpy(buf.data + read_cnt, temp + wasted, read_this);
         read_cnt += read_this;
         size = size - read_this;

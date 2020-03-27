@@ -23,7 +23,7 @@ int do_open(const char *path) {
     }
     if (fd == CFG_PROCESS_FDS)
         return -1;
-    process->fds[fd] = root_fs->root->open(std::string(path));
+    process->fds[fd] = root_fs->root->open(os::string(path));
     return fd;
 }
 

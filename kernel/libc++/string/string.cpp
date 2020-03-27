@@ -5,7 +5,7 @@
 #include <string.hpp>
 #include <string.h>
 
-using namespace std;
+using namespace os;
 
 void string::copy_str(const char *str, size_t len){
     if (str == nullptr)
@@ -83,9 +83,9 @@ string &string::operator=(const string &ano) {
 
 
 #include <vector.hpp>
-std::vector<std::string> std::split(const std::string& s, char sp) {
+os::vector<os::string> os::split(const os::string& s, char sp) {
     size_t i = 0, l = 0;
-    std::vector<std::string> res;
+    os::vector<os::string> res;
     while (i < s.size()) {
         if (s[i] == sp) {
             if (i != l)

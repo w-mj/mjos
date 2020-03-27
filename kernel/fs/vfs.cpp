@@ -10,7 +10,7 @@
 
 using namespace VFS;
 
-DEntry *DEntry::get_child(const std::string& name) {
+DEntry *DEntry::get_child(const os::string& name) {
     load_children();
     for (auto x: children) {
         if (x->name == name)
@@ -38,7 +38,7 @@ DEntry *DEntry::get_child(const NameI *namei, DEntry **path) {
 }
 
 
-DEntry *DEntry::get_path(const NameI *namei, std::string* fname) {
+DEntry *DEntry::get_path(const NameI *namei, os::string* fname) {
     DEntry *ans = this;
     if (namei->name == "/") {
         ans=fs->root;
@@ -64,10 +64,10 @@ DEntry *DEntry::get_path(const NameI *namei, std::string* fname) {
     return ans;
 }
 
-std::string DEntry::printed_path() {
+os::string DEntry::printed_path() {
     return "NOT IMPLEMENTED";
-//    std::stack<std::string> st;
-//    std::stringstream ss;
+//    os::stack<os::string> st;
+//    os::stringstream ss;
 //    VFS::DEntry *t = this;
 //    while (t != t->parent) {
 //        st.push(t->name);
@@ -80,7 +80,7 @@ std::string DEntry::printed_path() {
 //    return ss.str();
 }
 
-File *DEntry::open(const std::string& name) {
+File *DEntry::open(const os::string& name) {
     auto a = get_child(name);
     if (a == nullptr || a->type != RegularFile)
         return nullptr;
@@ -92,7 +92,7 @@ File *DEntry::open() {
 }
 
 
-NameI::NameI(const std::string name, NameI *p): name(name) {
+NameI::NameI(const os::string name, NameI *p): name(name) {
     if (p != nullptr) {
         p->next = this;
     }
@@ -115,7 +115,7 @@ void VFS::File::close() {
     delete this;  // 恶魔操作
 }
 
-VFS::NameI *VFS::NameI::from_str(const std::string& path) {
+VFS::NameI *VFS::NameI::from_str(const os::string& path) {
     using namespace VFS;
     NameI *ans = nullptr, *prev;
     if (path[0] == '/')
@@ -123,7 +123,7 @@ VFS::NameI *VFS::NameI::from_str(const std::string& path) {
     else
         ans = prev = new NameI(".");
     // printf("%x %x\n", ans->prev, ans->next);
-    std::vector<std::string> sp = split(path, '/');
+    os::vector<os::string> sp = split(path, '/');
     for (const auto& x: sp) {
         // printf("++++++++++++++++++++++++++++++++++++\n");
         _ss(x.c_str());

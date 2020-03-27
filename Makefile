@@ -6,7 +6,7 @@ NAME = myos
 OUTDIR  :=  $(CURDIR)
 ISODIR  :=  $(OUTDIR)/iso
 
-TOOLCHAIN_BASE := /usr/local/x86_64-elf-gcc/bin/# To make clion happy
+# TOOLCHAIN_BASE := /usr/local/x86_64-elf-gcc/bin/# To make clion happy
 
 CC      :=  $(TOOLCHAIN_BASE)$(ARCH)-elf-gcc
 CXX     :=  $(TOOLCHAIN_BASE)$(ARCH)-elf-g++
@@ -21,6 +21,9 @@ CFLAGS  :=  -c -std=c11 -DKERNEL -DARCH=$(ARCH)
 CFLAGS  +=  -Wall -Wextra -Werror=implicit 
 CFLAGS  +=  -ffreestanding -ffunction-sections -fdata-sections
 CXXFLAGS:=  -c -std=c++17 -ffreestanding -fno-exceptions #-fno-rtti
+
+TESTINC := -I$(CURDIR)/tools/UnitTest -I/usr/include
+
 ifeq ($(DEBUG), 1)
 	CFLAGS  +=  -g -DDEBUG
 	CXXFLAGS  +=  -g -DDEBUG
@@ -32,7 +35,8 @@ endif
 
 
 TEMPLATEFILE := $(CURDIR)/Makefile.template
-export CC CXX AR OBJCOPY LD NM CFLAGS TEMPLATEFILE ARCH CXXFLAGS
+
+export CC CXX AR OBJCOPY LD NM CFLAGS TEMPLATEFILE ARCH CXXFLAGS TESTINC
 
 userdirs := fs
 
@@ -40,14 +44,18 @@ all: build
 
 build: kernel $(userdirs)
 
-kernel: $(userdirs) FORCE
-	$(MAKE) -C kernel build
+test: kerneltest
 
-$(userdirs): FORCE
+kernel: $(userdirs) FORCE
 	$(MAKE) -C $@ build
 
-FORCE:
+kerneltest: FORCE
+	$(MAKE) -C kernel test
 
+$(userdirs): FORCE
+	$(MAKE) -C $@ $(MAKECMDGOALS)
+
+FORCE:
 
 clean: $(userdirs)
 	$(MAKE) -C kernel clean

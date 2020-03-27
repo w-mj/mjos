@@ -35,6 +35,8 @@ export INCLIST CFLAGS INCFILE CPPFLAGS
 
 build: $(subdirs) $(binfile) $(symfile)
 
+test: $(subdirs)
+
 clean: $(subdirs)
 	rm -f $(binfile)
 	rm -f $(elffile)

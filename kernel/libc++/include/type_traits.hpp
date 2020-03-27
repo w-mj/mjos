@@ -5,7 +5,7 @@
 #ifndef OS_TYPE_TRAITS_HPP
 #define OS_TYPE_TRAITS_HPP
 
-namespace std {
+namespace os{
     template< class T > struct remove_reference      {typedef T type;};
     template< class T > struct remove_reference<T&>  {typedef T type;};
     template< class T > struct remove_reference<T&&> {typedef T type;};
@@ -26,8 +26,8 @@ namespace std {
     using false_type = integral_constant<bool, false>;
     using true_type  = integral_constant<bool, true>;
 
-    template<class T> struct is_lvalue_reference     : std::false_type {};
-    template<class T> struct is_lvalue_reference<T&> : std::true_type {};
+    template<class T> struct is_lvalue_reference     : os::false_type {};
+    template<class T> struct is_lvalue_reference<T&> : os::true_type {};
 }
 
 #endif //OS_TYPE_TRAITS_HPP

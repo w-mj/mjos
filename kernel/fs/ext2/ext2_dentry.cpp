@@ -8,7 +8,7 @@
 
 using namespace EXT2;
 EXT2_DEntry::EXT2_DEntry(EXT2_FS* fs1, VFS::DEntry* parent1, 
-            _u32 inode_n1, _u8 type1, const std::string& name1) {
+            _u32 inode_n1, _u8 type1, const os::string& name1) {
     fs = fs1;
     ext2_fs = fs1;
     parent = parent1;
@@ -18,7 +18,7 @@ EXT2_DEntry::EXT2_DEntry(EXT2_FS* fs1, VFS::DEntry* parent1,
     ext2_inode = nullptr;
     inode_n = inode_n1;
     type=type1;
-    name = std::string(name1);
+    name = os::string(name1);
     sync = 1;
 }
 #include <iostream.hpp>
@@ -62,7 +62,7 @@ void EXT2_DEntry::load_children() {
             // } else {
                 EXT2_DEntry *sub = new EXT2_DEntry(ext2_fs, this, 
                         temp_str->inode, temp_str->file_type, 
-                        std::string((char*)temp_str->name, temp_str->name_len));
+                        os::string((char*)temp_str->name, temp_str->name_len));
                 // if (temp_str->inode == parent->inode_n) {
                 //     sub->inode = parent->inode; 
                 //     sub->sync = 0;
@@ -74,7 +74,7 @@ void EXT2_DEntry::load_children() {
                 // _si(temp_str->rec_len);
                 children.push_back(sub);
             //}
-            // std::cout << sub->name << " " << sub->inode_n << std::endl;
+            // os::cout << sub->name << " " << sub->inode_n << os::endl;
             s_pos += temp_str->rec_len;
             all_length += temp_str->rec_len;
         }
@@ -131,7 +131,7 @@ void EXT2_DEntry::write_children() {
     // _d_end();
 }
 
-VFS::DEntry* EXT2_DEntry::mkdir(const std::string& new_name) {
+VFS::DEntry* EXT2_DEntry::mkdir(const os::string& new_name) {
     assert(type == VFS::Directory);
     EXT2_GD *new_dir_gd = nullptr;
     _u32 new_i_n = ext2_fs->alloc_inode(&new_dir_gd);
@@ -196,7 +196,7 @@ VFS::DEntry* EXT2_DEntry::mkdir(const std::string& new_name) {
     return new_entry;
 }
 
-VFS::DEntry *EXT2_DEntry::create(const std::string& name) {
+VFS::DEntry *EXT2_DEntry::create(const os::string& name) {
     assert(type == VFS::Directory);
     _pos();
     inflate();
@@ -299,7 +299,7 @@ void EXT2_DEntry::unlink_children() {
     logd("unlink chlidren current %d. finish", inode_n);
 }
 
-VFS::DEntry *EXT2_DEntry::link(DEntry *tar, const std::string& s) {
+VFS::DEntry *EXT2_DEntry::link(DEntry *tar, const os::string& s) {
     if (tar->fs != fs) {
         _log_info("[EXT2]: Hard Link must in the same file system.");
         return nullptr;
@@ -309,7 +309,7 @@ VFS::DEntry *EXT2_DEntry::link(DEntry *tar, const std::string& s) {
         return nullptr;
     }
     EXT2_DEntry *t = dynamic_cast<EXT2_DEntry*>(tar);
-    std::string ts;
+    os::string ts;
     if (s == "")
         ts = t->name;
     else
@@ -331,7 +331,7 @@ VFS::DEntry *EXT2_DEntry::link(DEntry *tar, const std::string& s) {
     return new_e;
 }
 
-VFS::DEntry *EXT2_DEntry::move(DEntry *dir, const std::string& new_name) {
+VFS::DEntry *EXT2_DEntry::move(DEntry *dir, const os::string& new_name) {
     auto ans = link(dir, new_name);  // 在dir中创建item的硬链接
     parent->unlink(this);  // 在父目录中删除自己
     return ans;
@@ -342,7 +342,7 @@ bool EXT2_DEntry::empty() {
     return children.size() == 2;
 }
 
-VFS::DEntry* EXT2_DEntry::copy(DEntry *dir, const std::string& new_name) {
+VFS::DEntry* EXT2_DEntry::copy(DEntry *dir, const os::string& new_name) {
     VFS::DEntry *new_entry = dir->create(new_name==""?this->name:new_name);
     VFS::File *old_f = this->open();
     VFS::File *new_f = new_entry->open();
@@ -355,13 +355,13 @@ VFS::DEntry* EXT2_DEntry::copy(DEntry *dir, const std::string& new_name) {
     return new_entry;
 }
 
-VFS::DEntry *EXT2_DEntry::symlink(DEntry *file, const std::string& new_name) {
+VFS::DEntry *EXT2_DEntry::symlink(DEntry *file, const os::string& new_name) {
     EXT2_DEntry *new_entry = static_cast<EXT2_DEntry*>(create(new_name==""?file->name:new_name));
     _pos();
     new_entry->inode->mode = S_IFLNK | S_IRWXG | S_IRWXO | S_IRWXU;
     new_entry->type = VFS::SymbolLink;
     _pos();
-    std::string path = file->printed_path();
+    os::string path = file->printed_path();
     if (path.size() <= 60) {
         memmove(new_entry->ext2_inode->i->block, path.c_str(), path.size());
     } else {
@@ -389,7 +389,7 @@ VFS::DEntry *EXT2_DEntry::follow() {
         f->close();
     }
     _ss(buf);
-    VFS::NameI *path = VFS::NameI::from_str(std::string(buf, inode->size));
+    VFS::NameI *path = VFS::NameI::from_str(os::string(buf, inode->size));
     VFS::DEntry *ans = parent->get_child(path);
     delete path;
     // _d_end();

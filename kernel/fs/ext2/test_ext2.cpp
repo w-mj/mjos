@@ -3,7 +3,7 @@
 #include "fs/vfs.h"
 #include "dev/mock_disk.h"
 #include "delog/delog.h"
-using namespace std;
+using namespace os;
 
 int main(void) {
     cout << sizeof(EXT2::SuperBlock) << endl;

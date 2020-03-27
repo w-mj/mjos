@@ -7,7 +7,7 @@
 
 #include <type_traits.hpp>
 
-namespace std {
+namespace os {
 
     template <class _Ty>
     constexpr remove_reference_t <_Ty> &&move(_Ty &&_Arg) noexcept { // forward _Arg as movable
@@ -15,13 +15,13 @@ namespace std {
     }
 
     template <class T>
-    inline T&& forward(typename std::remove_reference<T>::type& t) noexcept {
+    inline T&& forward(typename os::remove_reference<T>::type& t) noexcept {
         return static_cast<T&&>(t);
     }
 
     template <class T>
-    inline T&& forward(typename std::remove_reference<T>::type&& t) noexcept {
-        static_assert(!std::is_lvalue_reference<T>::value,
+    inline T&& forward(typename os::remove_reference<T>::type&& t) noexcept {
+        static_assert(!os::is_lvalue_reference<T>::value,
                       "Can not forward an rvalue as an lvalue.");
         return static_cast<T&&>(t);
     }

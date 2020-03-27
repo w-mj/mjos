@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-namespace std {
+namespace os {
     template <typename T>
     class vector {
     private:

@@ -15,7 +15,7 @@ EXT2_FS::EXT2_FS(Dev::BlockDevice* dev): FS(dev) {
 }
 
 void EXT2_FS::printFS() {
-    using namespace std;
+    using namespace os;
     cerr << endl;
     cerr << "文件系统中Inode数量 " << sb->inodes_count << endl;
     cerr << "以块为单位的文件系统大小 " << sb->blocks_count << endl;

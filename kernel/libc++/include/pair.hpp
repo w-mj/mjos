@@ -5,7 +5,7 @@
 #ifndef OS_PAIR_HPP
 #define OS_PAIR_HPP
 
-namespace std {
+namespace os {
     template <typename A, typename B>
     class pair {
     public:
