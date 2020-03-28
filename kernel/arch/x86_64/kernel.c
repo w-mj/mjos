@@ -169,6 +169,7 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
     loapic_dev_init();
     ioapic_all_init();
     pci_probe_all();
+    ps2kbd_dev_init();
 	process_init();
 	scheduler_init();
 
