@@ -13,6 +13,7 @@ extern "C" {
 int do_open(const char *);
 int do_read(int, char *, size_t);
 int do_write(int, const char *, size_t);
+int do_close(int);
 
 #ifdef __cplusplus
 };

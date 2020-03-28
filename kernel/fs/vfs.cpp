@@ -84,7 +84,9 @@ File *DEntry::open(const os::string& name) {
     auto a = get_child(name);
     if (a == nullptr || a->type != RegularFile)
         return nullptr;
-    return a->get_file();
+    auto f = a->get_file();
+    f->open();
+    return f;
 }
 
 File *DEntry::open() {
@@ -113,6 +115,10 @@ NameI::~NameI() {
 void VFS::File::close() {
     logd("delete this");
     delete this;  // 恶魔操作
+}
+
+void File::open() {
+    open_cnt++;
 }
 
 VFS::NameI *VFS::NameI::from_str(const os::string& path) {

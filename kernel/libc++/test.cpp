@@ -1,4 +1,4 @@
-#include <test.h>
+#include <local_test.h>
 #include "include/algorithm.hpp"
 
 class TestLibCXX: public Test {

@@ -11,6 +11,7 @@ VFS::FS *root_fs = nullptr;
 extern "C" int do_open(const char *);
 extern "C" int do_read(int , char *, size_t);
 extern "C" int do_write(int , const char*, size_t);
+extern "C" int do_close(int);
 
 int do_open(const char *path) {
     ThreadDescriptor *thread= thiscpu_var(current);
@@ -27,22 +28,33 @@ int do_open(const char *path) {
     return fd;
 }
 
-int do_read(int fd, char *buf, size_t size) {
+VFS::File *get_file(int fd) {
     ThreadDescriptor *thread= thiscpu_var(current);
     ProcessDescriptor *process = thread->process;
     if (process->fds[fd] == NULL) {
-        return -1;
+        return nullptr;
     }
-    auto *file = static_cast<VFS::File*>(process->fds[fd]);
+    return static_cast<VFS::File*>(process->fds[fd]);
+}
+
+int do_read(int fd, char *buf, size_t size) {
+    auto file = get_file(fd);
+    if (file == nullptr)
+        return -1;
     return file->read(buf, size);
 }
 
 int do_write(int fd, const char *data, size_t size) {
-    ThreadDescriptor *thread= thiscpu_var(current);
-    ProcessDescriptor *process = thread->process;
-    if (process->fds[fd] == NULL) {
+    auto file = get_file(fd);
+    if (file == nullptr)
         return -1;
-    }
-    auto *file = static_cast<VFS::File*>(process->fds[fd]);
     return file->write(data, size);
+}
+
+int do_close(int fd) {
+    auto file = get_file(fd);
+    if (file == nullptr)
+        return -1;
+    file->close();
+    return 0;
 }

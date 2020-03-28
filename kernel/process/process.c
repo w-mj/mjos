@@ -8,6 +8,8 @@
 #include <memory/kmalloc.h>
 #include <process/scheduler.h>
 #include <process/process.h>
+#include <fs/syscall_handler.h>
+#include "process_helper.hpp"
 
 static u8 *pid_bitmap = NULL;
 static ListEntry process_list;
@@ -127,6 +129,9 @@ pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main) {
 	}
 	list_add_tail(&pd->process_list_entry, &process_list);
 
+	if (parent != NULL)
+        copy_file(pd, parent);
+
 	// 用户进程需要复制页表
 	if (type == PROCESS_USER) {
 		pd->cr3 = create_user_page(pd);  // 分配新的用户四级页表
@@ -150,7 +155,9 @@ ProcessDescriptor *get_process(u16 pid) {
 }
 
 int do_create_process(ProcessType type, void *main) {
-    return create_process(thiscpu_var(current)->process, type, main);
+    int pid = create_process(thiscpu_var(current)->process, type, main);
+
+    return pid;
 }
 
 void destroy_process(ProcessDescriptor *process) {
@@ -161,6 +168,12 @@ void destroy_process(ProcessDescriptor *process) {
         // 这里释放的主要是进程的页表，由于页表本身即将被释放，因此在页表中解除这些页的映射并无意义
         // normal_page_release(mem->addr, process->cr3);
         kfree_s(sizeof(MemList), mem);
+    }
+    int i;
+    forrange(i, 0, CFG_PROCESS_FDS) {
+        if (process->fds[i] != NULL) {
+            do_close(i);
+        }
     }
     kfree_s(sizeof(ProcessDescriptor), process);
 }
@@ -197,4 +210,9 @@ int do_quit_thread() {
     logi("thread quit");
     while (1);
     return 0;
+}
+
+int do_getpid() {
+    ThreadDescriptor *thread = thiscpu_var(current);
+    return thread->process->pid;
 }

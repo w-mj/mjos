@@ -1,5 +1,5 @@
 
-srclist := process.c scheduler.c elf.c ipc.c elfpiggy.S userprocesses.c pthread.c
+srclist := process.c scheduler.c elf.c ipc.c elfpiggy.S userprocesses.c pthread.c process_helper.cpp
 subdirs :=
 
 include $(TEMPLATEFILE)

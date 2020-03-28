@@ -78,6 +78,8 @@ int do_quit_thread();
 void add_to_mem_list(ProcessDescriptor *process, pfn_t pfn, void *addr);
 void remove_from_mem_list(ProcessDescriptor *process, pfn_t pfn);
 
+int do_getpid();
+
 #ifdef __cplusplus
 }
 #endif

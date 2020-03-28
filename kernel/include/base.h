@@ -93,6 +93,8 @@ static inline void *_container_of(void *ptr, size_t offset) {
 
 #define repet(x) for (int _ = 0; _ < (x); _++)
 
+#define forrange(i, s, e) for (i = s; i < e; i++)
+
 #ifdef __cplusplus
 }
 #endif

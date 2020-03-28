@@ -6,7 +6,7 @@ NAME = myos
 OUTDIR  :=  $(CURDIR)
 ISODIR  :=  $(OUTDIR)/iso
 
-# TOOLCHAIN_BASE := /usr/local/x86_64-elf-gcc/bin/# To make clion happy
+TOOLCHAIN_BASE := /usr/local/x86_64-elf-gcc/bin/# To make clion happy
 
 CC      :=  $(TOOLCHAIN_BASE)$(ARCH)-elf-gcc
 CXX     :=  $(TOOLCHAIN_BASE)$(ARCH)-elf-g++

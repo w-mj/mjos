@@ -98,6 +98,8 @@ SYS_CALL_0(6, quit_thread)
 SYS_CALL_1(7, open, const char *)
 SYS_CALL_3(8, read, int, char *, size_t)
 SYS_CALL_3(9, write, int, const char *, size_t)
+SYS_CALL_1(10, close, int)
+SYS_CALL_0(11, getpid)
 
 enum {
     SYS_FUNC_PRINTMSG = 0,

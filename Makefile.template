@@ -18,6 +18,8 @@ toclean += $(target) $(deplist) $(objlist) $(testrun)
 export MAKECMDGOALS
 
 all: build
+debugbackground: build
+debug: build
 
 clean: $(subdirs)
 	rm -f $(toclean)

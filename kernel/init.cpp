@@ -7,6 +7,8 @@
 #include <fs/ext2/ext2_fs.hpp>
 #include <iostream.hpp>
 #include <dev/sata_dev.hpp>
+#include <process/scheduler.h>
+#include <fs/pipe/pipe.hpp>
 
 extern "C" void init_main();
 
@@ -14,10 +16,13 @@ void process_print_message() {
     logd("start print message process");
     do_func_register(SYS_FUNC_PRINTMSG);
     char buf[1024];
-    while (1) {
-        int size = do_read_message(buf);
+    while (true) {
+        int size = do_read(FD_STDOUT, buf, 1024);
+        if (size == 0) {
+            size = do_read_message(buf);
+        }
         if (size == 0)
-            continue;
+            sched_yield();
         for (int i = 0; i < size; i++) {
             char c = buf[i];
             if (c == '\n') {
@@ -31,10 +36,13 @@ void process_print_message() {
 }
 
 void user_process() {
+    const char *str = "write to stdio\n";
+    size_t len = strlen(str);
     while (1) {
         for (int i = 0; i < 65536 * 2000; i++) {
             ;
         }
+        sys_write(FD_STDOUT, str, len);
         sys_print_msg("user message\n");
     }
 }
@@ -50,6 +58,7 @@ void init_main() {
     logi("start init process");
     // parse_elf64(user_processes[0]);
     // die();
+    // 加载文件系统
     auto dev = new Dev::SataDev;
     auto fs = new EXT2::EXT2_FS(dev);
     root_fs = fs;
@@ -64,7 +73,14 @@ void init_main() {
     for (auto x: root->children) {
         os::cout << x->name << os::endl;
     }
-    die();
+    // 打开基本文件
+    auto stdout = new PIPE::PIPE_File();
+    auto stdin  = new PIPE::PIPE_File();
+    ProcessDescriptor* processDescriptor = get_process(do_getpid());
+    processDescriptor->fds[FD_STDIN] = stdin;
+    processDescriptor->fds[FD_STDOUT] = stdout;
+    processDescriptor->fds[FD_STDOUT] = stdout;
+    // die();
     ASM("sti");
     // sys_print_msg("lalala");
     do_create_process(PROCESS_USER, (void*)user_process);

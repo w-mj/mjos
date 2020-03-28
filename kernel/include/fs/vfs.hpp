@@ -156,11 +156,14 @@ namespace VFS
      * 打开的文件
      */
     class File {
+    protected:
+        int open_cnt = 0;
     public:
         int pos;
         int size;
         int type;
         int open_mode;
+        void open();
         virtual int tell()=0;
         virtual int seek(int pos, int whence)=0;
         virtual int read(char*, int size)=0;

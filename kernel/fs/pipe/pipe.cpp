@@ -53,7 +53,7 @@ bool PIPE_File::full() {
 }
 
 int PIPE_File::size() {
-    return round(wpos - pipe_size);
+    return round(wpos - rpos);
 }
 
 int PIPE_File::write(const char *data, int len) {
@@ -68,6 +68,9 @@ int PIPE_File::write(const char *data, int len) {
 }
 
 void PIPE_File::close() {
-    kfree_s(pipe_size, pipe);
-    pipe = nullptr;
+    open_cnt--;
+    if (open_cnt == 0) {
+        kfree_s(pipe_size, pipe);
+        pipe = nullptr;
+    }
 }
