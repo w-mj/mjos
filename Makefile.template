@@ -49,7 +49,7 @@ $(subobjs): $(subdirs)
 	@ mv -f $(basename $@).t $(basename $@).d
 
 %.cpp.run: %.cpp %.cpp.d
-	g++  $(DEPGEN) $(TESTINC) $(INCFLAG) -o $@ $<
+	g++  $(DEPGEN) $(TESTINC) -o $@ $<
 	@mv -f $(basename $@).t $(basename $@).d
 
 test: $(testrun)

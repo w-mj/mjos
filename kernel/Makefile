@@ -29,6 +29,8 @@ INCLIST := $(CURDIR)/include $(CURDIR)/arch/$(ARCH)/include \
 LFLAGS  := -nostdlib -lgcc -T arch/$(ARCH)/linker.ld -Wl,-Map=$(mapfile)
 INCFLAG := $(addprefix -I, $(INCLIST))
 
+TESTINC += -I$(CURDIR)/libc++/include
+
 include arch/$(ARCH)/Makefile.config
 
 export INCLIST CFLAGS INCFILE CPPFLAGS

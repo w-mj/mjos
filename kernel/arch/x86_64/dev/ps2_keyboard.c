@@ -209,6 +209,7 @@ static void ps2kbd_int_handler() {
 void ps2kbd_dev_init() {
     int gsi = ioapic_irq_to_gsi(1);
     int vec = ioapic_gsi_to_vec(gsi);
+    // vec = 0x41
     isr_tbl[vec] = ps2kbd_int_handler;
     state = STATE_NORMAL;
     ioapic_gsi_unmask(gsi);

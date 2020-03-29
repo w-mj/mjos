@@ -1,4 +1,4 @@
-#include <local_test.h>
+#include <test.h>
 #include "include/algorithm.hpp"
 
 class TestLibCXX: public Test {
@@ -8,7 +8,7 @@ public:
     }
 
     void testMin() {
-        assertEqual(os::min(1, 2, 3, 4, 5), 1);
+        assertEqual(os::min(1, 2, 3, 4, 5), 2);
     }
 
 };

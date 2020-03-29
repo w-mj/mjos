@@ -13,6 +13,7 @@
 *.sym
 *.iso
 *.map
+*.run
 dump.txt
 CMakeLists.txt
 iso/
