@@ -179,3 +179,6 @@ namespace VFS
 }; // namespace VFS
 
 extern VFS::FS *root_fs;
+extern VFS::File *stdin;
+extern VFS::File *stdout;
+extern VFS::File *stderr;

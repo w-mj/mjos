@@ -31,9 +31,7 @@ typedef _u64 usize;
 
 #define def_type(x)  \
 	typedef _i##x i##x; \
-	typedef _u##x u##x; \
-	typedef _i##x int##x##_t; \
-	typedef _u##x uint##x##_t;
+	typedef _u##x u##x;
 
 def_type(8)
 def_type(16)

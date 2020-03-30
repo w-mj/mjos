@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef __cplusplue
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -63,12 +63,12 @@ typedef enum keycode {
     KEY_ACPI_POWER, KEY_ACPI_SLEEP, KEY_ACPI_WAKE,
 } keycode_t;
 
-extern void kbd_send(keycode_t code);
+void kbd_send(keycode_t code);
 
-extern keycode_t kbd_peek();
-
-extern keycode_t kbd_recv();
+//extern keycode_t kbd_peek();
+//
+//extern keycode_t kbd_recv();
 
 #ifdef __cplusplus
-};
+}
 #endif

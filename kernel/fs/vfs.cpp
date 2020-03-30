@@ -158,3 +158,8 @@ _u8 VFS::mode_to_type(_u8 mode) {
     if(S_ISSOCK(mode)) return VFS::SymbolLink;
     return Unknown;
 }
+
+
+VFS::File *stdin  = nullptr;
+VFS::File *stdout = nullptr;
+VFS::File *stderr = nullptr;

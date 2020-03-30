@@ -36,14 +36,15 @@ void process_print_message() {
 }
 
 void user_process() {
-    const char *str = "write to stdio\n";
+    char str[] = "write to stdio\n";
     size_t len = strlen(str);
     while (1) {
         for (int i = 0; i < 65536 * 2000; i++) {
             ;
         }
+        sys_read(FD_STDIN, str, len);
         sys_write(FD_STDOUT, str, len);
-        sys_print_msg("user message\n");
+        // sys_print_msg("user message\n");
     }
 }
 void user_process2() {
@@ -74,12 +75,13 @@ void init_main() {
         os::cout << x->name << os::endl;
     }
     // 打开基本文件
-    auto stdout = new PIPE::PIPE_File();
-    auto stdin  = new PIPE::PIPE_File();
+    stdout = new PIPE::PIPE_File();
+    stdin  = new PIPE::PIPE_File();
+    stderr = stdout;
     ProcessDescriptor* processDescriptor = get_process(do_getpid());
     processDescriptor->fds[FD_STDIN] = stdin;
     processDescriptor->fds[FD_STDOUT] = stdout;
-    processDescriptor->fds[FD_STDOUT] = stdout;
+    processDescriptor->fds[FD_STDOUT] = stderr;
     // die();
     ASM("sti");
     // sys_print_msg("lalala");

@@ -95,3 +95,7 @@ disk: disk.img
 disk.img:
 	dd if=/dev/zero of=disk.img bs=1024 count=1024
 	mkfs.ext2 disk.img
+
+makecompiledatabase:
+	compiledb -nf make
+	compiledb -n  make test
