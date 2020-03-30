@@ -131,7 +131,7 @@ pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main) {
 
 	if (parent != NULL)
         copy_file(pd, parent);
-
+    pd->signalHandler = NULL;
 	// 用户进程需要复制页表
 	if (type == PROCESS_USER) {
 		pd->cr3 = create_user_page(pd);  // 分配新的用户四级页表

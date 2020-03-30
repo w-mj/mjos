@@ -1,5 +1,13 @@
 
-srclist := process.c scheduler.c elf.c ipc.c elfpiggy.S userprocesses.c pthread.c process_helper.cpp
+srclist := process.c \
+		   scheduler.c \
+		   elf.c \
+		   ipc.c \
+		   elfpiggy.S \
+		   userprocesses.c \
+		   pthread.c \
+		   process_helper.cpp \
+		   signal.cpp
 subdirs :=
 
 include $(TEMPLATEFILE)
@@ -10,4 +18,4 @@ userprocesses.c: mkelf
 mkelf: mkuser.cpp
 	g++ mkuser.cpp -o mkuser.out && ./mkuser.out
 
-toclean += mkuser elfpiggy.S userprocesses.c
+toclean += mkuser.out elfpiggy.S userprocesses.c

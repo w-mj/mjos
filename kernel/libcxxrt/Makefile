@@ -6,6 +6,8 @@ srclist:= dynamic_cast.cc \
 		  memory.cc \
 		  auxhelper.cc \
 		  libelftc_dem_gnu3.c \
+		  cxa_atexit.c \
+		  cxa_finalize.c \
 		  # exception.cc \
 
 subdir :=

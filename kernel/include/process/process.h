@@ -9,6 +9,7 @@ extern "C" {
 #include <spin.h>
 
 #include <config.h>
+#include <process/signal.h>
 
 typedef enum {
 	THREAD_RUNNING,
@@ -61,6 +62,7 @@ typedef struct __ProcessDescriber {
 	Spin shared_mem_write_lock;
 	ListEntry mem_list;
 	void *fds[CFG_PROCESS_FDS];  // 打开的文件列表，每一个元素是一个指向VFS::File的指针
+    SignalHandler signalHandler;   // 信号处理函数，必须在内核空间
 } ProcessDescriptor;
 
 extern ThreadDescriptor *current;
@@ -81,5 +83,5 @@ void remove_from_mem_list(ProcessDescriptor *process, pfn_t pfn);
 int do_getpid();
 
 #ifdef __cplusplus
-}
+};
 #endif

@@ -25,5 +25,5 @@ extern "C" void kbd_send(keycode_t code) {
 #define PRE_RALT 5
 char kbd2ascii(keycode_t code) {
     static int pressing = 0;
-
+    return 0;
 }

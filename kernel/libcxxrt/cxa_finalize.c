@@ -22,8 +22,9 @@
  */
 
 
-void __cxa_finalize(void *d );
+void *__dso_handle;
 
+void __cxa_finalize(void *d );
 extern void *__dso_handle;
 
 __attribute__((__destructor__, __used__))

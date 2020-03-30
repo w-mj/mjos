@@ -2,6 +2,7 @@
 #include <atomic.h>
 #include <delog.h>
 
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 static void* threadDataTable[64];
 static int freeEntry = 0;
 

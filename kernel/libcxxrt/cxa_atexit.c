@@ -23,7 +23,6 @@
 
 /* Special thanks to TBricks for partially funding this work */
 
-#ifdef __sun__
 #include <pthread.h>
 #include <stdlib.h>
 
@@ -66,4 +65,3 @@ void __cxa_finalize(void *d ) {
   }
   pthread_mutex_unlock(&lock);
 }
-#endif

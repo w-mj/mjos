@@ -2,7 +2,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include <types.h>
 typedef i32 pthread_key_t;
 typedef i32 pthread_mutex_t;

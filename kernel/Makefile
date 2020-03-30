@@ -20,8 +20,8 @@ uwind_obj := unwind-c.o  unwind-dw2-fde.o  unwind-dw2.o  unwind-sjlj.o
 objs    := $(addsuffix .o, $(srclist))
 deps    := $(addsuffix .d, $(srclist))
 subobjs := $(foreach d, $(subdirs), $(addsuffix .obj, $(d)/$(d)))
-# objlist := $(crti_obj) $(crtbegin_obj) $(subobjs) $(objs) $(unwind_obj) $(crtend_obj) $(crtn_obj)
-objlist := $(subobjs) $(objs)
+objlist := $(crti_obj) $(crtbegin_obj) $(subobjs) $(objs)  $(crtend_obj) $(crtn_obj)
+# objlist := $(subobjs) $(objs)
 
 DEPGEN   =  -MT $@ -MMD -MP -MF $(basename $@).t
 INCLIST := $(CURDIR)/include $(CURDIR)/arch/$(ARCH)/include \
@@ -41,6 +41,7 @@ test: $(subdirs)
 all: build
 debugbackground: build
 debug: build
+dump: build
 
 clean: $(subdirs)
 	rm -f $(binfile)
@@ -79,7 +80,7 @@ $(binfile): $(elffile)
 	$(OBJCOPY) --strip-debug $< $@
 
 $(elffile): $(objlist)
-	$(CC) $(LFLAGS) -o $@ $^
+	$(CXX) $(LFLAGS) -o $@ $^
 
 $(symfile): $(elffile)
 	$(OBJCOPY) --only-keep-debug $< $@

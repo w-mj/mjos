@@ -9,6 +9,7 @@
 #include <dev/sata_dev.hpp>
 #include <process/scheduler.h>
 #include <fs/pipe/pipe.hpp>
+#include <process/signal.h>
 
 extern "C" void init_main();
 
@@ -42,9 +43,9 @@ void user_process() {
         for (int i = 0; i < 65536 * 2000; i++) {
             ;
         }
-        sys_read(FD_STDIN, str, len);
+        // sys_read(FD_STDIN, str, len);
         sys_write(FD_STDOUT, str, len);
-        // sys_print_msg("user message\n");
+        sys_print_msg("user message\n");
     }
 }
 void user_process2() {
@@ -52,9 +53,18 @@ void user_process2() {
        ;
    }
    sys_print_msg("user message2\n");
+   sys_signal(SignalType::SIG_KEY, 0, NOPID);
 }
 
+bool init_signal_handler(const Signal *signal) {
+    logd("Signal!");
+    return true;
+}
+
+
+void __static_initialization_and_destruction_0(int, int);
 void init_main() {
+    // __static_initialization_and_destruction_0(1, 0xffff);  // 初始化C++ 静态对象
     os::cout << "cout form " << "iostream" << os::endl;
     logi("start init process");
     // parse_elf64(user_processes[0]);
@@ -82,7 +92,9 @@ void init_main() {
     processDescriptor->fds[FD_STDIN] = stdin;
     processDescriptor->fds[FD_STDOUT] = stdout;
     processDescriptor->fds[FD_STDOUT] = stderr;
-    // die();
+
+    // 注册信号
+    signalRegister(SignalType::SIG_KEY, init_signal_handler, SignalRegisterType::NORMAL);
     ASM("sti");
     // sys_print_msg("lalala");
     do_create_process(PROCESS_USER, (void*)user_process);

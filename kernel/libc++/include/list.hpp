@@ -52,16 +52,20 @@ public:
         insert(begin(), data);
     }
 
-    void remove(const T& data) {
+    // 删除列表中的一个元素
+    // ret true:  成功删除
+    //     false: 未找到该元素
+    bool remove(const T& data) {
         for (auto iter = begin(); iter != end(); iter++) {
             _Wrapper *x = iter._current;
             if (x->data == data) {
                 x->prev->next = x->next;
                 x->next->prev = x->prev;
                 delete x;
-                return;
+                return true;
             }
         }
+        return false;
     }
 
     // 从from移动到to前面

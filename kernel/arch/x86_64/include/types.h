@@ -46,6 +46,7 @@ def_type(64)
 
 typedef u32 pfn_t;
 typedef u16 pid_t;
+#define NOPID ((pid_t)-1)
 
 #ifdef __cplusplus
 }
