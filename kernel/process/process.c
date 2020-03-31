@@ -208,6 +208,7 @@ int do_quit_thread() {
     ThreadDescriptor *thread = thiscpu_var(current);
     destroy_thread(thread);
     logi("thread quit");
+    sched_yield();
     while (1);
     return 0;
 }
