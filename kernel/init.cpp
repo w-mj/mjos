@@ -54,6 +54,7 @@ void user_process2() {
    }
    sys_print_msg("user message2\n");
    sys_signal(SignalType::SIG_KEY, 0, NOPID);
+   // while(1);
 }
 
 bool init_signal_handler(const Signal *signal) {

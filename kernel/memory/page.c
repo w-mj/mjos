@@ -288,9 +288,10 @@ static void write_new_kernel_page_table() {
 	_sL(VIRTUAL(newmp));
 	u64 addr = 0;
 	addr = 0;
-	// 低16M全部直接映射
+	// 低16M
+    // 0xffffffff80000000 - 0xffffffff81000000
 	while (addr < 16 * (1 << 20)) {
-		page_table_set_entry(newmp, addr, addr| MMU_P| MMU_RW| MMU_US| MMU_PCD| MMU_PWT, true);
+		page_table_set_entry(newmp, (u64)VIRTUAL(addr), addr| MMU_P| MMU_RW| MMU_US| MMU_PCD| MMU_PWT, true);
 		addr += PAGESIZE;
 	}
 	addr = 0xbfee0000;  // 3G
@@ -529,9 +530,8 @@ static inline u64 mk_page_entry(pfn_t frame, u64 flags) {
 
 // 创建用户页表
 // 内核空间从0xffffffff81000000 - 全F共有2G空间
+//         0x000000007fffffff
 //             ffffffff8565dff0
-// DMA 空间为低16M 共有4096个页面，8个二级页表项
-// 即占用四级页表的第一项、三级页表的第一项和二级页表的前8项
 // 占用2^19个页面，2^10个二级页表项，2个三级页表项
 // 即占用四级页表的最后一项和三级页表的最后两项
 // PCI 空间从bfee0000到4G
@@ -540,21 +540,21 @@ u64 create_user_page(ProcessDescriptor *process) {
 	pfn_t pml          = kernel_page_alloc(PG_KERNEL);
     pfn_t pml_0        = kernel_page_alloc(PG_KERNEL);
     pfn_t pml_511      = kernel_page_alloc(PG_KERNEL);
-    pfn_t pml_0_0      = kernel_page_alloc(PG_KERNEL);
+    // pfn_t pml_0_0      = kernel_page_alloc(PG_KERNEL);
     pfn_t pml_0_2      = kernel_page_alloc(PG_KERNEL);
     pfn_t pml_0_2_511  = kernel_page_alloc(PG_KERNEL);
 
     add_to_mem_list(process, pml, VIRTUAL(pml));
     add_to_mem_list(process, pml_0, VIRTUAL(pml));
     add_to_mem_list(process, pml_511, VIRTUAL(pml));
-    add_to_mem_list(process, pml_0_0, VIRTUAL(pml));
+//    add_to_mem_list(process, pml_0_0, VIRTUAL(pml));
     add_to_mem_list(process, pml_0_2, VIRTUAL(pml));
     add_to_mem_list(process, pml_0_2_511, VIRTUAL(pml));
 
 	u64  pml_phy         = pml << PAGEOFFSET;
 	u64  pml_0_phy       = pml_0 << PAGEOFFSET;
     u64  pml_511_phy     = pml_511 << PAGEOFFSET;
-	u64  pml_0_0_phy     = pml_0_0 << PAGEOFFSET;
+//	u64  pml_0_0_phy     = pml_0_0 << PAGEOFFSET;
     u64  pml_0_2_phy     = pml_0_2 << PAGEOFFSET;
     u64  pml_0_2_511_phy = pml_0_2_511 << PAGEOFFSET;
 	// _sL(pml4_phy);
@@ -562,14 +562,14 @@ u64 create_user_page(ProcessDescriptor *process) {
 	u64 *pml_vir         = (u64*)phys_to_virt(pml_phy);
     u64 *pml_0_vir       = (u64*)phys_to_virt(pml_0_phy);
     u64 *pml_511_vir     = (u64*)phys_to_virt(pml_511_phy);
-    u64 *pml_0_0_vir     = (u64*)phys_to_virt(pml_0_0_phy);
+//    u64 *pml_0_0_vir     = (u64*)phys_to_virt(pml_0_0_phy);
     u64 *pml_0_2_vir     = (u64*)phys_to_virt(pml_0_2_phy);
     u64 *pml_0_2_511_vir = (u64*)phys_to_virt(pml_0_2_511_phy);
 
 	memset(pml_vir        , 0, PAGESIZE);
     memset(pml_0_vir      , 0, PAGESIZE);
     memset(pml_511_vir    , 0, PAGESIZE);
-    memset(pml_0_0_vir    , 0, PAGESIZE);
+//    memset(pml_0_0_vir    , 0, PAGESIZE);
     memset(pml_0_2_vir    , 0, PAGESIZE);
     memset(pml_0_2_511_vir, 0, PAGESIZE);
 
@@ -578,23 +578,23 @@ u64 create_user_page(ProcessDescriptor *process) {
 	u64 *kernel_pml_0_vir       = (u64*)phys_to_virt(kernel_pml_0_phy);
     u64  kernel_pml_511_phy     = kernel_pml_vir[511] & MMU_ADDR;
     u64 *kernel_pml_511_vir     = (u64*)phys_to_virt(kernel_pml_511_phy);
-	u64  kernel_pml_0_0_phy     = kernel_pml_0_vir[0] & MMU_ADDR;
-	u64 *kernel_pml_0_0_vir     = (u64*)phys_to_virt(kernel_pml_0_0_phy);
+//	u64  kernel_pml_0_0_phy     = kernel_pml_0_vir[0] & MMU_ADDR;
+//	u64 *kernel_pml_0_0_vir     = (u64*)phys_to_virt(kernel_pml_0_0_phy);
 	u64  kernel_pml_0_2_phy     = kernel_pml_0_vir[2] & MMU_ADDR;
 	u64 *kernel_pml_0_2_vir     = (u64*)phys_to_virt(kernel_pml_0_2_phy);
 	u64  kernel_pml_0_2_511_phy = kernel_pml_0_2_vir[511] & MMU_ADDR;
 	u64 *kernel_pml_0_2_511_vir = (u64*)phys_to_virt(kernel_pml_0_2_511_phy);
 
     pml_vir[0]     = mk_page_entry(pml_0, MMU_US | MMU_P | MMU_RW);
-    pml_0_vir[0]   = mk_page_entry(pml_0_0, MMU_US | MMU_P | MMU_RW);
-    pml_0_0_vir[0] = kernel_pml_0_0_vir[0];
-    pml_0_0_vir[1] = kernel_pml_0_0_vir[1];
-    pml_0_0_vir[2] = kernel_pml_0_0_vir[2];
-    pml_0_0_vir[3] = kernel_pml_0_0_vir[3];
-    pml_0_0_vir[4] = kernel_pml_0_0_vir[4];
-    pml_0_0_vir[5] = kernel_pml_0_0_vir[5];
-    pml_0_0_vir[6] = kernel_pml_0_0_vir[6];
-    pml_0_0_vir[7] = kernel_pml_0_0_vir[7];
+//    pml_0_vir[0]   = mk_page_entry(pml_0_0, MMU_US | MMU_P | MMU_RW);
+//    pml_0_0_vir[0] = kernel_pml_0_0_vir[0];
+//    pml_0_0_vir[1] = kernel_pml_0_0_vir[1];
+//    pml_0_0_vir[2] = kernel_pml_0_0_vir[2];
+//    pml_0_0_vir[3] = kernel_pml_0_0_vir[3];
+//    pml_0_0_vir[4] = kernel_pml_0_0_vir[4];
+//    pml_0_0_vir[5] = kernel_pml_0_0_vir[5];
+//    pml_0_0_vir[6] = kernel_pml_0_0_vir[6];
+//    pml_0_0_vir[7] = kernel_pml_0_0_vir[7];
     pml_0_vir[3]   = kernel_pml_0_vir[3];
     pml_0_vir[2]   = mk_page_entry(pml_0_2, MMU_US | MMU_P | MMU_RW);
     pml_0_2_vir[511] = mk_page_entry(pml_0_2_511, MMU_US | MMU_P | MMU_RW);
@@ -613,7 +613,7 @@ u64 create_user_page(ProcessDescriptor *process) {
 	// _pos();
 	page_table_set_entry(pml_phy, (u64)pml_511_vir, pml_511_phy + 7, true);
     page_table_set_entry(pml_phy, (u64)pml_0_vir, pml_0_phy + 7, true);
-    page_table_set_entry(pml_phy, (u64)pml_0_0_vir, pml_0_0_phy + 7, true);
+//    page_table_set_entry(pml_phy, (u64)pml_0_0_vir, pml_0_0_phy + 7, true);
     page_table_set_entry(pml_phy, (u64)pml_0_2_511_vir, pml_0_2_511_phy + 7, true);
     page_table_set_entry(pml_phy, (u64)pml_0_2_vir, pml_0_2_phy + 7, true);
 	// _pos();

@@ -2,6 +2,7 @@
 #include <types.h>
 #include <string.h>
 #include <delog.h>
+#include <boot.h>
 
 
 static const _u16 VGA_WIDTH = 80;
@@ -15,7 +16,7 @@ _u16 *console_buffer;
 void console_initialize(void) {
 	console_row = 0;
 	console_column = 0;
-	console_buffer = (_u16 *) 0xB8000;
+	console_buffer = (_u16 *) VIRTUAL(0xB8000);
 	console_color = vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
 	_u16 ch = vga_entry(' ', console_color);
 	for (_u16 y = 0; y < VGA_HEIGHT; y++) {
