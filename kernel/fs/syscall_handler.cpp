@@ -5,6 +5,7 @@
 #include <process/process.h>
 #include <cpu.h>
 #include <fs/vfs.hpp>
+#include <stdio.h>
 
 VFS::FS *root_fs = nullptr;
 
@@ -12,6 +13,7 @@ extern "C" int do_open(const char *);
 extern "C" int do_read(int , char *, size_t);
 extern "C" int do_write(int , const char*, size_t);
 extern "C" int do_close(int);
+extern "C" int do_get_attr(int, struct FILE*);
 
 int do_open(const char *path) {
     ThreadDescriptor *thread= thiscpu_var(current);
@@ -56,5 +58,14 @@ int do_close(int fd) {
     if (file == nullptr)
         return -1;
     file->close();
+    return 0;
+}
+
+int do_get_attr(int fd, struct FILE *file) {
+    auto f = get_file(fd);
+    if (f == nullptr)
+        return -1;
+    file->fno = fd;
+    file->size = f->size;
     return 0;
 }

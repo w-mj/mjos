@@ -96,6 +96,8 @@ void init_main() {
 
     // 注册信号
     signalRegister(SignalType::SIG_KEY, init_signal_handler, SignalRegisterType::NORMAL);
+
+    do_create_process_from_file(do_open("shell.o"));
     ASM("sti");
     // sys_print_msg("lalala");
     do_create_process(PROCESS_USER, (void*)user_process);

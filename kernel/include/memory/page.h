@@ -54,6 +54,8 @@ void kernel_pages_release(pfn_t p, int n);
 // pn: 返回分配的物理页框
 void *normal_page_alloc(pfn_t *pn, u64 pml4);
 void normal_page_release(void *addr, u64 pml4);
+void *normal_pages_alloc(u64 pml4, int n);
+void normal_pages_release(void *addr, u64 pml4, int n);
 
 // 通过页表转换找到虚拟地址对应的物理地址
 // PML 第四级页表的物理地址

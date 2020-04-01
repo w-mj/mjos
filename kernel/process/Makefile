@@ -7,7 +7,9 @@ srclist := process.c \
 		   userprocesses.c \
 		   pthread.c \
 		   process_helper.cpp \
-		   signal.cpp
+		   signal.cpp \
+		   load_process.cpp
+
 subdirs :=
 
 include $(TEMPLATEFILE)

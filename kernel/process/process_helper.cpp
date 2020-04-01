@@ -1,5 +1,8 @@
 #include <process/process.h>
 #include <fs/vfs.hpp>
+#include <string.hpp>
+#include <memory/kmalloc.h>
+#include <cpu.h>
 
 extern "C" void copy_file(ProcessDescriptor *to, ProcessDescriptor *from) {
     for (int i = 0; i < CFG_PROCESS_FDS; i++) {

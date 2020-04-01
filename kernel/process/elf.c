@@ -2,7 +2,6 @@
 #include <delog.h>
 #include <stdio.h>
 #include <string.h>
-#include <asm.h>
 
 #define CHK(a, b, ok, fail) do {\
 	if ((a) == (b)) {\
@@ -122,6 +121,4 @@ void parse_elf64(void *addr) {
 				i++, name, sec->sh_addr, sec->sh_offset, sec->sh_size, 
 				sec->sh_link, sec->sh_info, sec->sh_entsize, type, flags);
 	}
-
-	return;
 }

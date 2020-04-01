@@ -199,7 +199,7 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	__libc_start_main();  // 初始化libc和cxxrt
 	_init();
 
-	pid_t pid = create_process(NULL, PROCESS_KERNEL, (void*)init_main);
+	pid_t pid = create_process(NULL, PROCESS_KERNEL, (void*)init_main, -1);
 
 	ProcessDescriptor *pd = get_process(pid);
 	// assert(pd->cr3 == read_cr3());

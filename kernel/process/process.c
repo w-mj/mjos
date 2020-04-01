@@ -101,7 +101,7 @@ ThreadDescriptor *create_thread(ProcessDescriptor *process, void *main) {
 	return thread;
 }
 
-pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main) {
+pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main, int fd) {
 	pid_t pid = find_usable_pid();
 	if (pid == (u16)-1) {
 		loge("no usable pid.");
@@ -138,7 +138,29 @@ pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main) {
 	} else {
 		pd->cr3 = read_cr3();
 	}
-	create_thread(pd, main);
+
+	if (fd != -1) {
+        // 复制代码
+	    struct FILE f;
+	    do_get_attr(fd, &f);
+	    size_t elf_size = f.size;
+        size_t elf_pages = ROUND_UP(elf_size, PAGESIZE) / PAGESIZE;
+        void *elf_addr = normal_pages_alloc(pd->cr3, elf_pages);
+        void *start_addr = elf_addr;
+        // u64 cr = read_cr3();
+        u64 cr;
+        ASM("movq %%cr3, %0":"=r"(cr));
+        ASM("movq %0, %%cr3"::"a"(pd->cr3));
+        // write_cr3(pd->cr3);
+        do_read(fd, elf_addr, elf_size);
+        parse_elf64(start_addr);
+        ASM("movq %0, %%cr3"::"a"(cr));
+        // write_cr3(cr3);
+
+        create_thread(pd, start_addr);
+    } else {
+	    create_thread(pd, main);
+    }
 	return pid;
 }
 
@@ -155,8 +177,12 @@ ProcessDescriptor *get_process(u16 pid) {
 }
 
 int do_create_process(ProcessType type, void *main) {
-    int pid = create_process(thiscpu_var(current)->process, type, main);
+    int pid = create_process(thiscpu_var(current)->process, type, main, -1);
+    return pid;
+}
 
+int do_create_process_from_file(int fd) {
+    pid_t pid = create_process(thiscpu_var(current)->process, PROCESS_USER, NULL, fd);
     return pid;
 }
 

@@ -8,13 +8,13 @@ extern "C" {
 #include <types.h>
 
 struct FILE {
-    int unused;
     int fno;
+    int size;
 };
 
-extern struct FILE *stderr;
-extern struct FILE *stdout;
-extern struct FILE *stdin;
+//extern struct FILE *stderr;
+//extern struct FILE *stdout;
+//extern struct FILE *stdin;
 
 int snprintf (char *, size_t, const char *, ...);
 int vsnprintf (char *, size_t, const char *, va_list);

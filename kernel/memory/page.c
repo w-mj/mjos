@@ -194,6 +194,7 @@ static void page_table_set_entry(u64 pmltop, u64 page_table_entry, u64 value, bo
 	// 	_sL(page_table_entry);
 	// 	_sL(value);
 	// }
+
 	int level = 4;
 	u64 *pml = (u64 *)pmltop;
 	while (level > 1) {
@@ -508,6 +509,17 @@ void kernel_page_release(pfn_t page) {
 	kernel_pages_release(page, 1);
 }
 
+void *normal_pages_alloc(u64 pml4, int n) {
+    void *vir = find_virtual_addr(pml4);
+    void *ret = vir;
+    while (n--) {
+        pfn_t t = frame_alloc(PG_NORMAL);
+        page_table_set_entry(pml4, (u64)vir, ((u64)t << PAGEOFFSET) | MMU_P| MMU_RW| MMU_US, true);
+        vir += PAGESIZE;
+    }
+    return ret;
+}
+
 void *normal_page_alloc(pfn_t *pn, u64 pml4) {
 	pfn_t t = frame_alloc(PG_NORMAL);
 	void *vir = find_virtual_addr(pml4);
@@ -519,6 +531,12 @@ void *normal_page_alloc(pfn_t *pn, u64 pml4) {
 	return vir;
 }
 
+void normal_pages_release(void *addr, u64 pml4, int n) {
+    while (n--) {
+        normal_page_release(addr, pml4);
+    }
+}
+
 void normal_page_release(void *addr, u64 pml4) {
 	pfn_t fn = virt_to_pfn(addr);
 	page_table_set_entry(pml4, (u64)addr, 0, false);
@@ -528,6 +546,7 @@ static inline u64 mk_page_entry(pfn_t frame, u64 flags) {
 	return ((u64)frame << PAGEOFFSET) | flags;
 }
 
+void copy_page(u64 top, u64 to, u64 from, int level);
 // 创建用户页表
 // 内核空间从0xffffffff81000000 - 全F共有2G空间
 //         0x000000007fffffff
@@ -538,6 +557,10 @@ static inline u64 mk_page_entry(pfn_t frame, u64 flags) {
 // 从[0,2,511,224]到[0,3,511,511]
 u64 create_user_page(ProcessDescriptor *process) {
 	pfn_t pml          = kernel_page_alloc(PG_KERNEL);
+    u64  pml_phy       = pml << PAGEOFFSET;
+//	copy_page(process->parent->cr3, pml_phy, process->parent->cr3, 4);
+//    return pml_phy;
+
     pfn_t pml_0        = kernel_page_alloc(PG_KERNEL);
     pfn_t pml_511      = kernel_page_alloc(PG_KERNEL);
     // pfn_t pml_0_0      = kernel_page_alloc(PG_KERNEL);
@@ -551,7 +574,6 @@ u64 create_user_page(ProcessDescriptor *process) {
     add_to_mem_list(process, pml_0_2, VIRTUAL(pml));
     add_to_mem_list(process, pml_0_2_511, VIRTUAL(pml));
 
-	u64  pml_phy         = pml << PAGEOFFSET;
 	u64  pml_0_phy       = pml_0 << PAGEOFFSET;
     u64  pml_511_phy     = pml_511 << PAGEOFFSET;
 //	u64  pml_0_0_phy     = pml_0_0 << PAGEOFFSET;
@@ -632,6 +654,7 @@ void copy_page(u64 top, u64 to, u64 from, int level) {
             pfn_t new_page = kernel_page_alloc(PG_KERNEL);
             u64 new_phy = new_page << PAGEOFFSET;
             to_vir[i] = mk_page_entry(new_page, MMU_US| MMU_P| MMU_RW);
+            page_table_set_entry(top, (u64)phys_to_virt(new_phy), new_phy | MMU_US| MMU_P | MMU_RW, true);
             copy_page(top, new_phy,from_vir[i] & MMU_ADDR, level - 1);
         }
     }

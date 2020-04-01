@@ -1,1 +1,1 @@
-../kernel/include/syscall.h
+../../kernel/include/syscall.h

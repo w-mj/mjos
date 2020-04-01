@@ -69,7 +69,7 @@ extern ThreadDescriptor *current;
 
 
 void process_init();
-pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main);
+pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main, int fd);
 ThreadDescriptor *create_thread(ProcessDescriptor *process, void *main);
 ProcessDescriptor *get_process(pid_t pid);
 
@@ -81,6 +81,7 @@ void add_to_mem_list(ProcessDescriptor *process, pfn_t pfn, void *addr);
 void remove_from_mem_list(ProcessDescriptor *process, pfn_t pfn);
 
 int do_getpid();
+int do_create_process_from_file(int);
 
 #ifdef __cplusplus
 };
