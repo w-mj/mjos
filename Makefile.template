@@ -17,11 +17,6 @@ deplist += $(addsuffix .d, $(testsrc))
 toclean += $(target) $(deplist) $(objlist) $(testrun)
 export MAKECMDGOALS
 
-all: build
-debugbackground: build
-debug: build
-dump:  build
-
 clean: $(subdirs)
 	rm -f $(toclean)
 	@ rm -f compiler-file*.d

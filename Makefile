@@ -38,27 +38,35 @@ TEMPLATEFILE := $(CURDIR)/Makefile.template
 
 export CC CXX AR OBJCOPY LD NM CFLAGS TEMPLATEFILE ARCH CXXFLAGS TESTINC
 
-userdirs := fs
-
 all: build
 
-build: kernel $(userdirs)
+build: build-kernel build-user
 
-test: kerneltest
+test:  test-kernel test-user
 
-kernel: $(userdirs) FORCE
-	$(MAKE) -C $@ build
+clean:
 
-kerneltest: FORCE
+build-kernel: FORCE
+	$(MAKE) -C kernel build
+
+test-kernel: FORCE
 	$(MAKE) -C kernel test
 
-$(userdirs): FORCE
-	$(MAKE) -C $@ $(MAKECMDGOALS)
+clean-kernel: FORCE
+	$(MAKE) -C kernel clean
+
+build-user: FORCE
+	$(MAKE) -C user build
+
+test-user: FORCE
+	$(MAKE) -C user test
+
+clean-user: FORCE
+	$(MAKE) -C user clean
 
 FORCE:
 
-clean: $(userdirs)
-	$(MAKE) -C kernel clean
+clean:  clean-kernel clean-user
 	rm -rf $(ISOFILE)
 	rm -f $(ISODIR)/boot/$(NAME).bin
 
@@ -87,7 +95,7 @@ debugbackground: iso disk
 	- ps aux | grep $(QEMU) | sed -n "1, 1p" | awk '{print $$2}' | xargs -I {} kill -9 {}
 	$(QEMU) -S -gdb tcp::4444 $(QEMUFLAGS) &
 
-dump: build
+dump: build-kernel
 	objdump -S -d kernel/kernel.elf > dump.txt
 
 disk: disk.img
