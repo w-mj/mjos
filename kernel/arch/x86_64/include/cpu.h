@@ -34,6 +34,7 @@ void *init_user_thread_stack(ThreadDescriptor *thread, void *main);
 void thread_switch();
 
 void set_rsp0(u64);
+void user_return(void *ip, void *rsp);
 #ifdef __cplusplus
 }
 #endif

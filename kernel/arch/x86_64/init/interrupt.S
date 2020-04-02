@@ -141,6 +141,8 @@ syscall_stub:
 	sysret  // sysret 从MSR中找到用户态的cs和ss
 
 
+// void user_return(void *ip, void *rsp)
+GLOBAL_FUNC(user_return)
 user_return:
     pushfq
     cli                             // disable interrupt for now
@@ -263,13 +265,4 @@ init_user_thread_stack:
     movq  %rsp, %rax
     movq  %r10, %cr3
     movq  %r9,  %rsp
-    ret
-
-// void exec_jmp(ThreadDescriptor *thread, void *ip)
-GLOBAL_FUNC(exec_jmp)
-exec_jmp:
-    movq  0x18(%rdi), %rax  // %rsp = thread->stack
-    movq  %rax, %rsp
-
-    pushq %rsi   // %ip = ip
     ret
