@@ -265,3 +265,11 @@ init_user_thread_stack:
     movq  %r9,  %rsp
     ret
 
+// void exec_jmp(ThreadDescriptor *thread, void *ip)
+GLOBAL_FUNC(exec_jmp)
+exec_jmp:
+    movq  0x18(%rdi), %rax  // %rsp = thread->stack
+    movq  %rax, %rsp
+
+    pushq %rsi   // %ip = ip
+    ret

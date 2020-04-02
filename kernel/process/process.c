@@ -118,7 +118,8 @@ pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main, Cr
 	pd->shared_mem = NULL;
 	pd->shared_mem_write_lock = SPIN_INIT;
 	pd->shared_mem_read_lock  = SPIN_INIT;
-	pd->linear_end = NULL;
+	pd->linear_start = (void*)0x400000;  // x64 起始地址
+	pd->linear_end = pd->linear_start;
 	memset(pd->fds, 0, sizeof(pd->fds));
 	raw_spin_take(&pd->shared_mem_read_lock);
 	list_init(&pd->threads);
@@ -179,8 +180,9 @@ int do_create_process_from_file(const char *path) {
 void destroy_process(ProcessDescriptor *process) {
     // 释放线性区
     kfree_s(strlen(process->path) + 1, process->path);
-    int linear_cnt = (int)((u64)process->linear_end / PAGESIZE);
-    normal_pages_release((void*)0, process->cr3, linear_cnt);
+    u64 linear_size = (u64)process->linear_end - (u64)process->linear_start;
+    int linear_cnt = (int)(linear_size / PAGESIZE);
+    normal_pages_release(process->linear_start, process->cr3, linear_cnt);
     // 释放页表
     ListEntry *c;
     foreach (c, process->mem_list) {

@@ -42,12 +42,15 @@ typedef struct {
 	// 同一个进程的所有线程的cr3都相同
 	// 这里冗余的cr3为了在汇编语言里寻址方便，以后可以优化掉
 	u64 cr3;
+    void *stack;  // 栈顶地址
+	// **以上所有成员位置不可改变**
+
+
 	ThreadState state;
 	struct __ProcessDescriber *process;
 	ListEntry next;   // 用于调度队列
 	ListEntry sibling;  // 兄弟线程
 	int tid;
-	void *stack;  // 栈顶地址
 	int stack_length;  // 栈长度(单位：页）
 } ThreadDescriptor;
 
@@ -68,6 +71,7 @@ typedef struct __ProcessDescriber {
 	ListEntry mem_list;
 	void *fds[CFG_PROCESS_FDS];  // 打开的文件列表，每一个元素是一个指向VFS::File的指针
     SignalHandler signalHandler;   // 信号处理函数，必须在内核空间
+    void *linear_start;
     void *linear_end;   // 线性区终止地址
     char *path;
 } ProcessDescriptor;
