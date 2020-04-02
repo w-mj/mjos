@@ -63,6 +63,7 @@ typedef struct __ProcessDescriber {
 	ListEntry mem_list;
 	void *fds[CFG_PROCESS_FDS];  // 打开的文件列表，每一个元素是一个指向VFS::File的指针
     SignalHandler signalHandler;   // 信号处理函数，必须在内核空间
+    void *linear_end;   // 线性区终止地址
 } ProcessDescriptor;
 
 extern ThreadDescriptor *current;

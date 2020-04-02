@@ -234,11 +234,18 @@ static inline u64 mk_virtual(int *frames) {
 	       ((u64)frames[2] << PDTE_SHIFT)   + \
 	       ((u64)frames[1] << PTE_SHIFT);
 }
+static inline void mk_frame(int *frames, u64 virtual) {
+	frames[4] = (int)(virtual >> PML4TE_SHIFT) & 0x1ff;
+	frames[3] = (int)(virtual >> PDPTE_SHIFT) & 0x1ff;
+	frames[2] = (int)(virtual >> PDTE_SHIFT) & 0x1ff;
+	frames[1] = (int)(virtual >> PTE_SHIFT) & 0x1ff;
+}
 // 找到一个空闲的虚拟地址
 // 硬件映射地址已经被标记为直接映射，可以大胆遍历
-void *find_virtual_addr(u64 pml4) {
+void *find_virtual_addr(u64 pml4, u64 above) {
 	int level = 4;
 	int pml_cursor[5] = {0};
+	mk_frame(pml_cursor, above);
 	u64 *pml_addr[5] = {0};
 	pml_addr[level] = (u64*)phys_to_virt(pml4);
 	do {
@@ -509,8 +516,8 @@ void kernel_page_release(pfn_t page) {
 	kernel_pages_release(page, 1);
 }
 
-void *normal_pages_alloc(u64 pml4, int n) {
-    void *vir = find_virtual_addr(pml4);
+void *normal_pages_alloc(u64 pml4, u64 above, int n) {
+    void *vir = find_virtual_addr(pml4, above);
     void *ret = vir;
     while (n--) {
         pfn_t t = frame_alloc(PG_NORMAL);
@@ -520,9 +527,9 @@ void *normal_pages_alloc(u64 pml4, int n) {
     return ret;
 }
 
-void *normal_page_alloc(pfn_t *pn, u64 pml4) {
+void *normal_page_alloc(pfn_t *pn, u64 pml4, u64 above) {
 	pfn_t t = frame_alloc(PG_NORMAL);
-	void *vir = find_virtual_addr(pml4);
+	void *vir = find_virtual_addr(pml4, above);
 	_sL(vir);
 	// assert(kernel_pml4 == read_cr3());
 	page_table_set_entry(pml4, (u64)vir, ((u64)t << PAGEOFFSET) | MMU_P | MMU_RW | MMU_US, true);

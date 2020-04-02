@@ -52,9 +52,9 @@ void kernel_page_release(pfn_t);
 void kernel_pages_release(pfn_t p, int n);
 // 分配一个自由映射页，返回映射好的虚拟地址
 // pn: 返回分配的物理页框
-void *normal_page_alloc(pfn_t *pn, u64 pml4);
+void *normal_page_alloc(pfn_t *pn, u64 pml4, u64 above);
 void normal_page_release(void *addr, u64 pml4);
-void *normal_pages_alloc(u64 pml4, int n);
+void *normal_pages_alloc(u64 pml4, u64 above, int n);
 void normal_pages_release(void *addr, u64 pml4, int n);
 
 // 通过页表转换找到虚拟地址对应的物理地址
@@ -98,10 +98,10 @@ pfn_t pglist_pop_tail (PageList *list);
 void  pglist_remove   (PageList *list, pfn_t page);
 void  pglist_free_all (PageList *list);
 
-// 在页表中找到一个未被映射的虚拟地址
+// 在页表中找到一个大于above且未被映射的虚拟地址
 // pml4:4级页表的物理地址
 // ret：空闲的虚拟地址
-void *find_virtual_addr(u64 pml4);
+void *find_virtual_addr(u64 pml4, u64 above);
 // 为用户进程创建页表
 // ret：页表的物理地址（cr3）
 u64   create_user_page(ProcessDescriptor *process);

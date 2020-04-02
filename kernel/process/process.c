@@ -61,7 +61,7 @@ ThreadDescriptor *create_thread(ProcessDescriptor *process, void *main) {
 	ThreadDescriptor *thread = (ThreadDescriptor*) kmalloc_s(sizeof(ThreadDescriptor));
 	_sL(process->cr3);
 	pfn_t pfn;
-	void *stack = normal_page_alloc(&pfn, process->cr3);
+	void *stack = normal_page_alloc(&pfn, process->cr3, ((u64)2 << 30));
 	add_to_mem_list(process, pfn, stack);
 	pfn = kernel_page_alloc(PG_KERNEL);
 	void *sp0 = pfn_to_virt(pfn);
@@ -117,6 +117,7 @@ pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main, in
 	pd->shared_mem = NULL;
 	pd->shared_mem_write_lock = SPIN_INIT;
 	pd->shared_mem_read_lock  = SPIN_INIT;
+	pd->linear_end = NULL;
 	memset(pd->fds, 0, sizeof(pd->fds));
 	raw_spin_take(&pd->shared_mem_read_lock);
 	list_init(&pd->threads);
@@ -145,7 +146,7 @@ pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main, in
 	    do_get_attr(fd, &f);
 	    size_t elf_size = f.size;
         size_t elf_pages = ROUND_UP(elf_size, PAGESIZE) / PAGESIZE;
-        void *elf_addr = normal_pages_alloc(pd->cr3, elf_pages);
+        void *elf_addr = normal_pages_alloc(pd->cr3, 0, elf_pages);
         void *start_addr = elf_addr;
         // u64 cr = read_cr3();
         u64 cr;
