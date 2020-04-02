@@ -14,7 +14,6 @@ extern "C" {
         int cs;\
         ASM("mov %%cs, %0": "=r"(cs)); \
         if ((cs & 0x3) == 0) { \
-            _ss("sys call shall not be called in kernel mode."); \
             while (1); \
             return -1; \
         } \

@@ -5,6 +5,7 @@ NAME = myos
 
 OUTDIR  :=  $(CURDIR)
 ISODIR  :=  $(OUTDIR)/iso
+DISKDIR  :=  $(CURDIR)/disk
 
 TOOLCHAIN_BASE := /usr/local/x86_64-elf-gcc/bin/# To make clion happy
 
@@ -36,7 +37,7 @@ endif
 
 TEMPLATEFILE := $(CURDIR)/Makefile.template
 
-export CC CXX AR OBJCOPY LD NM CFLAGS TEMPLATEFILE ARCH CXXFLAGS TESTINC
+export CC CXX AR OBJCOPY LD NM CFLAGS TEMPLATEFILE ARCH CXXFLAGS TESTINC DISKDIR
 
 all: build
 
@@ -46,7 +47,7 @@ test:  test-kernel test-user
 
 clean:
 
-build-kernel: FORCE
+build-kernel: build-user
 	$(MAKE) -C kernel build
 
 test-kernel: FORCE
@@ -56,7 +57,11 @@ clean-kernel: FORCE
 	$(MAKE) -C kernel clean
 
 build-user: FORCE
+	mkdir -p $(DISKDIR)
 	$(MAKE) -C user build
+	guestmount -a disk.img -m /dev/sda mnt
+	cp -r disk/* mnt/
+	guestunmount mnt
 
 test-user: FORCE
 	$(MAKE) -C user test

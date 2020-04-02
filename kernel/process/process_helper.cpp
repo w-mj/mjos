@@ -29,18 +29,7 @@ extern "C" int do_real_exec() {
         process->linear_end = (void*)((u64)process->linear_end + PAGESIZE * pages);
     }
     void *linear = (char *)0;
-//    while (size > 0) {
-//        file->read((char *)linear, 512);
-//        linear = (void *)((u64)linear + 512);
-//        size -= 512;
-//    }
-//    void *ss = &shell_start;
     file->read((char *)linear, size); // 进程的线性区起始地址就是0
-//    for (int i = 0; i < size; i++) {
-//        if (((char *)ss)[i] != ((char *)linear)[i]) {
-//            die();
-//        }
-//    }
     parse_elf64(linear);
     while(1);
     return 0;  // make compiler happy.
