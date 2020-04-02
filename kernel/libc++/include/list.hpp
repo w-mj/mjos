@@ -81,10 +81,10 @@ public:
         _Wrapper *to_wrapper   = to._current;
         // 断开from的连接
         if (from_wrapper->next != nullptr) {
-            from_wrapper->prev = from_wrapper->next->prev;
+            from_wrapper->prev->next = from_wrapper->next;
         }
         if (from_wrapper->prev != nullptr) {
-            from_wrapper->next = from_wrapper->prev->next;
+            from_wrapper->next->prev = from_wrapper->prev;
         }
         // 将from插入to前面
         from_wrapper->prev = to_wrapper->prev;

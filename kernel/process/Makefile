@@ -7,8 +7,7 @@ srclist := process.c \
 		   userprocesses.c \
 		   pthread.c \
 		   process_helper.cpp \
-		   signal.cpp \
-		   load_process.cpp
+		   signal.cpp
 
 subdirs :=
 

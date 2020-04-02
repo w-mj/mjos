@@ -23,6 +23,11 @@ typedef enum {
 	PROCESS_KERNEL
 } ProcessType;
 
+typedef enum {
+    CREATE_PROCESS_FROM_EXISTS,
+    CREATE_PROCESS_FROM_FILE
+} CreateProcessFrom;
+
 struct __ProcessDescriber;
 
 typedef struct __MemList {
@@ -64,13 +69,14 @@ typedef struct __ProcessDescriber {
 	void *fds[CFG_PROCESS_FDS];  // 打开的文件列表，每一个元素是一个指向VFS::File的指针
     SignalHandler signalHandler;   // 信号处理函数，必须在内核空间
     void *linear_end;   // 线性区终止地址
+    char *path;
 } ProcessDescriptor;
 
 extern ThreadDescriptor *current;
 
 
 void process_init();
-pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main, int fd);
+pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main, CreateProcessFrom from);
 ThreadDescriptor *create_thread(ProcessDescriptor *process, void *main);
 ProcessDescriptor *get_process(pid_t pid);
 
@@ -82,7 +88,7 @@ void add_to_mem_list(ProcessDescriptor *process, pfn_t pfn, void *addr);
 void remove_from_mem_list(ProcessDescriptor *process, pfn_t pfn);
 
 int do_getpid();
-int do_create_process_from_file(int);
+int do_create_process_from_file(const char *);
 
 #ifdef __cplusplus
 };

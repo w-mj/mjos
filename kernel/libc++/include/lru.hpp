@@ -9,6 +9,7 @@
 #include <stddef.h>
 #include <list.hpp>
 #include <pair.hpp>
+#include <iostream.hpp>
 
 namespace os {
     template <typename K, typename T>
@@ -31,6 +32,11 @@ namespace os {
         destruct_t  on_destruct;
         swap_out_t on_swap_out;
 
+    void print_inner() {
+        for (auto x: pool) {
+            os::cout << x.cnt << " " << x.key << " " << x.data << " " << os::endl;
+        }
+    }
 
     public:
         LRU(size_t sz,
@@ -73,7 +79,7 @@ namespace os {
                 auto end = pool.end();
                 end--;
                 on_swap_out(end->key, end->data, end->dirty);
-                end->data = on_construct(key);
+                // end->data = on_construct(key);
                 end->cnt = 1;
                 end->key = key;
                 end->dirty = set_dirty;

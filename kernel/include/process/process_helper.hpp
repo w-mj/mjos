@@ -12,6 +12,9 @@ extern "C" {
 // 复制打开的文件
 void copy_file(ProcessDescriptor *to, ProcessDescriptor *from);
 
+int do_exec(const char *);
+int do_real_exec();
+
 #ifdef __cplusplus
 };
 #endif

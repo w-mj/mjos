@@ -13,7 +13,7 @@ EXT2_File::EXT2_File(EXT2_DEntry *d, EXT2_Inode *i) {
     pos = 0;
     size = i->size;
     logd("打开文件");
-    _si(size);
+    // _si(size);
 }
 
 EXT2_File::EXT2_File(EXT2_DEntry *d) {
@@ -26,7 +26,7 @@ EXT2_File::EXT2_File(EXT2_DEntry *d) {
     pos = 0;
     size = d->ext2_inode->size;
     logd("打开文件");
-    _si(size);
+    // _si(size);
 }
 
 
@@ -48,7 +48,7 @@ int EXT2_File::seek(int pos, int whence) {
         default:
             loge("Unknow whence %d", whence);
     }
-    _si(this->pos);
+    // _si(this->pos);
     return this->pos;
 }
 
@@ -66,13 +66,15 @@ int EXT2_File::read(char *buf, int len) {
 
     MM::Buf buff(block_size);
     ext2_fs->dev->read(buff, pos_in_fs, block_size);  // 从第一个块读入数据，每次都读出一整块
-    _sa(buff.data, 1024);
+    // _sa(buff.data, 1024);
     memcpy(buf, buff.data + byte_in_block, os::min((_u32)len, block_size - byte_in_block));
     read_len = os::min((_u32)len, block_size - byte_in_block);
     while (read_len < (_u32)len && pos + read_len < (_u32)size) {
         it++;  // 指向下一个块
         block_n = *it;  // 下一个块号
+        _si(block_n);
         pos_in_fs = ext2_fs->block_to_pos(block_n);  // 下一个块的位置
+        _si(pos_in_fs);
         this_read_len = ext2_fs->dev->read(buff, pos_in_fs, block_size);  // 读入
         memcpy(buf + read_len, buff.data, os::min(block_size, len - read_len));
         read_len += this_read_len;

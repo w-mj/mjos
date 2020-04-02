@@ -9,7 +9,8 @@
 #include <process/scheduler.h>
 #include <process/process.h>
 #include <fs/syscall_handler.h>
-#include "process_helper.hpp"
+#include <syscall.h>
+#include "process/process_helper.hpp"
 
 static u8 *pid_bitmap = NULL;
 static ListEntry process_list;
@@ -101,7 +102,7 @@ ThreadDescriptor *create_thread(ProcessDescriptor *process, void *main) {
 	return thread;
 }
 
-pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main, int fd) {
+pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main, CreateProcessFrom from) {
 	pid_t pid = find_usable_pid();
 	if (pid == (u16)-1) {
 		loge("no usable pid.");
@@ -140,26 +141,14 @@ pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main, in
 		pd->cr3 = read_cr3();
 	}
 
-	if (fd != -1) {
-        // 复制代码
-	    struct FILE f;
-	    do_get_attr(fd, &f);
-	    size_t elf_size = f.size;
-        size_t elf_pages = ROUND_UP(elf_size, PAGESIZE) / PAGESIZE;
-        void *elf_addr = normal_pages_alloc(pd->cr3, 0, elf_pages);
-        void *start_addr = elf_addr;
-        // u64 cr = read_cr3();
-        u64 cr;
-        ASM("movq %%cr3, %0":"=r"(cr));
-        ASM("movq %0, %%cr3"::"a"(pd->cr3));
-        // write_cr3(pd->cr3);
-        do_read(fd, elf_addr, elf_size);
-        parse_elf64(start_addr);
-        ASM("movq %0, %%cr3"::"a"(cr));
-        // write_cr3(cr3);
-
-        create_thread(pd, start_addr);
+	if (from == CREATE_PROCESS_FROM_FILE) {
+	    // 从文件创建进程
+	    size_t size = strlen((char *)main) + 1;
+	    pd->path = kmalloc_s(size);
+	    memcpy(pd->path, main, size);
+        create_thread(pd, sys_real_exec);
     } else {
+	    pd->path = NULL;
 	    create_thread(pd, main);
     }
 	return pid;
@@ -178,16 +167,21 @@ ProcessDescriptor *get_process(u16 pid) {
 }
 
 int do_create_process(ProcessType type, void *main) {
-    int pid = create_process(thiscpu_var(current)->process, type, main, -1);
+    int pid = create_process(thiscpu_var(current)->process, type, main, CREATE_PROCESS_FROM_EXISTS);
     return pid;
 }
 
-int do_create_process_from_file(int fd) {
-    pid_t pid = create_process(thiscpu_var(current)->process, PROCESS_USER, NULL, fd);
+int do_create_process_from_file(const char *path) {
+    pid_t pid = create_process(thiscpu_var(current)->process, PROCESS_USER, (void*)path, CREATE_PROCESS_FROM_FILE);
     return pid;
 }
 
 void destroy_process(ProcessDescriptor *process) {
+    // 释放线性区
+    kfree_s(strlen(process->path) + 1, process->path);
+    int linear_cnt = (int)((u64)process->linear_end / PAGESIZE);
+    normal_pages_release((void*)0, process->cr3, linear_cnt);
+    // 释放页表
     ListEntry *c;
     foreach (c, process->mem_list) {
         MemList *mem = list_entry(c, MemList, next);
@@ -196,6 +190,7 @@ void destroy_process(ProcessDescriptor *process) {
         // normal_page_release(mem->addr, process->cr3);
         kfree_s(sizeof(MemList), mem);
     }
+    // 关闭文件
     int i;
     forrange(i, 0, CFG_PROCESS_FDS) {
         if (process->fds[i] != NULL) {
@@ -203,6 +198,7 @@ void destroy_process(ProcessDescriptor *process) {
         }
     }
     kfree_s(sizeof(ProcessDescriptor), process);
+
 }
 
 void destroy_thread(ThreadDescriptor *thread) {

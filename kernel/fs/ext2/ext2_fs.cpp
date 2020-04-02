@@ -87,7 +87,7 @@ void EXT2_FS::mount() {
     memmove(sb, sb_buf.data, 1024);
 
     magic = sb->magic;
-    _sx(magic);
+    assert(magic == 0xef53);
 
     // _si(sb->log_block_size);
     // _si(sb->blocks_count);

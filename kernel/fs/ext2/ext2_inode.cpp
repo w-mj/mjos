@@ -236,7 +236,7 @@ void EXT2_Inode::iterator::load_buf(int t) {
             fs->dev->read(buf, fs->block_to_pos(new_block_pos), fs->block_size);
             memcpy(block_buf[t + 1], buf.data, fs->block_size);
         }
-        _sa(block_buf[t + 1], 1024);
+        // _sa(block_buf[t + 1], 1024);
         t++;
     }
 }
