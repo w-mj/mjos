@@ -39,6 +39,8 @@ bool schedule() {
 	if (thiscpu_var(current) == NULL) {
 		thiscpu_var(current) = next;
 		prepare_switch(NULL, next);
+		set_rsp0((u64) next->rsp0);
+		load_tid_next(next);
 	} else {
 		// _sL(&thiscpu_var(current)->next);
 		// _sL(thiscpu_var(current)->next.prev);
@@ -48,7 +50,7 @@ bool schedule() {
 		prepare_switch(thiscpu_var(current), next);
 		thiscpu_var(current) = next;
 		set_rsp0((u64) next->rsp0);
+        thread_switch();
 	}
-	thread_switch();
 	return true;
 }

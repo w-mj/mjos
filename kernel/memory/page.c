@@ -541,6 +541,7 @@ void *normal_page_alloc(pfn_t *pn, u64 pml4, u64 above) {
 void normal_pages_release(void *addr, u64 pml4, int n) {
     while (n--) {
         normal_page_release(addr, pml4);
+        addr += PAGESIZE;
     }
 }
 

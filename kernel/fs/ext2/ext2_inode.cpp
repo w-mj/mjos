@@ -1,3 +1,4 @@
+#undef DEBUG
 #include "fs/ext2/ext2_inode.hpp"
 #include "fs/stat.hpp"
 #include "delog.h"
@@ -8,6 +9,7 @@
 using namespace EXT2;
 
 void EXT2_Inode::print() {
+#ifdef DEBUG
     using namespace os;
     cerr << "\nInode:  " << inode_n << endl;
     // cerr << "文件类型和访问权限 " << i->mode << mode_to_str(i->mode) << endl;
@@ -29,6 +31,7 @@ void EXT2_Inode::print() {
     for (_u32 j = 0; j < min(blocks, (_u32)15); j++)
         cerr << i->block[j] << " ";
     cerr << endl;
+#endif
 }
 
 EXT2_Inode::EXT2_Inode(EXT2_FS *fs, _u32 n, EXT2::Inode *i): VFS::Inode(fs) {

@@ -32,6 +32,7 @@ static inline void *init_kernel_thread_stack(void *sp, void *main) {
 }
 void *init_user_thread_stack(ThreadDescriptor *thread, void *main);
 void thread_switch();
+void load_tid_next(ThreadDescriptor *);
 
 void set_rsp0(u64);
 void user_return(void *ip, void *rsp);

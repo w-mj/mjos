@@ -2,8 +2,11 @@
 subdirs := shell
 
 # TODO: 简化include
+# TODO: 使用hosted gcc
 INCLIST := sys_header $(CURDIR)/../kernel/include $(CURDIR)/../kernel/arch/$(ARCH)/include \
 		   $(CURDIR)/../kernel/libc/include $(CURDIR)/../kernel/libc++/include
+
+INCFLAG := $(addprefix -I, $(INCLIST))
 
 CRT0 := $(CURDIR)/crt0.o
 
@@ -20,6 +23,6 @@ $(subdirs): $(CRT0) FORCE
 	$(MAKE) -C $@ $(MAKECMDGOALS)
 
 $(CRT0): crt0.c
-	$(CC) $(CFLAGS) crt0.c -o crt0.o
+	$(CC) $(CFLAGS) $(INCFLAG) crt0.c -o crt0.o
 
 FORCE:

@@ -60,9 +60,9 @@ build-user: FORCE
 	mkdir -p $(DISKDIR)
 	$(MAKE) -C user build
 	- guestunmount mnt
-#	guestmount -a disk.img -m /dev/sda mnt
-#	cp -r disk/* mnt/
-#	guestunmount mnt
+	guestmount -a disk.img -m /dev/sda mnt
+	cp -r disk/* mnt/
+	guestunmount mnt
 
 test-user: FORCE
 	$(MAKE) -C user test

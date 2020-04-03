@@ -54,6 +54,7 @@ void remove_from_mem_list(ProcessDescriptor *process, pfn_t pfn) {
         return;
     }
     MemList *mem = list_entry(e, MemList, next);
+    list_remove(e);
     kfree_s(sizeof(MemList), mem);
 }
 
@@ -180,7 +181,8 @@ int do_create_process_from_file(const char *path) {
 void destroy_process(ProcessDescriptor *process) {
     // 释放线性区
     if (process->path != NULL) {
-        kfree_s(strlen(process->path) + 1, process->path);
+        size_t size = strlen(process->path) + 1;
+        kfree_s(size, process->path);
     }
     u64 linear_size = (u64)process->linear_end - (u64)process->linear_start;
     int linear_cnt = (int)(linear_size / PAGESIZE);
@@ -191,7 +193,7 @@ void destroy_process(ProcessDescriptor *process) {
         MemList *mem = list_entry(c, MemList, next);
         frame_release(mem->page);
         // 这里释放的主要是进程的页表，由于页表本身即将被释放，因此在页表中解除这些页的映射并无意义
-        // normal_page_release(mem->addr, process->cr3);
+        normal_page_release(mem->addr, process->cr3);
         kfree_s(sizeof(MemList), mem);
     }
     // 关闭文件
@@ -218,23 +220,29 @@ void destroy_thread(ThreadDescriptor *thread) {
     }
     // rsp0 rsp0值永远不变，每次进入中断都用一个空的内核栈
     if (process->shared_mem != thread->rsp0) {
-		void *kst = thread->rsp0 - PAGESIZE;
-		pfn_t kpg = virt_to_pfn(kst);
+        void *kst = thread->rsp0 - PAGESIZE;
+        pfn_t kpg = virt_to_pfn(kst);
         remove_from_mem_list(process, kpg);
         kernel_page_release(kpg);
-	}
+    }
 	process->threads_cnt -= 1;
 	list_remove(&thread->sibling);
 	remove_thread_from_running(thread);
 	if (process->threads_cnt == 0) {
 		destroy_process(process);
 	}
+
 }
 
+char special_kernel_stack[2048];
 int do_quit_thread() {
+    ASM("cli");
+    ASM("movq %0, %%rsp"::"r"(special_kernel_stack));
     ThreadDescriptor *thread = thiscpu_var(current);
     destroy_thread(thread);
-    logi("thread quit");
+    // logi("thread quit");
+    thiscpu_var(current) = NULL;
+    ASM("sti");
     sched_yield();
     while (1);
     return 0;

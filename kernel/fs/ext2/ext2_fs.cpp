@@ -1,3 +1,4 @@
+#undef DEBUG
 #include "fs/ext2/ext2_fs.hpp"
 #include "memory/buf.hpp"
 #include "delog.h"
@@ -15,6 +16,7 @@ EXT2_FS::EXT2_FS(Dev::BlockDevice* dev): FS(dev) {
 }
 
 void EXT2_FS::printFS() {
+#ifdef DEBUG
     using namespace os;
     cerr << endl;
     cerr << "文件系统中Inode数量 " << sb->inodes_count << endl;
@@ -45,6 +47,7 @@ void EXT2_FS::printFS() {
         cerr << "组中目录的个数 " << gdt->get_gd()->used_dirs_count << endl;
         cerr << endl;
     }
+#endif
 }
 
 

@@ -26,7 +26,7 @@ _u32 Dev::SataDev::read(MM::Buf &buf, _u32 pos, _u32 size) {
         u64 sector = round_pos / SECTOR_SIZE;          // 待读扇区号
         auto t = pool.get(sector);
         char *temp = t.first;                 // 缓存
-        _si(t.second);
+        // _si(t.second);
         if (t.second == 0) {
             // 只有这个缓存是第一次访问才读取磁盘
             sata_read(sata, l32(sector), h32(sector), 1, virt_to_phys(temp));

@@ -1,3 +1,5 @@
+#undef DEBUG
+
 #include "fs/ext2/ext2_dentry.hpp"
 #include "fs/ext2/ext2_file.hpp"
 #include "fs/stat.hpp"

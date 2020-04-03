@@ -136,7 +136,6 @@ static __INIT void parse_madt(madt_t * tbl) {
 }
 
 void init_main();
-void load_tid_next(ThreadDescriptor *);
 void __libc_start_main();
 void _init();
 // extern void *elf_addr;
@@ -207,21 +206,10 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 	assert(thread_list_entry != &pd->threads);
 	ThreadDescriptor *thread = list_entry(thread_list_entry, ThreadDescriptor, sibling);
 	assert(thread->process == pd); // 启动init进程
+//	schedule();
+//	assert(0);
 	thiscpu_var(current) = thread;
 	set_rsp0((u64) thread->rsp0);
-	// 0x0xffffffff8101d3fa
-	// 0xffffd8
-	// 0x1000008
-//	usize tt;
-//	tt = virt_to_phys((void*)0xffffffff8101d3fa);
-//	_sL(tt);
-//	tt = page_translate(read_cr3(),0xffffffff8101d3fa);
-//	_sL(tt);
-//    tt = virt_to_phys((void*)0xffffd8);
-//    _sL(tt);
-//    tt = virt_to_phys((void*)0x1000000);
-//    _sL(tt);
-    // *(u64*)0x0ff0ffff8101d3fa = 1;
     load_tid_next(thread);
 
 	die();

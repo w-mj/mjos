@@ -1,3 +1,4 @@
+#undef DEBUG
 #include "fs/ext2/ext2_group_descriptor.hpp"
 #include "fs/ext2/ext2_disk_stru.hpp"
 #include "base.h"
