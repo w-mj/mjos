@@ -36,7 +36,7 @@ extern "C" int do_real_exec() {
     // parse_elf64(process->linear_start);
     auto *elf = (Elf64_Ehdr *)process->linear_start;
     u64 ip = elf->e_entry;
-    user_return((void*)ip, (void*)((u64)thread->stack - 16));
+    user_return((void*)ip, (void*)((u64)thread->stack));
     while(1);
     return 0;  // make compiler happy.
 }

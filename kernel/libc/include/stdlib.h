@@ -14,8 +14,7 @@ void free(void *addr);
 
 void abort();
 
-int time(int a);
-
+#include "time.h"
 
 long strtol (const char *__restrict s, char **__restrict ptr, int base);
 

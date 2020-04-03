@@ -10,6 +10,7 @@
 #include <process/scheduler.h>
 #include <fs/pipe/pipe.hpp>
 #include <process/signal.h>
+#include <time.h>
 
 extern "C" void init_main();
 
@@ -68,6 +69,9 @@ void init_main() {
     // __static_initialization_and_destruction_0(1, 0xffff);  // 初始化C++ 静态对象
     os::cout << "cout form " << "iostream" << os::endl;
     logi("start init process");
+//    struct tm time_s;
+    // time(&time_s);
+//    logi("%d-%d-%d %d:%d:%d", time_s.tm_year, time_s.tm_mon, time_s.tm_mday, time_s.tm_hour, time_s.tm_min, time_s.tm_sec);
     // parse_elf64(user_processes[0]);
     // die();
     // 加载文件系统
