@@ -179,7 +179,9 @@ int do_create_process_from_file(const char *path) {
 
 void destroy_process(ProcessDescriptor *process) {
     // 释放线性区
-    kfree_s(strlen(process->path) + 1, process->path);
+    if (process->path != NULL) {
+        kfree_s(strlen(process->path) + 1, process->path);
+    }
     u64 linear_size = (u64)process->linear_end - (u64)process->linear_start;
     int linear_cnt = (int)(linear_size / PAGESIZE);
     normal_pages_release(process->linear_start, process->cr3, linear_cnt);
