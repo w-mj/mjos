@@ -236,13 +236,13 @@ void destroy_thread(ThreadDescriptor *thread) {
 
 char special_kernel_stack[2048];
 int do_quit_thread() {
-    ASM("cli");
+    // ASM("cli");
     ASM("movq %0, %%rsp"::"r"(special_kernel_stack));
     ThreadDescriptor *thread = thiscpu_var(current);
     destroy_thread(thread);
     // logi("thread quit");
     thiscpu_var(current) = NULL;
-    ASM("sti");
+    // ASM("sti");
     sched_yield();
     while (1);
     return 0;

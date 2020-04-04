@@ -28,6 +28,7 @@ typedef struct _Signal {
 } Signal;
 
 typedef bool(*SignalHandler)(const Signal*);
+extern bool on_signal(const Signal *);
 
 int do_signal(SignalType, uint64_t, pid_t);
 void signalRegister(SignalType, SignalHandler, SignalRegisterType);

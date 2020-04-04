@@ -82,6 +82,8 @@ void parse_elf64(void *addr) {
 	logi(" parse elf section table");
 	u8 *ht = (u8*)head + head->e_shoff;
 	int i = 0;
+	Elf64_Shdr *symtbl_sec = NULL;
+	Elf64_Shdr *strtbl_sec = NULL;
 	logi("    name, addr, offset, size, link, info, entsize, type, flags");
 	while (ht < (u8*)head + head->e_shoff + head->e_shentsize * head->e_shnum) {
 		Elf64_Shdr *sec = (Elf64_Shdr *)ht;
@@ -89,7 +91,9 @@ void parse_elf64(void *addr) {
 		switch (sec->sh_type) {
 			case SHT_NULL:     snprintf(type, 16, "NULL");     break;
 			case SHT_PROGBITS: snprintf(type, 16, "PROGBITS"); break;
-			case SHT_SYMTAB:   snprintf(type, 16, "symtabl");  break;
+			case SHT_SYMTAB:   snprintf(type, 16, "symtabl");
+			    symtbl_sec = sec;
+			    break;
 			case SHT_STRTAB:   snprintf(type, 16, "strtab");   break;
 			case SHT_RELA:     snprintf(type, 16, "rela");     break;
 			case SHT_HASH:     snprintf(type, 16, "hash");     break;
@@ -120,5 +124,51 @@ void parse_elf64(void *addr) {
 		logi(" %02d %-10s, %5llx, %7llx, %5d, %5d, %5d, %8d, %s, %s",
 				i++, name, sec->sh_addr, sec->sh_offset, sec->sh_size, 
 				sec->sh_link, sec->sh_info, sec->sh_entsize, type, flags);
+		if (strcmp(name, ".strtab") == 0) {
+            strtbl_sec = sec;
+		}
 	}
+
+    if (symtbl_sec == NULL || strtbl_sec == NULL) {
+        return;
+    }
+
+	Elf64_Sym *sym = (Elf64_Sym *) (symtbl_sec->sh_offset + addr);
+	while ((u8*)sym < symtbl_sec->sh_offset + (u8*)head + symtbl_sec->sh_size) {
+        char *name = addr + strtbl_sec->sh_offset +sym->st_name;
+	    logi("  %s", name);
+	    sym = (Elf64_Sym *) ((u8 *) sym + sizeof(Elf64_Sym));
+	}
+}
+
+Elf64_Shdr *elf_get_section(Elf64_Ehdr* head, const char *name) {
+    if (head->e_shstrndx == SHN_UNDEF)
+        return NULL;
+    const char *strtab = (char*)head + head->e_shoff + head->e_shstrndx * head->e_shentsize;
+    u8 *ht = (u8*)head + head->e_shoff;
+	while (ht < (u8*)head + head->e_shoff + head->e_shentsize * head->e_shnum) {
+        Elf64_Shdr *sec = (Elf64_Shdr *) ht;
+        const char *sec_name = (char *)head + ((Elf64_Shdr *)strtab)->sh_offset + sec->sh_name;
+        if (strcmp(sec_name, name) == 0)
+            return sec;
+    }
+	return NULL;
+}
+
+Elf64_Sym *elf_get_symbol(Elf64_Ehdr* head, const char *name) {
+    Elf64_Shdr *strtab = elf_get_section(head, ".strtab");
+    Elf64_Shdr *symtab = elf_get_section(head, ".symtab");
+    if (strtab == NULL || symtab == NULL) {
+        return NULL;
+    }
+    void *addr = (void*)head;
+    Elf64_Sym *sym = (Elf64_Sym *) (symtab->sh_offset + addr);
+    while ((u8*)sym < symtab->sh_offset + (u8*)head + symtab->sh_size) {
+        char *sym_name = addr + strtab->sh_offset +sym->st_name;
+        if (strcmp(name, sym_name) == 0) {
+            return sym;
+        }
+        sym = (Elf64_Sym *) ((u8 *) sym + sizeof(Elf64_Sym));
+    }
+    return NULL;
 }
