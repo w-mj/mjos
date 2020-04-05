@@ -54,3 +54,7 @@ bool schedule() {
 	}
 	return true;
 }
+
+void before_schedule_in() {
+    signalCheck();
+}

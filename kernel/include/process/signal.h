@@ -10,7 +10,6 @@ extern "C" {
 typedef enum{
      NORMAL,
      FRONT,
-     ANYWAY,
      FINALLY
 } SignalRegisterType;
 
@@ -22,7 +21,6 @@ typedef enum {
 }SignalType ;
 
 typedef struct _Signal {
-    pid_t from;
     SignalType type;
     int   value;
 } Signal;
@@ -33,6 +31,8 @@ extern bool on_signal(const Signal *);
 int do_signal(SignalType, uint64_t, pid_t);
 void signalRegister(SignalType, SignalHandler, SignalRegisterType);
 void signalUnregister(SignalHandler);
+void signalCheck();
+void signal_init();
 
 
 #ifdef __cplusplus

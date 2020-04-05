@@ -159,7 +159,7 @@ user_return:
 
 EXTERN_DATA(tid_prev)
 EXTERN_DATA(tid_next)
-
+EXTERN_FUNC(before_schedule_in)
 GLOBAL_FUNC(thread_switch)
 GLOBAL_FUNC(load_tid_next)
 // 进行线程切换，调用时栈顶为中断返回地址
@@ -206,6 +206,7 @@ load_tid_next:
 	movq    0x10(%rdi), %rax        // rax = cr3
 	movq    %rax, %cr3              // 换新线程页表
 4:
+    call    before_schedule_in
     testl   $3, 0x88(%rsp)          // (15 + 3 - 1)* 8 = 0x88
     jz      3f
     swapgs

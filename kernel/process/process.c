@@ -128,6 +128,7 @@ pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main, Cr
 	list_init(&pd->siblings);
 	list_init(&pd->process_list_entry);
 	list_init(&pd->mem_list);
+	list_init(&pd->signal_ist);
 	if (parent != NULL) {
 		list_add_tail(&pd->siblings, &parent->children);
 	}

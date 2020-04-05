@@ -33,7 +33,7 @@ extern "C" int do_real_exec() {
     }
     file->read((char *)process->linear_start, size); // 进程的线性区起始地址就是0
     file->close();
-   parse_elf64(process->linear_start);
+//   parse_elf64(process->linear_start);
     auto *elf = (Elf64_Ehdr *)process->linear_start;
 
 

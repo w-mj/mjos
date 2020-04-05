@@ -73,7 +73,8 @@ typedef struct __ProcessDescriber {
     SignalHandler signalHandler;   // 信号处理函数，必须在内核空间
     void *linear_start;
     void *linear_end;   // 线性区终止地址
-    char *path;
+    char *path;   // 进程路径
+    ListEntry signal_ist;   // 信号队列
 } ProcessDescriptor;
 
 extern ThreadDescriptor *current;

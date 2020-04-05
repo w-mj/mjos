@@ -99,7 +99,7 @@ void init_main() {
     processDescriptor->fds[FD_STDOUT] = stderr;
 
     // 注册信号
-    signalRegister(SignalType::SIG_KEY, init_signal_handler, SignalRegisterType::NORMAL);
+    // signalRegister(SignalType::SIG_KEY, init_signal_handler, SignalRegisterType::NORMAL);
 
     ASM("sti");
     // sys_print_msg("lalala");

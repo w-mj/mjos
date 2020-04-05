@@ -172,6 +172,7 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
     ps2kbd_dev_init();
 	process_init();
 	scheduler_init();
+	signal_init();
 
 	// ioapic_gsi_unmask(ioapic_irq_to_gsi(1));
 //    ioapic_gsi_unmask(ioapic_irq_to_gsi(16));
