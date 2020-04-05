@@ -54,7 +54,10 @@ void user_process2() {
 //       ;
 //   }
 //   sys_print_msg("user message2\n");
-   // sys_signal(SignalType::SIG_KEY, 0, NOPID);
+    sys_signal(SignalType::SIG_KEY, 0, NOPID);
+    sys_signal(SignalType::SIG_KEY, 0, NOPID);
+    sys_signal(SignalType::SIG_KEY, 0, NOPID);
+    sys_signal(SignalType::SIG_KEY, 0, NOPID);
    while(1);
 }
 
@@ -99,7 +102,7 @@ void init_main() {
 
     // 注册信号
     // signalRegister(SignalType::SIG_KEY, init_signal_handler, SignalRegisterType::NORMAL);
-    // do_signal_register(SignalType::SIG_KEY);
+    do_signal_register(SignalType::SIG_KEY);
 
     ASM("sti");
     // sys_print_msg("lalala");
