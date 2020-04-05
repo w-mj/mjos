@@ -204,6 +204,10 @@ void destroy_process(ProcessDescriptor *process) {
             do_close(i);
         }
     }
+    // 取消注册回调
+    forrange(i, 0, SIG_CNT) {
+    	signalUnregister(i, process);
+    }
     kfree_s(sizeof(ProcessDescriptor), process);
 
 }
@@ -235,15 +239,16 @@ void destroy_thread(ThreadDescriptor *thread) {
 
 }
 
-char special_kernel_stack[2048];
+char special_kernel_stack[4096];
 int do_quit_thread() {
-    // ASM("cli");
-    ASM("movq %0, %%rsp"::"r"(special_kernel_stack));
+    ASM("cli");
+    char *st = special_kernel_stack + 4096;
+    ASM("movq %0, %%rsp"::"r"(st));
     ThreadDescriptor *thread = thiscpu_var(current);
     destroy_thread(thread);
     // logi("thread quit");
     thiscpu_var(current) = NULL;
-    // ASM("sti");
+    ASM("sti");
     sched_yield();
     while (1);
     return 0;

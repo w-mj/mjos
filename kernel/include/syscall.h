@@ -107,6 +107,8 @@ SYS_CALL_1(13, create_process_from_file, const char *)
 SYS_CALL_2(14, get_attr, int, struct FILE*)
 SYS_CALL_0(15, real_exec)
 SYS_CALL_1(16, exec, const char *)
+SYS_CALL_1(17, signal_register, SignalType)
+SYS_CALL_1(18, signal_unregister, SignalType)
 
 enum {
     SYS_FUNC_PRINTMSG = 0,

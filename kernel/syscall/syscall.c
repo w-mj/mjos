@@ -45,6 +45,8 @@ void *syscall_tbl[256] = {
         /* 13 */ (void*)do_create_process_from_file,
         /* 14 */ (void*)do_get_attr,
         /* 15 */ (void*)do_real_exec,
-        /* 16 */ (void*)do_exec
+        /* 16 */ (void*)do_exec,
+        /* 17 */ (void*)do_signal_register,
+        /* 18 */ (void*)do_signal_unregister
 };
 

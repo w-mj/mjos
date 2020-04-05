@@ -17,7 +17,7 @@ extern "C" {
 #define CFG_TTY_BUFF_SIZE       1024
 
 #define CFG_WORK_QUEUE_SIZE     64
-#define CFG_SYS_CLOCK_RATE      10
+#define CFG_SYS_CLOCK_RATE      50
 #define CFG_TASK_TIMESLICE      10
 
 #define CFG_PROCESS_FDS    128

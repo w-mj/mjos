@@ -37,6 +37,7 @@ SignalWrapper *signalCreate(SignalType type, uint64_t value) {
     wrapper->signal.value = value;
     wrapper->currentItem = nullptr;
     list_init(&wrapper->nextSignal);
+    return wrapper;
 }
 
 void signalSend(SignalWrapper *wrapper, ProcessDescriptor *to) {
@@ -127,7 +128,7 @@ extern "C" int do_signal_register(SignalType type) {
 }
 
 // 取消注册回调
-extern "C" void signalUnregister(SignalType type, ProcessDescriptor *process) {
+extern "C" void signalUnregister(SignalType type, __ProcessDescriptor *process) {
     ListEntry *c;
     foreach(c, signalHandlers[type]) {
         auto *item = list_entry(c, SignalHandlerItem, nextProcess);

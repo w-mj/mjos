@@ -1,4 +1,6 @@
-#pragma once
+#ifndef OS_PROCESS_H
+#define OS_PROCESS_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -28,7 +30,7 @@ typedef enum {
     CREATE_PROCESS_FROM_FILE
 } CreateProcessFrom;
 
-struct __ProcessDescriber;
+struct __ProcessDescriptor;
 
 typedef struct __MemList {
 	pfn_t page;
@@ -47,7 +49,7 @@ typedef struct {
 
 
 	ThreadState state;
-	struct __ProcessDescriber *process;
+	struct __ProcessDescriptor *process;
 	ListEntry next;   // 用于调度队列
 	ListEntry sibling;  // 兄弟线程
 	int tid;
@@ -55,10 +57,10 @@ typedef struct {
 } ThreadDescriptor;
 
 
-typedef struct __ProcessDescriber {
+typedef struct __ProcessDescriptor {
 	pid_t pid;   // 0~32767
 	ProcessType type;
-	struct __ProcessDescriber *parent;
+	struct __ProcessDescriptor *parent;
 	ListEntry threads;
 	ListEntry children;  // list head
 	ListEntry siblings;  // list entry
@@ -97,4 +99,6 @@ int do_create_process_from_file(const char *);
 
 #ifdef __cplusplus
 };
+#endif
+
 #endif

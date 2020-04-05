@@ -5,10 +5,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 #include <process/process.h>
+
+struct __ProcessDescriptor;
+
 #include <stddef.h>
-struct ProcessDescriptor;
 typedef enum{
      NORMAL,
      FRONT,
@@ -32,9 +33,9 @@ extern bool on_signal(const Signal *);
 
 int do_signal(SignalType, uint64_t, pid_t);
 int do_signal_register(SignalType);
-int do_signal_register(SignalType);
-void signalRegister(SignalType, ProcessDescriptor*, SignalRegisterType);
-void signalUnregister(SignalType , ProcessDescriptor *);
+int do_signal_unregister(SignalType);
+void signalRegister(SignalType, struct __ProcessDescriptor*, SignalRegisterType);
+void signalUnregister(SignalType , struct __ProcessDescriptor *);
 void signalCheck();
 void signal_init();
 
