@@ -96,7 +96,7 @@ extern "C" int do_signal(SignalType type, uint64_t value, pid_t to) {
 }
 
 // 注册一个信号回调
-void signalRegister(SignalType type, ProcessDescriptor *process, SignalRegisterType regType) {
+extern "C" void signalRegister(SignalType type, ProcessDescriptor *process, SignalRegisterType regType) {
     ListEntry &head = signalHandlers[type];
 
     switch (regType) {
@@ -120,8 +120,14 @@ void signalRegister(SignalType type, ProcessDescriptor *process, SignalRegisterT
     }
 }
 
+extern "C" int do_signal_register(SignalType type) {
+    ProcessDescriptor *process = thiscpu_var(current)->process;
+    signalRegister(type, process, SignalRegisterType::NORMAL);
+    return 0;
+}
+
 // 取消注册回调
-void signalUnregister(SignalType type, ProcessDescriptor *process) {
+extern "C" void signalUnregister(SignalType type, ProcessDescriptor *process) {
     ListEntry *c;
     foreach(c, signalHandlers[type]) {
         auto *item = list_entry(c, SignalHandlerItem, nextProcess);
@@ -133,6 +139,12 @@ void signalUnregister(SignalType type, ProcessDescriptor *process) {
     }
     if (signalHandlersFinally[type] == process)
         signalHandlersFinally[type] = nullptr;
+}
+
+extern "C" int do_signal_unregister(SignalType type) {
+    auto process =thiscpu_var(current)->process;
+    signalUnregister(type, process);
+    return 0;
 }
 
 // 在进程调入之前检查并处理信号
