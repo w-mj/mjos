@@ -13,7 +13,7 @@ EXT2_File::EXT2_File(EXT2_DEntry *d, EXT2_Inode *i) {
     type = d->type;
     pos = 0;
     size = i->size;
-    logd("打开文件");
+//    logd("打开文件");
     // _si(size);
 }
 
@@ -26,7 +26,7 @@ EXT2_File::EXT2_File(EXT2_DEntry *d) {
     type = d->type;
     pos = 0;
     size = d->ext2_inode->size;
-    logd("打开文件");
+//    logd("打开文件");
     // _si(size);
 }
 

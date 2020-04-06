@@ -29,7 +29,7 @@ int do_func_register(int funnum) {
 }
 
 void *syscall_tbl[256] = {
-        NULL,
+        /* 0 */  (void*)do_kernel_return,
         /* 1 */  (void*)do_print_msg,
         /* 2 */  (void*)do_create_process,
         /* 3 */  (void*)do_send_message,

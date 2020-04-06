@@ -98,10 +98,9 @@ extern "C" int do_signal(SignalType type, uint64_t value, pid_t to) {
 
 // 注册一个信号回调
 extern "C" void signalRegister(SignalType type, ProcessDescriptor *process, SignalRegisterType regType) {
-    ListEntry &head = signalHandlers[type];
-
     switch (regType) {
         case SignalRegisterType::NORMAL: {
+            ListEntry &head = signalHandlers[type];
             auto *handler = (SignalHandlerItem *) kmalloc_s(sizeof(SignalHandlerItem));
             handler->process = process;
             list_init(&handler->nextProcess);
@@ -109,6 +108,7 @@ extern "C" void signalRegister(SignalType type, ProcessDescriptor *process, Sign
             break;
         }
         case SignalRegisterType::FRONT: {
+            ListEntry &head = signalHandlers[type];
             auto *handler= (SignalHandlerItem*) kmalloc_s(sizeof(SignalHandlerItem));
             handler->process = process;
             list_init(&handler->nextProcess);
@@ -154,7 +154,14 @@ extern "C" void signalCheck() {
     while (!list_empty(&process->signal_ist)) {
         auto wrapper_entry = list_pop_head(&process->signal_ist);
         auto wrapper = list_entry(wrapper_entry, SignalWrapper, nextSignal);
-        if (process->signalHandler(&wrapper->signal) || wrapper->currentItem == nullptr) {
+        u64 res;
+        if (process->type == PROCESS_USER) {
+            res = user_call1(&wrapper->signal, (void*)process->signalHandler);
+        } else {
+            res = process->signalHandler(&wrapper->signal);
+        }
+
+        if (res || wrapper->currentItem == nullptr) {
             // 进程处理了这个信号，或这个信号是单播信号
             signalDestroy(wrapper);
         } else {

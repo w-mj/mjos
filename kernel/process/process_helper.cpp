@@ -36,7 +36,9 @@ extern "C" int do_real_exec() {
 //   parse_elf64(process->linear_start);
     auto *elf = (Elf64_Ehdr *)process->linear_start;
 
+    auto *signal_symbol = elf_get_symbol(elf, "on_signal");
 
+    process->signalHandler = reinterpret_cast<SignalHandler>(signal_symbol->st_value);
 
     u64 ip = elf->e_entry;
     user_return((void*)ip, (void*)((u64)thread->stack));

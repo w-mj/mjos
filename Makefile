@@ -59,6 +59,7 @@ clean-kernel: FORCE
 build-user: FORCE
 	mkdir -p $(DISKDIR)
 	$(MAKE) -C user build
+	- ps aux | grep $(QEMU) | sed -n "1, 1p" | awk '{print $$2}' | xargs -I {} kill -9 {}
 	- guestunmount mnt
 	guestmount -a disk.img -m /dev/sda mnt
 	cp -r disk/* mnt/

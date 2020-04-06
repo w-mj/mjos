@@ -3,14 +3,15 @@
 #include <iostream.hpp>
 
 int main() {
+    sys_signal_register(SignalType::SIG_KEY);
     sys_write(1, "Hello world\n", 12);
+    while(1);
     return 0;
 }
 
-__attribute__((__section__("kernel")))
 bool on_signal(const Signal *signal) {
     if (signal->type == SignalType::SIG_KEY) {
-        sys_write(1, "key\n", 5);
+        sys_write(1, "key\r\n", 5);
     }
-    return false;
+    return true;
 }

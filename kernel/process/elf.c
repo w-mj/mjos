@@ -148,6 +148,7 @@ Elf64_Shdr *elf_get_section(Elf64_Ehdr* head, const char *name) {
     u8 *ht = (u8*)head + head->e_shoff;
 	while (ht < (u8*)head + head->e_shoff + head->e_shentsize * head->e_shnum) {
         Elf64_Shdr *sec = (Elf64_Shdr *) ht;
+        ht = ht + head->e_shentsize;
         const char *sec_name = (char *)head + ((Elf64_Shdr *)strtab)->sh_offset + sec->sh_name;
         if (strcmp(sec_name, name) == 0)
             return sec;

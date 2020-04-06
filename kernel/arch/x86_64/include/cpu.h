@@ -1,4 +1,7 @@
 #pragma once
+
+#include "asm.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -36,6 +39,21 @@ void load_tid_next(ThreadDescriptor *);
 
 void set_rsp0(u64);
 void user_return(void *ip, void *rsp);
+
+u64 user_call0(void *func);
+u64 user_call1(void *p1, void *func);
+
+void *get_ip();
+
+static inline void* get_sp() {
+    void* r;
+    ASM("movq %%rsp, %0": "=r"(r));
+    return r;
+}
+//void go_kernel();
+//void go_user();
+
+int do_kernel_return(void *rip, void *rsp);
 #ifdef __cplusplus
 }
 #endif

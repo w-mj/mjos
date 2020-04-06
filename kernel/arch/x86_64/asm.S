@@ -141,20 +141,91 @@ syscall_stub:
 	sysret  // sysret 从MSR中找到用户态的cs和ss
 
 
+#define USER_RETURN_TEMPLATE(reg_ip, reg_sp) \
+    pushfq; \
+    cli;    \
+    popq    %rax; \
+    pushq   $USER_DATA_DEC; \
+    pushq   reg_sp; \
+    pushq   %rax; \
+    pushq   $USER_CODE_DEC; \
+    pushq   reg_ip; \
+    swapgs; \
+    iretq; \
+
+#define USER_RETURN_0 USER_RETURN_TEMPLATE(%rdi, %rsi)
+#define USER_RETURN_1 USER_RETURN_TEMPLATE(%rsi, %rdx)
+
 // void user_return(void *ip, void *rsp)
 GLOBAL_FUNC(user_return)
 user_return:
+    USER_RETURN_0
+/*
     pushfq
     cli                             // disable interrupt for now
-    popq    %rcx                    // rflags before cli
+    popq    %rax                    // rflags before cli
     pushq   $USER_DATA_DEC          // ss
     pushq   %rsi                    // rsp
-    pushq   %rcx                    // rflags
+    pushq   %rax                    // rflags
     pushq   $USER_CODE_DEC          // cs
     pushq   %rdi                    // rip
     swapgs
     iretq
+*/
 
+user_return1:
+    USER_RETURN_1
+
+#define USER_CALL_TEMPLATE(reg_sp) \
+    pushq  %rsp; \
+    pushq  $kernel_return ;\
+    movq   %rsp, reg_sp
+    /*
+    popq   %rax; \
+    addq   $-8, reg_sp; \
+    movq   %rax, (reg_sp); \
+    addq   $-8, reg_sp; \
+    movq   %rsp, (reg_sp); \
+    addq   $-8, reg_sp; \
+    movq   $kernel_return1, (reg_sp)
+    */
+#define USER_CALL_0 USER_CALL_TEMPLATE(%rsi)
+#define USER_CALL_1 USER_CALL_TEMPLATE(%rdx)
+
+// u64 user_call0(void *func)
+GLOBAL_FUNC(user_call0)
+user_call0:
+    USER_CALL_0
+    call user_return
+/*
+    popq   %rax           // rax = rip
+    addq   $-8, %rsi      // push %rip
+    movq   %rax, (%rsi)
+    addq   $-8, %rsi      // push %rsp
+    movq   %rsp, (%rsi)
+    jmp    user_return
+*/
+
+
+// u64 user_call1(void *param, void *func)
+GLOBAL_FUNC(user_call1)
+user_call1:
+    USER_CALL_1
+    call user_return1
+
+
+kernel_return:
+    movq  $0, %r9
+    popq  %rsi     // %rsi = %rsp
+    popq  %rdi     // %rdi = %rip
+    syscall
+
+// int do_kernel_return(void *rip, void *rsp);
+GLOBAL_FUNC(do_kernel_return)
+do_kernel_return:
+    movq %rsi, %rsp
+    pushq %rdi
+    ret
 
 
 EXTERN_DATA(tid_prev)
@@ -205,7 +276,15 @@ load_tid_next:
     movq    0x00(%rdi), %rsp        // 切换上下文
 	movq    0x10(%rdi), %rax        // rax = cr3
 	movq    %rax, %cr3              // 换新线程页表
-4:
+
+/*
+    movq    $0,   %rdi
+    testl   $3, 0x88(%rsp)          // (15 + 3 - 1)* 8 = 0x88
+    jz      1f
+    movq    0x98(%rsp), %rdi        // rdi = rsp
+1:
+*/
+
     call    before_schedule_in
     testl   $3, 0x88(%rsp)          // (15 + 3 - 1)* 8 = 0x88
     jz      3f
@@ -267,3 +346,29 @@ init_user_thread_stack:
     movq  %r10, %cr3
     movq  %r9,  %rsp
     ret
+
+GLOBAL_FUNC(get_ip)
+get_ip:
+    movq 0(%rsp), %rax
+    ret
+
+
+/*
+GLOBAL_FUNC(go_kernel)
+go_kernel:
+    movl   %cs, %eax
+    test   $3, %eax
+    jz     1f
+    swapgs
+1:
+    ret
+
+GLOBAL_FUNC(go_user)
+go_user:
+    movl  %cs, %eax
+    test  $3,  %eax
+    jnz   1f
+    swapgs
+1:
+    ret
+*/

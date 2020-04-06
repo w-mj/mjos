@@ -86,7 +86,7 @@ void EXT2_DEntry::load_children() {
 void EXT2_DEntry::inflate() {
     if (inode != nullptr && sync != 1)
         return;
-    _log_info("inflate");
+    // _log_info("inflate");
     delete inode;
     EXT2::Inode* disk_inode = new Inode();
     MM::Buf buf(sizeof(Inode));
