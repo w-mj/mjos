@@ -60,7 +60,7 @@ static int state = 0;
 
 static inline void send_keycode(keycode_t code, int release) {
     if (release) {
-        kbd_send(code | 0x80000000);
+        kbd_send(code | RELEASE);
     } else {
         kbd_send(code);
     }

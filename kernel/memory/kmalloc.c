@@ -47,9 +47,7 @@ void kmalloc_init() {
 void *kmalloc_s(size_t size) {
 //	logd("kmalloc %d", size);
 	CacheDescriptor *cache = get_kmalloc_cache(size);
-	if (strncmp(cache->name, "kmalloc", 7) != 0) {
-	    die();
-	}
+	assert (strncmp(cache->name, "kmalloc", 7) == 0);
 	if (cache == NULL) {
 		loge("kmalloc too large %d", size);
 		die();

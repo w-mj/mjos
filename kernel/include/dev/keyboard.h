@@ -11,11 +11,26 @@ typedef enum keycode {
     KEY_0, KEY_1, KEY_2, KEY_3, KEY_4,
     KEY_5, KEY_6, KEY_7, KEY_8, KEY_9,
 
-    // letteer keys
+    // letter keys
     KEY_A, KEY_B, KEY_C, KEY_D, KEY_E, KEY_F, KEY_G,
     KEY_H, KEY_I, KEY_J, KEY_K, KEY_L, KEY_M, KEY_N,
     KEY_O, KEY_P, KEY_Q, KEY_R, KEY_S, KEY_T,
     KEY_U, KEY_V, KEY_W, KEY_X, KEY_Y, KEY_Z,
+
+    // punctuations
+    KEY_BACKTICK, KEY_MINUS, KEY_EQUAL, KEY_TAB,
+    KEY_LEFTBRACE, KEY_RIGHTBRACE, KEY_SEMICOLON, KEY_QUOTE,
+    KEY_COMMA, KEY_DOT, KEY_SLASH, KEY_BACKSLASH,
+    KEY_SPACE, KEY_BACKSPACE, KEY_ENTER,
+
+    // key pad
+    KEY_KP_0, KEY_KP_1, KEY_KP_2, KEY_KP_3, KEY_KP_4,
+    KEY_KP_5, KEY_KP_6, KEY_KP_7, KEY_KP_8, KEY_KP_9,
+    KEY_KP_SLASH, KEY_KP_STAR, KEY_KP_MINUS, KEY_KP_PLUS,
+    KEY_KP_ENTER, KEY_KP_DOT,
+
+    // 所有可显示字符按键放上面，控制键放下面
+    ASCII_KEY_COUNT,
 
     // function keys
     KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6,
@@ -26,23 +41,12 @@ typedef enum keycode {
     KEY_LEFTSHIFT, KEY_RIGHTSHIFT,
     KEY_LEFTALT, KEY_RIGHTALT,
 
-    // punctuations
-    KEY_BACKTICK, KEY_MINUS, KEY_EQUAL, KEY_TAB,
-    KEY_LEFTBRACE, KEY_RIGHTBRACE, KEY_SEMICOLON, KEY_QUOTE,
-    KEY_COMMA, KEY_DOT, KEY_SLASH, KEY_BACKSLASH,
-    KEY_SPACE, KEY_BACKSPACE, KEY_ENTER,
-
     // control keys
     KEY_ESCAPE, KEY_CAPSLOCK, KEY_NUMLOCK, KEY_SCROLLLOCK,
     KEY_INSERT, KEY_DELETE, KEY_HOME, KEY_END,
     KEY_PAGEUP, KEY_PAGEDOWN,
     KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT,
 
-    // key pad
-    KEY_KP_0, KEY_KP_1, KEY_KP_2, KEY_KP_3, KEY_KP_4,
-    KEY_KP_5, KEY_KP_6, KEY_KP_7, KEY_KP_8, KEY_KP_9,
-    KEY_KP_SLASH, KEY_KP_STAR, KEY_KP_MINUS, KEY_KP_PLUS,
-    KEY_KP_ENTER, KEY_KP_DOT,
 
     // special
     KEY_PRTSC, KEY_PAUSE, KEY_APPS,
@@ -64,6 +68,8 @@ typedef enum keycode {
 } keycode_t;
 
 void kbd_send(keycode_t code);
+
+#define RELEASE 0x80000000
 
 //extern keycode_t kbd_peek();
 //

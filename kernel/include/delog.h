@@ -64,29 +64,29 @@ _I print_bin(_s str, _I size, _u8 *p, _I len);
 #include <string.h>
 extern _c __log_prefix[16];
 #define logi(...) do { \
-	_u8 c = console_getcolor(); \
+	_u8 __c__ = console_getcolor(); \
 	console_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK)); \
 	memcpy(__log_prefix, "[INFO] ", 8); \
 	_log_info(__VA_ARGS__); \
-	console_setcolor(c); \
+	console_setcolor(__c__); \
 } while(0)
 
 #define logd logi
 
 #define logw(...) do { \
-	_u8 c = console_getcolor(); \
+	_u8 __c__ = console_getcolor(); \
 	console_setcolor(vga_entry_color(VGA_COLOR_LIGHT_BLUE, VGA_COLOR_BLACK)); \
 	memcpy(__log_prefix, "[WARR] ", 8); \
 	_log_info(__VA_ARGS__); \
-	console_setcolor(c); \
+	console_setcolor(__c__); \
 } while(0)
 
 #define loge(...) do { \
-	_u8 c = console_getcolor(); \
+	_u8 __c__ = console_getcolor(); \
 	console_setcolor(vga_entry_color(VGA_COLOR_RED, VGA_COLOR_BLACK)); \
 	memcpy(__log_prefix, "[ERROR] ", 9); \
 	_log_info(__VA_ARGS__); \
-	console_setcolor(c); \
+	console_setcolor(__c__); \
 } while(0)
 
 #define assert(x) do {\

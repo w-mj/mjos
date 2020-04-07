@@ -350,9 +350,10 @@ typedef struct elf64_note {
   Elf64_Word n_type;	/* Content type */
 } Elf64_Nhdr;
 
-Elf64_Shdr *elf_get_section(Elf64_Ehdr *head, const char *name);
-Elf64_Sym  *elf_get_symbol(Elf64_Ehdr  *head, const char *name);
-
+//Elf64_Shdr *elf_get_section(Elf64_Ehdr *head, const char *name);
+//Elf64_Sym  *elf_get_symbol(Elf64_Ehdr  *head, const char *name);
+Elf64_Shdr *elf_get_section(Elf64_Shdr *st, size_t st_size, char *shstrtab, const char *name);
+Elf64_Sym *elf_get_symbol(Elf64_Sym *symtab, size_t symtab_size, char *strtab, const char *name);
 #ifdef __cplusplus
 }
 #endif

@@ -1,5 +1,5 @@
 
-srclist := shell.cpp
+srclist := shell.cpp keycode2ascii.cpp
 deplist := $(addsuffix .d, $(srclist))
 objlist := $(addsuffix .o, $(srclist))
 
@@ -19,7 +19,7 @@ $(target): $(objlist)
 	ld $(CRT0) $(objlist) -o shell.run
 	yes | cp -f shell.run $(DISKDIR)
 
-shell.cpp.o: shell.cpp shell.cpp.d
+%.cpp.o: %.cpp %.cpp.d
 	g++ $(CXXFLAGS) $(INCFLAG) $(DEPGEN) -o $@ $<
 	@ mv -f $(basename $@).t $(basename $@).d
 

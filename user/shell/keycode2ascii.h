@@ -5,4 +5,8 @@
 #ifndef OS_KEYCODE2ASCII_H
 #define OS_KEYCODE2ASCII_H
 
+#include <dev/keyboard.h>
+
+char keycode2ascii(keycode_t);
+
 #endif //OS_KEYCODE2ASCII_H

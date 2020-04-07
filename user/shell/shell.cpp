@@ -1,6 +1,6 @@
 #include <syscall.h>
 #include <process/signal.h>
-#include <iostream.hpp>
+#include "keycode2ascii.h"
 
 int main() {
     sys_signal_register(SignalType::SIG_KEY);
@@ -10,8 +10,13 @@ int main() {
 }
 
 bool on_signal(const Signal *signal) {
+    char msg[] = "key.\r\n";
     if (signal->type == SignalType::SIG_KEY) {
-        sys_write(1, "key\r\n", 5);
+        char c = keycode2ascii(static_cast<keycode_t>(signal->value));
+        if (c) {
+            msg[3] = c;
+            sys_write(1, msg, 6);
+        }
     }
     return true;
 }
