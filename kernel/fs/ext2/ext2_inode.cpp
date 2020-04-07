@@ -176,20 +176,20 @@ EXT2_Inode::iterator EXT2_Inode::iterator::getInstance(EXT2_Inode *i, _u32 block
     if (blocks == 0) {
         it.level = 0;
         it.indexs[0] = 0;
-    } else if (blocks <= it.max_blocks[0]) {
+    } else if (blocks < it.max_blocks[0]) {
         it.level = 0;
         it.indexs[0] = blocks;
-    } else if (blocks <= it.max_blocks[1]) {
+    } else if (blocks < it.max_blocks[1]) {
         it.level = 1;
         it.indexs[0] = 12;
         it.indexs[1] = blocks - it.max_blocks[0];
-    } else if (blocks <= it.max_blocks[2]) {
+    } else if (blocks < it.max_blocks[2]) {
         it.level = 2;
         blocks -= 12;
         it.indexs[0] = 13;
         it.indexs[1] = blocks / it.max_blocks[1];
         it.indexs[2] = blocks % it.max_blocks[1];
-    } else if (blocks <= it.max_blocks[3]) {
+    } else if (blocks < it.max_blocks[3]) {
         it.level = 3;
         blocks -= 12;
         it.indexs[0] = 14;
@@ -337,6 +337,9 @@ EXT2_Inode::iterator::operator!=(const iterator& ano) const {
 int EXT2_Inode::iterator::operator*() {
     if (block_buf[level] == nullptr)
         load_buf(0);
+    if (indexs[0] == 12 && indexs[1] == 0) {
+        assert(1);
+    }
     int ans = block_buf[level][indexs[level]];
     if (ans == 0 && auto_alloc) {
         logd("auto alloc data block");
