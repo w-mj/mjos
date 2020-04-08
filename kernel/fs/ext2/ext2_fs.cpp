@@ -1,14 +1,13 @@
 #undef DEBUG
 #include "fs/ext2/ext2_fs.hpp"
-#include "memory/buf.hpp"
 #include "delog.h"
 #include "fs/stat.hpp"
 #include "base.h"
-
 #include <string.h>
 #include <iostream.hpp>
-
 #include <math.h>
+#include <memory/kmalloc.h>
+
 using namespace EXT2;
 
 EXT2_FS::EXT2_FS(Dev::BlockDevice* dev): FS(dev) {
@@ -85,9 +84,7 @@ int EXT2_FS::inode_to_pos(int inode_n) {
 void EXT2_FS::mount() {
     sb = new SuperBlock();
     // dev->seek(1024);  // 跳过引导块
-    MM::Buf sb_buf(1024);
-    dev->read(sb_buf, 1024, 1024);  // 先读1k的超级块
-    memmove(sb, sb_buf.data, 1024);
+    dev->read((char *)sb, 1024, 1024);  // 先读1k的超级块
 
     magic = sb->magic;
     assert(magic == 0xef53);
@@ -103,15 +100,14 @@ void EXT2_FS::mount() {
     group_cnt = sb->inodes_count / sb->inodes_per_group;
     for (_u32 i = 0; i < group_cnt; i++) {
         GroupDescriptor* gtp = new GroupDescriptor();
-        dev->read(sb_buf, read_pos, sizeof(GroupDescriptor));
-        memmove(gtp, sb_buf.data, sizeof(GroupDescriptor));
+        dev->read((char *)gtp, read_pos, sizeof(GroupDescriptor));
         gdt_list.push_back(new EXT2_GD(this, gtp, i));
         read_pos += sizeof(GroupDescriptor);
     }
 
     // 数据块位图
     // dev->seek());
-    dev->read(sb_buf, block_to_pos(gdt_list.front()->get_gd()->inode_bitmap), block_size);
+//    dev->read(sb_buf, block_to_pos(gdt_list.front()->get_gd()->inode_bitmap), block_size);
     // _sa(sb_buf.data, 1024);
 
     // 第一个索引节点 / 
@@ -183,10 +179,8 @@ void EXT2_FS::release_block(_u32 block_n, EXT2_GD **ret_gd) {
 
 void EXT2_FS::write_super() {
     _u32 super_pos = 1;  // super block 
-    MM::Buf buf(sizeof(SuperBlock));
-    memcpy(buf.data, sb, sizeof(SuperBlock));
     for (size_t i = 0; i < gdt_list.size(); i++) {
-        dev->write(buf, block_to_pos(super_pos), sizeof(SuperBlock));
+        dev->write((char *)sb, block_to_pos(super_pos), sizeof(SuperBlock));
         super_pos += sb->blocks_per_group;
     }
     // _d_end();
@@ -194,11 +188,12 @@ void EXT2_FS::write_super() {
 
 void EXT2_FS::write_gdt() {
     _u32 super_pos = 2; // 第一个组描述符表位置
-    MM::Buf buf(gdt_list.size() * sizeof(GroupDescriptor));
+//    MM::Buf buf(gdt_list.size() * sizeof(GroupDescriptor));
+    char *buf = (char *)kmalloc_s(sizeof(GroupDescriptor));
     _u32 s_pos = 0;
 
     for (EXT2_GD *x: gdt_list) {
-        memcpy(buf.data + s_pos, x->get_gd(), sizeof(GroupDescriptor));
+        memcpy(buf + s_pos, x->get_gd(), sizeof(GroupDescriptor));
         s_pos += sizeof(GroupDescriptor);
         x->write_inode_bitmap();
         x->write_block_bitmap();

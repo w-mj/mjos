@@ -5,7 +5,6 @@
 #include "fs/stat.hpp"
 #include <delog.h>
 #include <string.h>
-#include <memory/buf.hpp>
 #include <time.h>
 
 using namespace EXT2;
@@ -24,6 +23,8 @@ EXT2_DEntry::EXT2_DEntry(EXT2_FS* fs1, VFS::DEntry* parent1,
     sync = 1;
 }
 #include <iostream.hpp>
+#include <memory/kmalloc.h>
+
 void EXT2_DEntry::load_children() {
     assert(type == VFS::Directory);
 
@@ -36,7 +37,7 @@ void EXT2_DEntry::load_children() {
     //_si(ext2_inode->size);
 
     Dev::BlockDevice* dev = ext2_fs->dev;
-    MM::Buf buf(ext2_fs->block_size);
+    char *buf = (char *)kmalloc_s(ext2_fs->block_size);
 
     DirEntry *temp_str = new DirEntry();
     for (auto x: children)
@@ -54,7 +55,7 @@ void EXT2_DEntry::load_children() {
         // _u32 next_length = 12;
         while (all_length < ext2_inode->size) {
             // _sa(buf.data + s_pos, 20);
-            memmove(temp_str, buf.data + s_pos, sizeof(DirEntry));
+            memmove(temp_str, buf + s_pos, sizeof(DirEntry));
             if (temp_str->rec_len == 0)
                 break;
             // if (temp_str->inode == parent->inode_n) {
@@ -81,6 +82,7 @@ void EXT2_DEntry::load_children() {
             all_length += temp_str->rec_len;
         }
     }
+    kfree_s(ext2_fs->block_size, buf);
 }
 
 void EXT2_DEntry::inflate() {
@@ -89,11 +91,9 @@ void EXT2_DEntry::inflate() {
     // _log_info("inflate");
     delete inode;
     EXT2::Inode* disk_inode = new Inode();
-    MM::Buf buf(sizeof(Inode));
     _u32 inode_pos = ext2_fs->inode_to_pos(inode_n);
     _si(inode_pos);
-    fs->dev->read(buf, inode_pos, sizeof(Inode));
-    memcpy(disk_inode, buf.data, sizeof(Inode));
+    fs->dev->read((char *)disk_inode, inode_pos, sizeof(Inode));
     ext2_inode = new EXT2_Inode(ext2_fs, inode_n, disk_inode);
     ext2_inode->print();
     inode = ext2_inode;

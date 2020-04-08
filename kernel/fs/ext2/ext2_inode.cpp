@@ -2,10 +2,11 @@
 #include "fs/ext2/ext2_inode.hpp"
 #include "fs/stat.hpp"
 #include "delog.h"
-#include "memory/buf.hpp"
 #include <iostream.hpp>
 #include <string.h>
 #include <algorithm.hpp>
+#include <memory/kmalloc.h>
+
 using namespace EXT2;
 
 void EXT2_Inode::print() {
@@ -72,28 +73,29 @@ _u32 EXT2_Inode::nth_block(_u32 n) {
         return i->block[n];
     _u32 ans;
     _u32 blocks_in_block = ext2_fs->block_size / 4;
-    MM::Buf buf(ext2_fs->block_size);
+//    MM::Buf buf(ext2_fs->block_size);
+    char *buf = (char *)kmalloc_s(ext2_fs->block_size);
     if (n < 12 + blocks_in_block) {
         ext2_fs->dev->read(buf, ext2_fs->block_to_pos(i->block[12]), ext2_fs->block_size);
         n -= 12;
-        memcpy(&ans, buf.data + n, 4);
+        memcpy(&ans, buf + n, 4);
         return ans;
     }
     if (n < 12 + blocks_in_block + blocks_in_block * blocks_in_block) {
         ext2_fs->dev->read(buf, ext2_fs->block_to_pos(i->block[13]), ext2_fs->block_size);
         n -= 12;  
-        memcpy(&ans, buf.data + (n / blocks_in_block), 4);
+        memcpy(&ans, buf + (n / blocks_in_block), 4);
         ext2_fs->dev->read(buf, ext2_fs->block_to_pos(ans), ext2_fs->block_size); 
-        memcpy(&ans, buf.data + (n % blocks_in_block), 4);
+        memcpy(&ans, buf + (n % blocks_in_block), 4);
         return ans;
     } else {
         ext2_fs->dev->read(buf, ext2_fs->block_to_pos(i->block[14]), ext2_fs->block_size);
         n -= 12;  
-        memcpy(&ans, buf.data + (n / (blocks_in_block * blocks_in_block)), 4);
+        memcpy(&ans, buf + (n / (blocks_in_block * blocks_in_block)), 4);
         ext2_fs->dev->read(buf, ext2_fs->block_to_pos(ans), ext2_fs->block_size); 
-        memcpy(&ans, buf.data + (n / blocks_in_block), 4);
+        memcpy(&ans, buf + (n / blocks_in_block), 4);
         ext2_fs->dev->read(buf, ext2_fs->block_to_pos(ans), ext2_fs->block_size); 
-        memcpy(&ans, buf.data + (n % blocks_in_block), 4);
+        memcpy(&ans, buf + (n % blocks_in_block), 4);
         return ans;
     }
     return 0;
@@ -102,7 +104,7 @@ _u32 EXT2_Inode::nth_block(_u32 n) {
 void EXT2_Inode::write_inode() {
     logd("inode %d, size %d", inode_n, i->size);
     _u32 inode_pos = ext2_fs->inode_to_pos(inode_n);
-    MM::Buf buf(sizeof(EXT2::Inode));
+//    MM::Buf buf(sizeof(EXT2::Inode));
     i->blocks = blocks * (ext2_fs->block_size / 512);
     i->size = size;
     _si(size);
@@ -113,9 +115,9 @@ void EXT2_Inode::write_inode() {
     i->atime = atime;
     i->mtime = mtime;
     i->ctime = ctime;
-    memcpy(buf.data, i, sizeof(EXT2::Inode));
+//    memcpy(buf.data, i, sizeof(EXT2::Inode));
     // _sa(buf.data, sizeof(EXT2::Inode));
-    ext2_fs->dev->write(buf, inode_pos, sizeof(EXT2::Inode));
+    ext2_fs->dev->write((char *)i, inode_pos, sizeof(EXT2::Inode));
     // memset(buf.data, 0, sizeof(EXT2::Inode));
     // _sa(buf.data, sizeof(EXT2::Inode));
     // ext2_fs->dev->read(buf, inode_pos, sizeof(EXT2::Inode));
@@ -235,9 +237,7 @@ void EXT2_Inode::iterator::load_buf(int t) {
             block_pos[t + 1] = new_block_pos;
             memset(block_buf[t + 1], 0, fs->block_size);  // 新块数据清零
         } else {
-            MM::Buf buf(fs->block_size);
-            fs->dev->read(buf, fs->block_to_pos(new_block_pos), fs->block_size);
-            memcpy(block_buf[t + 1], buf.data, fs->block_size);
+            fs->dev->read((char *)block_buf[t + 1], fs->block_to_pos(new_block_pos), fs->block_size);
         }
         // _sa(block_buf[t + 1], 1024);
         t++;
@@ -251,15 +251,17 @@ void EXT2_Inode::iterator::write_back() {
         dirty[0] = false;
     }
     EXT2_FS *fs = inode->ext2_fs;
-    MM::Buf *buf=nullptr;
+//    MM::Buf *buf=nullptr;
+    char *buf = nullptr;
     for (int t = 1; t < 4; t++) {
         if (dirty[t]) {
             logd("write back %d", t);
             if (buf == nullptr)
-                buf = new MM::Buf(fs->block_size);
+                buf = (char *)kmalloc_s(fs->block_size);
+//                buf = new MM::Buf(fs->block_size);
             _u32 pos = fs->block_to_pos(block_pos[t]);
-            memmove(buf->data, block_buf[t], fs->block_size);
-            fs->dev->write(*buf, pos, fs->block_size);
+            memmove(buf, block_buf[t], fs->block_size);
+            fs->dev->write(buf, pos, fs->block_size);
             dirty[t] = false;
         }
     }
@@ -337,9 +339,6 @@ EXT2_Inode::iterator::operator!=(const iterator& ano) const {
 int EXT2_Inode::iterator::operator*() {
     if (block_buf[level] == nullptr)
         load_buf(0);
-    if (indexs[0] == 12 && indexs[1] == 0) {
-        assert(1);
-    }
     int ans = block_buf[level][indexs[level]];
     if (ans == 0 && auto_alloc) {
         logd("auto alloc data block");

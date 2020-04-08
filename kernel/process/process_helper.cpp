@@ -31,6 +31,7 @@ extern "C" int do_real_exec() {
     auto file = root_fs->root->open(process->path);
     auto elf = (Elf64_Ehdr*)kmalloc_s(sizeof(Elf64_Ehdr));
     file->read((char *)elf, sizeof(Elf64_Ehdr));  // 读入elf头
+    assert(*(u32*)elf->e_ident == 0x464c457f);
     // 处理程序表
     size_t pt_size = elf->e_phnum * elf->e_phentsize;   // pt表大小
     auto pt = (Elf64_Phdr*) kmalloc_s(pt_size);

@@ -1,4 +1,3 @@
-#undef DEBUG
 #include "fs/ext2/ext2_file.hpp"
 #include <string.h>
 #include <delog.h>
@@ -54,8 +53,7 @@ int EXT2_File::seek(int pos, int whence) {
 }
 
 int EXT2_File::read(char *buf, int len) {
-    if (pos + len > size)
-        return 0;
+    len = os::min(len, size - pos);
     _u32 read_len = 0, this_read_len;
     _u32 block_size = ext2_fs->block_size;  // 块大小
     _u32 byte_in_block = pos % block_size;  // 第一个字节在块中的位置
@@ -65,19 +63,17 @@ int EXT2_File::read(char *buf, int len) {
     _si(block_n);
     _u32 pos_in_fs = ext2_fs->block_to_pos(block_n);  // 第一个块在文件系统中的位置
 
-    MM::Buf buff(block_size);
-    ext2_fs->dev->read(buff, pos_in_fs, block_size);  // 从第一个块读入数据，每次都读出一整块
-    // _sa(buff.data, 1024);
-    memcpy(buf, buff.data + byte_in_block, os::min((_u32)len, block_size - byte_in_block));
     read_len = os::min((_u32)len, block_size - byte_in_block);
+    ext2_fs->dev->read(buf, pos_in_fs + byte_in_block, read_len);  //  读入数据
+    // _sa(buff.data, 1024);
     while (read_len < (_u32)len && pos + read_len < (_u32)size) {
+        // 后续的数据都是从块起始位置开始
         it++;  // 指向下一个块
         block_n = *it;  // 下一个块号
         _si(block_n);
         pos_in_fs = ext2_fs->block_to_pos(block_n);  // 下一个块的位置
         _si(pos_in_fs);
-        this_read_len = ext2_fs->dev->read(buff, pos_in_fs, block_size);  // 读入
-        memcpy(buf + read_len, buff.data, os::min(block_size, len - read_len));
+        this_read_len = ext2_fs->dev->read(buf + read_len, pos_in_fs, os::min(block_size, len - read_len));  // 读入
         read_len += this_read_len;
     }
     pos += read_len;
@@ -97,18 +93,15 @@ int EXT2_File::write(const char *buf, int len) {
     _u32 block_n = *it;  // 第一个字节的块号
     _u32 pos_in_fs = ext2_fs->block_to_pos(block_n);  // 第一个块在文件系统中的位置
     //_si(pos + len);
-    MM::Buf buff(block_size);
     this_write_len = os::min(block_size - byte_in_block, (_u32)len);
-    memcpy(buff.data, buf, this_write_len);
-    ext2_fs->dev->write(buff, pos_in_fs + byte_in_block, this_write_len);  // 向第一个块写数据
+    ext2_fs->dev->write(buf, pos_in_fs + byte_in_block, this_write_len);  // 向第一个块写数据
     write_len = this_write_len;
     while (write_len < (_u32)len) {
         it++;  // 指向下一个块
         block_n = *it;  // 下一个块号，其实这里可以自动分配空间，不用resize
         pos_in_fs = ext2_fs->block_to_pos(block_n);  // 下一个块的位置
         this_write_len = os::min(block_size, len - write_len);
-        memcpy(buff.data, buf + write_len, this_write_len);
-        ext2_fs->dev->write(buff, pos_in_fs, this_write_len);  // 写
+        ext2_fs->dev->write(buf + write_len, pos_in_fs, this_write_len);  // 写
         write_len += this_write_len;
     }
     pos += write_len;

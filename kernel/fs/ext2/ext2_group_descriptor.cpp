@@ -5,6 +5,8 @@
 #include "delog.h"
 #include <string.h>
 #include <algorithm.hpp>
+#include <memory/kmalloc.h>
+
 using namespace EXT2;
 
 
@@ -16,8 +18,10 @@ EXT2_GD::EXT2_GD(EXT2_FS *fs, GroupDescriptor* gd, _u32 n) {
 
 EXT2_GD::~EXT2_GD() {
     delete gd;
-    delete inode_bitmap;
-    delete block_bitmap;
+    kfree_s(fs->block_size * sizeof(_u8), inode_bitmap);
+    kfree_s(fs->block_size * sizeof(_u8), block_bitmap);
+//    delete inode_bitmap;
+//    delete block_bitmap;
 }
 
 GroupDescriptor *EXT2_GD::get_gd() {
@@ -27,22 +31,20 @@ GroupDescriptor *EXT2_GD::get_gd() {
 _u8 *EXT2_GD::get_inode_bitmap() {
     if (inode_bitmap != nullptr)
         return inode_bitmap;
-    MM::Buf buf(fs->block_size);
+//    MM::Buf buf(fs->block_size);
     // fs->dev->seek();
-    fs->dev->read(buf, fs->block_to_pos(gd->inode_bitmap), fs->block_size);
-    inode_bitmap = new _u8[fs->block_size];
-    memcpy(inode_bitmap, buf.data, fs->block_size);
+    inode_bitmap = (_u8*)kmalloc_s(fs->block_size * sizeof(_u8)); // new _u8[fs->block_size];
+    fs->dev->read((char *)inode_bitmap, fs->block_to_pos(gd->inode_bitmap), fs->block_size);
+//    memcpy(inode_bitmap, buf.data, fs->block_size);
     return inode_bitmap;
 }
 
 _u8 *EXT2_GD::get_block_bitmap() {
     if (block_bitmap != nullptr)
         return block_bitmap;
-    MM::Buf buf(fs->block_size);
     // fs->dev->seek();
-    fs->dev->read(buf, fs->block_to_pos(gd->block_bitmap), fs->block_size);
-    block_bitmap = new _u8[fs->block_size];
-    memcpy(block_bitmap, buf.data, fs->block_size);
+    block_bitmap = (_u8*)kmalloc_s(fs->block_size * sizeof(_u8)); // new _u8[fs->block_size];
+    fs->dev->read((char *)block_bitmap, fs->block_to_pos(gd->block_bitmap), fs->block_size);
     // _sa(block_bitmap, 1024);
     return block_bitmap;
 }
@@ -112,16 +114,16 @@ void EXT2_GD::write_inode_bitmap() {
     // fs->dev->seek();
     if (inode_bitmap == nullptr)
         return;
-    MM::Buf buf(fs->block_size);
-    memcpy(buf.data, inode_bitmap, fs->block_size);
-    fs->dev->write(buf, fs->block_to_pos(gd->inode_bitmap), fs->block_size);
+//    MM::Buf buf(fs->block_size);
+//    memcpy(buf.data, inode_bitmap, fs->block_size);
+    fs->dev->write((char *)inode_bitmap, fs->block_to_pos(gd->inode_bitmap), fs->block_size);
 }
 
 void EXT2_GD::write_block_bitmap() {
     // fs->dev->seek();
     if (block_bitmap == nullptr)
         return;
-    MM::Buf buf(fs->block_size);
-    memcpy(buf.data, block_bitmap, fs->block_size);
-    fs->dev->write(buf, fs->block_to_pos(gd->block_bitmap), fs->block_size);
+//    MM::Buf buf(fs->block_size);
+//    memcpy(buf.data, block_bitmap, fs->block_size);
+    fs->dev->write((char *)block_bitmap, fs->block_to_pos(gd->block_bitmap), fs->block_size);
 }
