@@ -18,7 +18,8 @@ os::LRU<int, char *> pool(10,
 });
 
 _u32 Dev::SataDev::read(char *buf, _u32 pos, _u32 size) {
-
+    // 从SATA磁盘读入数据，目前是按块分批次读取，因此不存在物理地址不连续的问题。
+    // 改成一次读取多个块后需要考虑得到连续的物理页面
     u32 read_cnt = 0;
     while (size > 0) {
         u64 round_pos = ROUND_DOWN(pos, SECTOR_SIZE);  // 按扇区对齐

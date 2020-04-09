@@ -30,3 +30,4 @@ cscope.*
 cmake-build-*/
 elfpiggy.S
 userprocesses.c
+build-toolchain/build-*

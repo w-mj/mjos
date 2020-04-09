@@ -2,12 +2,17 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include <asm.h>
-#include <process/process.h>
-#include <delog.h>
-#include <stddef.h>
-#include <process/signal.h>
-#include <stdio.h>
+
+#include <stdint.h>
+#include <sys/types.h>
+
+#define asm __asm__
+#define ASM asm volatile
+
+struct stat;
+struct tms;
+struct timeval;
+struct timezone;
 
 #define PREPARE(n) ASM("movq $"#n", %r9"); \
     do {\
@@ -90,6 +95,28 @@ extern "C" {
 		RET;        \
 	}
 
+/*
+ * void _exit();
+int close(int file);
+char **environ; pointer to array of char * strings that define the current environment variables
+int execve(char *name, char **argv, char **env);
+int fork();
+int fstat(int file, struct stat *st);
+int getpid();
+int isatty(int file);
+int kill(int pid, int sig);
+int link(char *old, char *new);
+int lseek(int file, int ptr, int dir);
+int open(const char *name, int flags, ...);
+int read(int file, char *ptr, int len);
+caddr_t sbrk(int incr);
+int stat(const char *file, struct stat *st);
+clock_t times(struct tms *buf);
+int unlink(char *name);
+int wait(int *status);
+int write(int file, char *ptr, int len);
+int gettimeofday(struct timeval *p, struct timezone *z);
+ */
 
 SYS_CALL_1(1, print_msg, const char *)
 SYS_CALL_2(2, create_process, ProcessType, void *)
@@ -109,6 +136,25 @@ SYS_CALL_0(15, real_exec)
 SYS_CALL_1(16, exec, const char *)
 SYS_CALL_1(17, signal_register, SignalType)
 SYS_CALL_1(18, signal_unregister, SignalType)
+
+SYS_CALL_3(19, execve,char *, char **, char **)
+SYS_CALL_0(20, fork)
+SYS_CALL_2(21, fstat, int, struct stat*)
+SYS_CALL_1(22, isatty, int)
+SYS_CALL_2(23, kill, int, int)
+SYS_CALL_2(24, link, char *, char *)
+SYS_CALL_3(25, lseek, int, int, int)
+// 26 open(const char *, int, ...)
+SYS_CALL_1(27, sbrk, int)  // ret caddr_t
+SYS_CALL_2(28, stat, const char*, struct stat *);
+SYS_CALL_1(29, times, struct tms*) // ret clock_t
+SYS_CALL_1(30, wait, int*)
+SYS_CALL_1(31, unlink, char *)
+SYS_CALL_2(32, gettimeofday, struct timeval*, struct timezone *)
+
+
+#define _exit sys_quit_thread
+#define close sys_close
 
 enum {
     SYS_FUNC_PRINTMSG = 0,

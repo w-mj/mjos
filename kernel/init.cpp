@@ -20,9 +20,9 @@ void process_print_message() {
     char buf[1024];
     while (true) {
         int size = do_read(FD_STDOUT, buf, 1024);
-        if (size == 0) {
-            size = do_read_message(buf);
-        }
+//        if (size == 0) {
+//            size = do_read_message(buf);
+//        }
         if (size == 0)
             sched_yield();
         for (int i = 0; i < size; i++) {
@@ -37,6 +37,7 @@ void process_print_message() {
     }
 }
 
+
 void user_process() {
     char str[] = "write to stdio\n";
     size_t len = strlen(str);
@@ -49,6 +50,7 @@ void user_process() {
         sys_print_msg("user message\n");
     }
 }
+/*
 void user_process2() {
 //   for (int i = 0; i < 65536 * 2000; i++) {
 //       ;
@@ -60,9 +62,9 @@ void user_process2() {
 //    sys_signal(SignalType::SIG_KEY, 0, NOPID);
    while(1);
 }
-
+*/
 bool init_signal_handler(const Signal *signal) {
-    logd("Signal!");
+//    logd("Signal");
     return false;
 }
 
@@ -106,8 +108,8 @@ void init_main() {
 
     ASM("sti");
     // sys_print_msg("lalala");
-    do_create_process(PROCESS_USER, (void*)user_process);
-    do_create_process(PROCESS_USER, (void*)user_process2);
+//    do_create_process(PROCESS_USER, (void*)user_process);
+//    do_create_process(PROCESS_USER, (void*)user_process2);
     do_create_process_from_file("shell.run");
     do_create_process(PROCESS_KERNEL, (void*)process_print_message);
     while (true);
