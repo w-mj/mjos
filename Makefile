@@ -1,13 +1,13 @@
 ARCH ?= x86_64
 DEBUG ?= 1
 
-NAME = myos
+NAME = mjos
 
 OUTDIR  :=  $(CURDIR)
 ISODIR  :=  $(OUTDIR)/iso
 DISKDIR  :=  $(CURDIR)/disk
 
-TOOLCHAIN_BASE := /usr/local/x86_64-elf-gcc/bin/# To make clion happy
+TOOLCHAIN_BASE := $(CURDIR)/opt/bin/# To make clion happy
 
 CC      :=  $(TOOLCHAIN_BASE)$(ARCH)-elf-gcc
 CXX     :=  $(TOOLCHAIN_BASE)$(ARCH)-elf-g++
