@@ -3,11 +3,12 @@
 extern "C" {
 #endif
 
+#include <process/process.h>
 #include <stdint.h>
 #include <sys/types.h>
-
-#define asm __asm__
-#define ASM asm volatile
+#include <process/signal.h>
+#include <asm.h>
+#include <stdio.h>
 
 struct stat;
 struct tms;
@@ -137,6 +138,7 @@ SYS_CALL_1(16, exec, const char *)
 SYS_CALL_1(17, signal_register, SignalType)
 SYS_CALL_1(18, signal_unregister, SignalType)
 
+/*
 SYS_CALL_3(19, execve,char *, char **, char **)
 SYS_CALL_0(20, fork)
 SYS_CALL_2(21, fstat, int, struct stat*)
@@ -151,7 +153,7 @@ SYS_CALL_1(29, times, struct tms*) // ret clock_t
 SYS_CALL_1(30, wait, int*)
 SYS_CALL_1(31, unlink, char *)
 SYS_CALL_2(32, gettimeofday, struct timeval*, struct timezone *)
-
+*/
 
 #define _exit sys_quit_thread
 #define close sys_close

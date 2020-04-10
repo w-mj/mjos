@@ -1,11 +1,9 @@
 #include <delog.h>
 #include <process/process.h>
-#include <process/ipc.h>
 #include <cpu.h>
 #include <syscall.h>
 #include <string.h>
 #include <fs/syscall_handler.h>
-#include <process/signal.h>
 #include <process/process_helper.hpp>
 
 
