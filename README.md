@@ -1,6 +1,6 @@
 # 毕业设计：一个玩具操作系统
 
-## 搭建开发环境
+## 搭建内核开发环境
 1. 安装依赖 gcc bulitin make bison flex gmp mpfr mpc texinfo tee
 
 2. 下载[gcc](https://ftp.gnu.org/gnu/gcc/)和[builtin](https://ftp.gnu.org/gnu/binutils/)的源码，并解压到~/src。
@@ -45,6 +45,11 @@
     
 7. 如果你修改了PREFIX，需要将根Makefile中的TOOLCHAIN_BASE也修改为正确的位置。
 
+## 搭建用户开发环境
+
+1. 将项目目录下diff文件合并进binutlis和gcc的源码中。
+2. 使用--target=x86_64-mjos和--with-sysroot="sysroot"再次编译。
+
 ## 构建
 
 ### 编译和运行
@@ -60,3 +65,4 @@ make run
 ```shell script
 make debug
 ```
+
