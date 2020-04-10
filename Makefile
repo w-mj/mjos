@@ -114,3 +114,8 @@ disk.img:
 makecompiledatabase:
 	compiledb -nf make
 	compiledb -n  make test
+
+
+mksysroot:
+	rsync -av kernel/include/* sysroot/usr/include/
+	rsync -av kernel/arch/$(ARCH)/include/* sysroot/usr/include/

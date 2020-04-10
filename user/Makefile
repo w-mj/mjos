@@ -1,8 +1,6 @@
 
 subdirs := shell
 
-# TODO: 简化include
-# TODO: 使用hosted gcc
 INCLIST := sys_header $(CURDIR)/../kernel/include $(CURDIR)/../kernel/arch/$(ARCH)/include \
 		   $(CURDIR)/../kernel/libc/include $(CURDIR)/../kernel/libc++/include
 
