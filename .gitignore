@@ -31,3 +31,5 @@ cmake-build-*/
 elfpiggy.S
 userprocesses.c
 build-toolchain/build-*
+build-toolchain/gcc-*
+build-toolchain/binutils-*
