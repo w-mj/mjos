@@ -1,11 +1,11 @@
 #include <stdio.h>
 
-struct FILE *stdout;
-struct FILE *stdin;
-struct FILE *stderr;
-static struct FILE _stdout;
-static struct FILE _stdin;
-static struct FILE _stderr;
+FILE *stdout;
+FILE *stdin;
+FILE *stderr;
+static FILE _stdout;
+static FILE _stdin;
+static FILE _stderr;
 
 #include <stdarg.h>
 #include <console.h>
@@ -13,7 +13,7 @@ static struct FILE _stderr;
 
 #define BUF_SIZE 4096
 static char fprintf_buf[BUF_SIZE];
-int fprintf(struct FILE *f, const char *fmt, ...) {
+int fprintf(FILE *f, const char *fmt, ...) {
     va_list va;
     va_start(va, fmt);
     int n = vsnprintf(fprintf_buf, BUF_SIZE, fmt, va);

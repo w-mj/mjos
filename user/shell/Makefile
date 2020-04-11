@@ -16,11 +16,11 @@ clean:
 test:
 
 $(target): $(objlist)
-	ld $(CRT0) $(objlist) -o shell.run
+	$(CXX) $(objlist) -o shell.run
 	yes | cp -f shell.run $(DISKDIR)
 
 %.cpp.o: %.cpp %.cpp.d
-	g++ $(CXXFLAGS) $(INCFLAG) $(DEPGEN) -o $@ $<
+	$(CXX) -c $(DEPGEN) -o $@ $<
 	@ mv -f $(basename $@).t $(basename $@).d
 
 $(deplist): ;

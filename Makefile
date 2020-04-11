@@ -21,7 +21,7 @@ ISOFILE :=  $(OUTDIR)/$(NAME).iso
 CFLAGS  :=  -c -std=c11 -DKERNEL -DARCH=$(ARCH)
 CFLAGS  +=  -Wall -Wextra -Werror=implicit 
 CFLAGS  +=  -ffreestanding -ffunction-sections -fdata-sections
-CXXFLAGS:=  -c -std=c++17 -ffreestanding -fno-exceptions #-fno-rtti
+CXXFLAGS:=  -c -std=c++17 -ffreestanding -fno-exceptions -DKERNEL #-fno-rtti
 
 TESTINC := -I$(CURDIR)/tools/UnitTest -I/usr/include
 
@@ -37,7 +37,7 @@ endif
 
 TEMPLATEFILE := $(CURDIR)/Makefile.template
 
-export CC CXX AR OBJCOPY LD NM CFLAGS TEMPLATEFILE ARCH CXXFLAGS TESTINC DISKDIR
+export CC CXX AR OBJCOPY LD NM CFLAGS TEMPLATEFILE ARCH CXXFLAGS TESTINC DISKDIR NAME TOOLCHAIN_BASE
 
 all: build
 
@@ -56,7 +56,7 @@ test-kernel: FORCE
 clean-kernel: FORCE
 	$(MAKE) -C kernel clean
 
-build-user: FORCE
+build-user: mksysroot FORCE
 	mkdir -p $(DISKDIR)
 	$(MAKE) -C user build
 	- ps aux | grep $(QEMU) | sed -n "1, 1p" | awk '{print $$2}' | xargs -I {} kill -9 {}

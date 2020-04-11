@@ -8,7 +8,14 @@ INCFLAG := $(addprefix -I, $(INCLIST))
 
 CRT0 := $(CURDIR)/crt0.o
 
-export INCLIST CRT0
+CC      :=  $(TOOLCHAIN_BASE)$(ARCH)-$(NAME)-gcc
+CXX     :=  $(TOOLCHAIN_BASE)$(ARCH)-$(NAME)-g++
+AR      :=  $(TOOLCHAIN_BASE)$(ARCH)-$(NAME)-ar
+OBJCOPY :=  $(TOOLCHAIN_BASE)$(ARCH)-$(NAME)-objcopy
+LD      :=  $(TOOLCHAIN_BASE)$(ARCH)-$(NAME)-ld
+NM      :=  $(TOOLCHAIN_BASE)$(ARCH)-$(NAME)-nm
+
+export CC CXX AR OBJCOPY LD NM CFLAGS TEMPLATEFILE ARCH CXXFLAGS TESTINC DISKDIR NAME
 
 build: $(subdirs)
 
