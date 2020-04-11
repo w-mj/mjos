@@ -13,7 +13,7 @@ extern "C" int do_open(const char *);
 extern "C" int do_read(int , char *, size_t);
 extern "C" int do_write(int , const char*, size_t);
 extern "C" int do_close(int);
-extern "C" int do_get_attr(int, struct FILE*);
+extern "C" int do_get_attr(int, FILE*);
 
 int do_open(const char *path) {
     ThreadDescriptor *thread= thiscpu_var(current);
@@ -61,7 +61,7 @@ int do_close(int fd) {
     return 0;
 }
 
-int do_get_attr(int fd, struct FILE *file) {
+int do_get_attr(int fd, FILE *file) {
     auto f = get_file(fd);
     if (f == nullptr)
         return -1;

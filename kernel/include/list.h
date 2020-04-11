@@ -3,7 +3,7 @@
 extern "C" {
 #endif
 
-#include <base.h>
+#include <types.h>
 
 typedef struct _ListEntry {
 	struct _ListEntry *prev, *next;

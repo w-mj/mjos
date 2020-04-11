@@ -60,7 +60,7 @@ int EXT2_File::read(char *buf, int len) {
     _u32 nth_block = pos / block_size;  // 第一个字节在第n个块，pos以0开始计数，不需要加1
     auto it = ext2_inode->iter_at(nth_block);
     _u32 block_n = *it;  // 第一个字节的块号
-    _si(block_n);
+//    _si(block_n);
     _u32 pos_in_fs = ext2_fs->block_to_pos(block_n);  // 第一个块在文件系统中的位置
 
     read_len = os::min((_u32)len, block_size - byte_in_block);
@@ -72,7 +72,7 @@ int EXT2_File::read(char *buf, int len) {
         block_n = *it;  // 下一个块号
         _si(block_n);
         pos_in_fs = ext2_fs->block_to_pos(block_n);  // 下一个块的位置
-        _si(pos_in_fs);
+//        _si(pos_in_fs);
         this_read_len = ext2_fs->dev->read(buf + read_len, pos_in_fs, os::min(block_size, len - read_len));  // 读入
         read_len += this_read_len;
     }

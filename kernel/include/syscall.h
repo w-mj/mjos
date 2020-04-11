@@ -10,10 +10,10 @@ extern "C" {
 #include <asm.h>
 #include <stdio.h>
 
-struct stat;
-struct tms;
-struct timeval;
-struct timezone;
+//struct stat;
+//struct tms;
+//struct timeval;
+//struct timezone;
 
 #define PREPARE(n) ASM("movq $"#n", %r9"); \
     do {\
@@ -32,42 +32,59 @@ struct timezone;
 #define CALL       ASM("syscall")
 #define RET        ASM("leaveq; retq"); return 0
 
+static inline int SYS_CALL(uint64_t v1, uint64_t v2,uint64_t v3,uint64_t v4,uint64_t v5,uint64_t code) {
+    CALL;
+    RET;
+}
+
 #define SYS_CALL_0(n, name) \
     int do_##name(); \
 	static inline int sys_##name() {\
+	    return SYS_CALL(0, 0, 0, 0, 0, n); \
+	    /*
 		PREPARE(n); \
 		CALL;	    \
 		RET;        \
+		*/ \
 	}
 
 #define SYS_CALL_1(n, name, t1) \
     int do_##name(t1);  \
 	static inline int sys_##name(t1 v1) { \
+	    return SYS_CALL((uint64_t)v1, 0, 0, 0, 0, n); \
+	    /*
 		PREPARE(n); \
 		PARAM1(v1); \
 		CALL;       \
 		RET;        \
+		*/ \
 	} 
 
 #define SYS_CALL_2(n, name, t1, t2) \
     int do_##name(t1, t2);  \
 	static inline int sys_##name(t1 v1, t2 v2) {\
+	    return SYS_CALL((uint64_t)v1, (uint64_t) v2, 0, 0, 0, n); \
+	    /*
 		PREPARE(n); \
 		PARAM1(v1); \
 		PARAM2(v2); \
 		CALL;       \
 		RET;        \
+		*/ \
 	}
 
 #define SYS_CALL_3(n, name, t1, t2, t3) \
     int do_##name(t1, t2, t3);  \
 	static inline int sys_##name(t1 v1, t2 v2, t3 v3) {\
+	    return SYS_CALL((uint64_t)v1, (uint64_t)v2, (uint64_t)v3, 0, 0, n); \
+	    /*
 		PREPARE(n); \
 		PARAM1(v1); \
 		PARAM2(v2); \
 		PARAM3(v3); \
 		CALL;       \
 		RET;        \
+		*/ \
 	}
 
 #define SYS_CALL_4(n, name, t1, t2, t3, t4) \
@@ -132,7 +149,7 @@ SYS_CALL_1(10, close, int)
 SYS_CALL_0(11, getpid)
 SYS_CALL_3(12, signal, SignalType, uint64_t, pid_t)
 SYS_CALL_1(13, create_process_from_file, const char *)
-SYS_CALL_2(14, get_attr, int, struct FILE*)
+SYS_CALL_2(14, get_attr, int, FILE*)
 SYS_CALL_0(15, real_exec)
 SYS_CALL_1(16, exec, const char *)
 SYS_CALL_1(17, signal_register, SignalType)
@@ -155,8 +172,8 @@ SYS_CALL_1(31, unlink, char *)
 SYS_CALL_2(32, gettimeofday, struct timeval*, struct timezone *)
 */
 
-#define _exit sys_quit_thread
-#define close sys_close
+//#define _exit sys_quit_thread
+//#define close sys_close
 
 enum {
     SYS_FUNC_PRINTMSG = 0,

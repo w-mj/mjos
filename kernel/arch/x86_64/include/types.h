@@ -1,4 +1,8 @@
-#pragma once
+#ifndef OS_TYPES_H
+#define OS_TYPES_H
+
+#ifdef KERNEL
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -51,3 +55,31 @@ typedef u16 pid_t;
 #ifdef __cplusplus
 }
 #endif
+
+#else  // #ifdef KERNEL
+
+#include <sys/types.h>
+#define def_type(x) \
+    typedef uint##x##_t u##x; \
+    typedef uint##x##_t _u##x; \
+    typedef int##x##_t i##x; \
+    typedef int##x##_t _i##x; \
+
+def_type(8)
+def_type(16)
+def_type(32)
+def_type(64)
+
+typedef unsigned long addr_t;
+typedef u32 pfn_t;
+typedef int pid_t;
+#define NOPID ((pid_t)-1)
+
+#ifndef __cplusplus
+#define bool _u8
+#define true 1
+#define false 0
+#endif
+#endif // #ifdef KERNEL
+
+#endif // #ifndef OS_TYPES_H
