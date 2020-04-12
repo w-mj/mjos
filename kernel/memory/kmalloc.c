@@ -57,6 +57,8 @@ void *kmalloc_s(size_t size) {
 
 void kfree_s(size_t size, void *addr) {
 //	logd("kfree %d %llx", size, addr);
+	if (addr == NULL)
+		return;
 	CacheDescriptor *cache = get_kmalloc_cache(size);
 	if (cache == NULL) {
 		loge("kmalloc too large %d", size);

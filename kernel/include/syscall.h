@@ -32,7 +32,13 @@ extern "C" {
 #define CALL       ASM("syscall")
 #define RET        ASM("leaveq; retq"); return 0
 
-static inline int SYS_CALL(uint64_t v1, uint64_t v2,uint64_t v3,uint64_t v4,uint64_t v5,uint64_t code) {
+static inline int SYS_CALL(
+        __attribute__((unused)) uint64_t v1,
+        __attribute__((unused)) uint64_t v2,
+        __attribute__((unused)) uint64_t v3,
+        __attribute__((unused)) uint64_t v4,
+        __attribute__((unused)) uint64_t v5,
+        __attribute__((unused)) uint64_t code) {
     CALL;
     RET;
 }

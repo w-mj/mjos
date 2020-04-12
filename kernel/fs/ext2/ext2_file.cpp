@@ -54,6 +54,7 @@ int EXT2_File::seek(int pos, int whence) {
 
 int EXT2_File::read(char *buf, int len) {
     len = os::min(len, size - pos);
+    logd("read start %d, size %d, size %d", pos, len, size);
     _u32 read_len = 0, this_read_len;
     _u32 block_size = ext2_fs->block_size;  // 块大小
     _u32 byte_in_block = pos % block_size;  // 第一个字节在块中的位置
