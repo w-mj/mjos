@@ -175,10 +175,7 @@ EXT2_Inode::iterator::iterator(EXT2_Inode* i) {
 EXT2_Inode::iterator EXT2_Inode::iterator::getInstance(EXT2_Inode *i, _u32 blocks) {
     EXT2_Inode::iterator it(i);
     it.index_cnt = blocks;  // 最大值
-    if (blocks == 0) {
-        it.level = 0;
-        it.indexs[0] = 0;
-    } else if (blocks < it.max_blocks[0]) {
+    if (blocks < it.max_blocks[0]) {
         it.level = 0;
         it.indexs[0] = blocks;
     } else if (blocks < it.max_blocks[1]) {
@@ -187,17 +184,17 @@ EXT2_Inode::iterator EXT2_Inode::iterator::getInstance(EXT2_Inode *i, _u32 block
         it.indexs[1] = blocks - it.max_blocks[0];
     } else if (blocks < it.max_blocks[2]) {
         it.level = 2;
-        blocks -= 12;
+        blocks -= it.max_blocks[1];
         it.indexs[0] = 13;
-        it.indexs[1] = blocks / it.max_blocks[1];
-        it.indexs[2] = blocks % it.max_blocks[1];
+        it.indexs[1] = blocks / 256;
+        it.indexs[2] = blocks % 256;
     } else if (blocks < it.max_blocks[3]) {
         it.level = 3;
-        blocks -= 12;
+        blocks -= it.max_blocks[2];
         it.indexs[0] = 14;
-        it.indexs[1] = blocks / it.max_blocks[2];
-        it.indexs[2] = blocks / it.max_blocks[1];
-        it.indexs[3] = blocks % it.max_blocks[1];
+        it.indexs[1] = blocks / (256 * 256);
+        it.indexs[2] = blocks / 256;
+        it.indexs[3] = blocks % 256;
     } else {
         // _error(1);
         assert(0);
@@ -210,9 +207,13 @@ EXT2_Inode::iterator EXT2_Inode::iterator::getInstance(EXT2_Inode *i, _u32 block
 
 EXT2_Inode::iterator::~iterator() {
     write_back();
-    delete block_buf[1];
-    delete block_buf[2];
-    delete block_buf[3];
+    // 前12个块是描述符的一部分，不用释放
+    kfree_s(sizeof(_u32) * sub_blocks_in_block[1], block_buf[1]);
+    kfree_s(sizeof(_u32) * sub_blocks_in_block[2], block_buf[2]);
+    kfree_s(sizeof(_u32) * sub_blocks_in_block[3], block_buf[3]);
+//    delete block_buf[1];
+//    delete block_buf[2];
+//    delete block_buf[3];
 }
 
 void EXT2_Inode::iterator::load_buf(int t) {
@@ -222,10 +223,11 @@ void EXT2_Inode::iterator::load_buf(int t) {
         write_back();  // 在换页之前尝试将修改写入磁盘
         _u32 new_block_pos = block_buf[t][indexs[t]];
         if (block_buf[t + 1] == nullptr)
-            block_buf[t + 1] = new _u32[sub_blocks_in_block[level]];
+            block_buf[t + 1] = static_cast<_u32 *>(kmalloc_s(sizeof(_u32) * sub_blocks_in_block[t + 1])); //new _u32[sub_blocks_in_block[level]];
         _si(new_block_pos);
         if (new_block_pos == 0 && !auto_alloc) {
             logd("Reach iter end but not set auto alloc.");
+            assert(0);
             return;
         }
         if (new_block_pos == 0) {
@@ -267,7 +269,6 @@ void EXT2_Inode::iterator::write_back() {
     }
     delete buf;
 }
-
 
 const EXT2_Inode::iterator& EXT2_Inode::iterator::operator++(int) {
     return ++(*this);
