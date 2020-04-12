@@ -1,54 +1,12 @@
-# 毕业设计：一个玩具操作系统
+# 一个玩具操作系统
 
-## 搭建内核开发环境
-1. 安装依赖 gcc bulitin make bison flex gmp mpfr mpc texinfo tee
+## 搭建开发环境
 
-2. 下载[gcc](https://ftp.gnu.org/gnu/gcc/)和[builtin](https://ftp.gnu.org/gnu/binutils/)的源码，并解压到~/src。
-
-3. 设置环境变量
-    ```shell script
-    export PREFIX="/usr/local"
-    export TARGET=x86_64-elf
-    export PATH="$PREFIX/bin:$PATH"
-    ```
-    
-4. 编译builtin
-    ```shell script
-    cd $HOME/src
-    mkdir build-binutils
-    cd build-binutils
-    ../binutils-x.y.z/configure --target=$TARGET --prefix="$PREFIX" --with-sysroot --disable-nls --disable-werror
-    make
-    sudo make install
-    ```
-    
-5. 编译gcc和libgcc，并备份编译libgcc的命令
-   ```shell script
-   cd $HOME/src
-   mkdir build-gcc
-   cd build-gcc
-   ../gcc-x.y.z/configure --target=$TARGET --prefix="$PREFIX" --disable-nls --enable-languages=c,c++ --without-headers
-   make all-gcc
-   make all-target-libgcc | tee lib.txt
-   sudo make install-gcc
-   sudo make install-target-libgcc
-   ```
-	
-6. 编译64位版本的crtbegin.o和crtend.o
-
-    ```shell script
-    grep crtstuff.c lib.txt  # 并复制输出的两条指令
-    cd x86_64-elf/libgcc/
-	  # 分别粘贴将第一步中输出的指令，并在末尾加上-mcmodel=large，执行
-    cp crtbegin.o crtend.o ~/os/kernel/   # 将这两个文件复制到项目中的kernel的目录
-    ```
-    
-7. 如果你修改了PREFIX，需要将根Makefile中的TOOLCHAIN_BASE也修改为正确的位置。
-
-## 搭建用户开发环境
-
-1. 将项目目录下diff文件合并进binutlis和gcc的源码中。
-2. 使用--target=x86_64-mjos和--with-sysroot="sysroot"再次编译。
+1. 下载gcc-9.3.0, bintuils-2.34, newlib-3.3.0，并解压到~/build-toolchain
+2. 将目录下的三个patch文件应用到源代码中
+3. 执行./build.sh all
+4. 如果修改了newlib/libc/sys/mjos/syscall.c，需要重写编译newlib，执行./build.sh newlib
+5. 如果在newlib/libc/sys/mjos/中新增或删除了源文件，需要在该目录下使用autoconf-2.64和automake-1.11执行autoreconf
 
 ## 构建
 
@@ -65,4 +23,3 @@ make run
 ```shell script
 make debug
 ```
-

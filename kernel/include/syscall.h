@@ -160,26 +160,7 @@ SYS_CALL_0(15, real_exec)
 SYS_CALL_1(16, exec, const char *)
 SYS_CALL_1(17, signal_register, SignalType)
 SYS_CALL_1(18, signal_unregister, SignalType)
-
-/*
-SYS_CALL_3(19, execve,char *, char **, char **)
-SYS_CALL_0(20, fork)
-SYS_CALL_2(21, fstat, int, struct stat*)
-SYS_CALL_1(22, isatty, int)
-SYS_CALL_2(23, kill, int, int)
-SYS_CALL_2(24, link, char *, char *)
-SYS_CALL_3(25, lseek, int, int, int)
-// 26 open(const char *, int, ...)
-SYS_CALL_1(27, sbrk, int)  // ret caddr_t
-SYS_CALL_2(28, stat, const char*, struct stat *);
-SYS_CALL_1(29, times, struct tms*) // ret clock_t
-SYS_CALL_1(30, wait, int*)
-SYS_CALL_1(31, unlink, char *)
-SYS_CALL_2(32, gettimeofday, struct timeval*, struct timezone *)
-*/
-
-//#define _exit sys_quit_thread
-//#define close sys_close
+SYS_CALL_1(19, unimplemented_syscall, const char *)
 
 enum {
     SYS_FUNC_PRINTMSG = 0,
