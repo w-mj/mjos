@@ -6,6 +6,8 @@
 int main() {
     sys_signal_register(SignalType::SIG_KEY);
     sys_write(1, "Hello world\n", 12);
+    volatile int a = 0;
+    // if (a > 0)
     printf("hello printf\n");
     while(1);
     return 0;

@@ -82,7 +82,7 @@ int_err_code:
 	pushq $-1        ;\
 	pushq %rdi               ;\
 	movq  $vec, %rdi         ;\
-	jmp int_err_code          
+	jmp int_err_code
 
 
 .balign 16
