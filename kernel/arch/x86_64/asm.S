@@ -43,45 +43,48 @@ EXTERN_FUNC(interrupt_stub)
 //      |    CS    | +20
 //      |   RIP    | +18
 //      | ERR CODE | +10 (RSI)
-//      |   RDI    | +8
+//      |   VEC    | +8
 //      |   RAX    | $rsp
 EXTERN_DATA(isr_tbl)
 int_err_code:
-    pushq   %rax
+    // pushq   %rax
+    save_regs
+    movq    %rsp, %rdi
     movq    $KERNEL_DATA_DEC, %rax
     movq    %rax, %ss
 
-	xchgq   %rsi, 0x10(%rsp)  // 把rsi备份到栈里，同时取出error code
+	// xchgq   %rsi, 0x10(%rsp)  // 把rsi备份到栈里，同时取出error code
+	movq    0x78(%rsp), %rsi  // movq vec, %rsi
 
-	testl   $3, 0x20(%rsp)  // cs = rsp + 0x20
+	testl   $3, 0x90(%rsp)  // cs = rsp + 0x80
     jz  1f   // 判断cs的特权级别，如果为用户态则交换gsbase和kgsbase
     swapgs
 1:
 
 	movq    $isr_tbl, %rax
-    movq    (%rax, %rdi, 8), %rax  // 查表调用相应的中断处理程序
+    movq    (%rax, %rsi, 8), %rax  // 查表调用相应的中断处理程序
     call    * %rax
 
-	testl  $3, 0x20(%rsp)   // %cs = %rsp + 0x20
+	testl  $3, 0x90(%rsp)   // %cs = %rsp + 0x20
 	jz 2f
 	swapgs
 2:
-    popq    %rax
-	popq    %rdi
-	popq    %rsi
+    // popq    %rax
+	// popq    %rdi
+	// popq    %rsi
+	restore_regs
+	add  $0x10, %rsp  // 跳过vec和errcode
 
 	iretq
 
 #define with_errcode(vec) \
-	pushq  %rdi           ;\
-	movq   $vec, %rdi     ;\
+	pushq  $vec           ;\
 	jmp int_err_code      ;\
 	pushq $-1 // 不可能被执行到，占位
 
 #define without_errcode(vec) \
 	pushq $-1        ;\
-	pushq %rdi               ;\
-	movq  $vec, %rdi         ;\
+	pushq $vec               ;\
 	jmp int_err_code
 
 
