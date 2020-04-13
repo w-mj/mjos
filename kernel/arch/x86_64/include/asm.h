@@ -207,10 +207,15 @@ static inline void write_kgsbase(u64 val) {
 }
 
 
-static inline void die() {
+static inline void __die() {
 	ASM("cli");
 	ASM("hlt");
 }
+
+#define die() do {\
+    _pos(); \
+    __die(); \
+} while (0)
 
 static inline void relax() {
 	ASM("pause");

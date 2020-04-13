@@ -117,9 +117,10 @@ syscall_stub:
 	// rdx = 参数三
 	// rcx = 参数四
 	// r8  = 参数五
+	save_regs
 	swapgs
-    pushq %rcx
-	pushq %r11
+    // pushq %rcx
+	// pushq %r11
 
     // movq  %gs:(current), %rbp
     // movq  %rsp, (%rbp)      // 备份用户栈
@@ -135,11 +136,26 @@ syscall_stub:
 	// swapgs
     // popq  %rbx
     // movq  (%rbp), %rsp   // 恢复用户栈
-	popfq
 	// retq
 	// popq %r11
-	popq %rdi
-	jmp  user_return
+
+	// popfq
+	// popq %rdi
+	// movq %rsp, %rsi
+	// popq  %r11
+	// popq  %rcx
+	// jmp  user_return
+    restore_regs
+   // sub $1, %rcx
+    cli
+    pushq   $USER_DATA_DEC
+    pushq   %rsp
+    add     $0x8, (%rsp)
+    pushq   %r11
+    pushq   $USER_CODE_DEC
+    pushq   %rcx
+	swapgs
+    iretq
 
 	sysret  // sysret 从MSR中找到用户态的cs和ss
 

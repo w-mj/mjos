@@ -86,7 +86,7 @@ extern "C" int do_real_exec() {
 //    process->signalHandler = reinterpret_cast<SignalHandler>(signal_symbol->st_value);
     u64 ip = elf->e_entry;
     user_return((void*)ip, (void*)((u64)thread->stack));
-    while(1);
+    die();
     return 0;  // make compiler happy.
 }
 

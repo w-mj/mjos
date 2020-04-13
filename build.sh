@@ -11,14 +11,17 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PREFIX/lib
 export ELF_TARGET=x86_64-elf
 
 mjos_cxx() {
+  cd $SRC
 	cd build-gcc
 	../gcc-9.3.0/configure --target=$TARGET --prefix="$PREFIX" --with-sysroot=$SYSROOT --enable-languages=c,c++ --enable-shared
 	make all-target-libstdc++-v3
 	make install-target-libstdc++-v3
 	cd ..
+  cd $PROJECT_PATH
 }
 
 mjos_gcc() {
+  cd $SRC
 	mkdir -p build-gcc
 	cd build-gcc
 	../gcc-9.3.0/configure --target=$TARGET --prefix="$PREFIX" --with-sysroot=$SYSROOT --enable-languages=c,c++ --enable-shared
@@ -27,39 +30,51 @@ mjos_gcc() {
 	make install-gcc
 	make install-target-libgcc
 	cd ..
+  cd $PROJECT_PATH
 }
 
 mjos_binutils() {
+  cd $SRC
 	mkdir -p build-binutils
 	cd build-binutils
 	../binutils-2.34/configure --target=$TARGET --prefix="$PREFIX" --with-sysroot=$SYSROOT --enable-shared
 	make
 	make install
 	cd ..
+  cd $PROJECT_PATH
 }
 
 newlib() {
-	 # rm -r build-newlib
-	 mkdir -p build-newlib
-	 cd build-newlib
-	 ../newlib-3.3.0/configure --prefix=/usr --target=$TARGET CFLAGS="-m64"
-	 make all
-	 make DESTDIR=${SYSROOT} install
-	 cp -ar $SYSROOT/usr/x86_64-mjos/* $SYSROOT/usr/
-	 rm -rf $SYSROOT/usr/x86_64-mjos/
-	 cd ..
+  make mksysroot
+  cd $SRC
+  rm -f build-toolchain/build-newlib/x86_64-mjos/newlib/libc/sys/mjos/lib.a
+  rm -f build-toolchain/build-newlib/x86_64-mjos/newlib/libc/sys/mjos/*.o
+	# rm -r build-newlib
+	mkdir -p build-newlib
+	cd build-newlib
+	../newlib-3.3.0/configure --prefix=/usr --target=$TARGET CFLAGS="-m64"
+	make all
+	make DESTDIR=${SYSROOT} install
+	cp -ar $SYSROOT/usr/x86_64-mjos/* $SYSROOT/usr/
+	rm -rf $SYSROOT/usr/x86_64-mjos/
+	cd
+  cd $PROJECT_PATH
+
 }
 
 elf_binutils() {
+  cd $SRC
 	mkdir -p build-elf-binutils
 	cd build-elf-binutils
 	../binutils-2.34/configure --target=$ELF_TARGET --prefix="$PREFIX" --with-sysroot --disable-nls --disable-werror
 	make
 	make install
 	cd ..
+  cd $PROJECT_PATH
 }
 
 elf_gcc() {
+  cd $SRC
 	mkdir -p build-elf-gcc
 	cd build-elf-gcc
 	../gcc-9.3.0/configure --target=$ELF_TARGET --prefix="$PREFIX" --disable-nls --enable-languages=c,c++ --without-headers
@@ -71,9 +86,9 @@ elf_gcc() {
 	grep crtstuff.c lib.txt | awk '{print($0" -mcmodel=large"); system($0" -mcmodel=large")}'
 	cp crtbegin.o crtend.o $PROJECT_PATH/kernel/
 	cd ../../..
+  cd $PROJECT_PATH
 }
 
-cd $SRC
 case $1 in
   "elf")
 	  elf_binutils
@@ -111,4 +126,3 @@ case $1 in
 	  mjos_cxx
 	  ;;
 esac
-cd $PROJECT_PATH

@@ -14,7 +14,7 @@ extern "C" {
 //struct tms;
 //struct timeval;
 //struct timezone;
-
+#ifdef KERNEL
 #define PREPARE(n) ASM("movq $"#n", %r9"); \
     do {\
         int cs;\
@@ -24,13 +24,17 @@ extern "C" {
             return -1; \
         } \
     } while(0)
-#define PARAM1(v)  ASM("movq %0, %%rdi" :: "rm"(v))
-#define PARAM2(v)  ASM("movq %0, %%rsi" :: "rm"(v))
-#define PARAM3(v)  ASM("movq %0, %%rdx" :: "rm"(v))
-#define PARAM4(v)  ASM("movq %0, %%rcx" :: "rm"(v))
-#define PARAM5(v)  ASM("movq %0, %%r8"  :: "rm"(v))
-#define CALL       ASM("syscall")
-#define RET        ASM("leaveq; retq"); return 0
+#else
+#define PREPARE(n) ASM("movq $"#n", %r9")
+#endif
+#define PARAM1(v)  ASM("movq %0, %%rdi" :: "rm"((uint64_t)v))
+#define PARAM2(v)  ASM("movq %0, %%rsi" :: "rm"((uint64_t)v))
+#define PARAM3(v)  ASM("movq %0, %%rdx" :: "rm"((uint64_t)v))
+#define PARAM4(v)  ASM("movq %0, %%rcx" :: "rm"((uint64_t)v))
+#define PARAM5(v)  ASM("movq %0, %%r8"  :: "rm"((uint64_t)v))
+#define CALL       ASM("syscall; nop;")
+// #define RET        ASM("leaveq; retq"); return 0
+#define RET        do {int a; ASM("movl %%eax, %0": "=rm"(a)); return a; } while (0)
 
 static inline int SYS_CALL(
         __attribute__((unused)) uint64_t v1,
@@ -63,7 +67,6 @@ static inline int SYS_CALL(
 #define SYS_CALL_2(n, name, t1, t2) \
     int do_##name(t1, t2);  \
 	static inline int sys_##name(t1 v1, t2 v2) {\
-	    return SYS_CALL((uint64_t)v1, (uint64_t) v2, 0, 0, 0, n); \
 		PREPARE(n); \
 		PARAM1(v1); \
 		PARAM2(v2); \
@@ -74,7 +77,6 @@ static inline int SYS_CALL(
 #define SYS_CALL_3(n, name, t1, t2, t3) \
     int do_##name(t1, t2, t3);  \
 	static inline int sys_##name(t1 v1, t2 v2, t3 v3) {\
-	    return SYS_CALL((uint64_t)v1, (uint64_t)v2, (uint64_t)v3, 0, 0, n); \
 		PREPARE(n); \
 		PARAM1(v1); \
 		PARAM2(v2); \

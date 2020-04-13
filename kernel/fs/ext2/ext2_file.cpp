@@ -1,3 +1,4 @@
+#undef DEBUG
 #include "fs/ext2/ext2_file.hpp"
 #include <string.h>
 #include <delog.h>

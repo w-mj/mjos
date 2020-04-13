@@ -47,7 +47,7 @@ void user_process() {
         }
         // sys_read(FD_STDIN, str, len);
         sys_write(FD_STDOUT, str, len);
-        sys_print_msg("user message\n");
+//        sys_print_msg("user message\n");
     }
 }
 /*
@@ -110,7 +110,7 @@ void init_main() {
     ASM("sti");
     // sys_print_msg("lalala");
 //    do_create_process(PROCESS_USER, (void*)user_process);
-//    do_create_process(PROCESS_USER, (void*)user_process2);
+//    do_create_process(PROCESS_USER, (void*)uses_process2);
     do_create_process_from_file("shell.run");
     do_create_process(PROCESS_KERNEL, (void*)process_print_message);
     while (true);

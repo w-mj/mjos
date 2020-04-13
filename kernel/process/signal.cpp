@@ -98,6 +98,7 @@ extern "C" int do_signal(SignalType type, uint64_t value, pid_t to) {
 
 // 注册一个信号回调
 extern "C" void signalRegister(SignalType type, ProcessDescriptor *process, SignalRegisterType regType) {
+    logd("signal register reg: %d, pid: %d", type, process->pid);
     switch (regType) {
         case SignalRegisterType::NORMAL: {
             ListEntry &head = signalHandlers[type];
