@@ -46,51 +46,41 @@ static inline int SYS_CALL(
 #define SYS_CALL_0(n, name) \
     int do_##name(); \
 	static inline int sys_##name() {\
-	    return SYS_CALL(0, 0, 0, 0, 0, n); \
-	    /*
 		PREPARE(n); \
 		CALL;	    \
 		RET;        \
-		*/ \
 	}
 
 #define SYS_CALL_1(n, name, t1) \
     int do_##name(t1);  \
 	static inline int sys_##name(t1 v1) { \
-	    return SYS_CALL((uint64_t)v1, 0, 0, 0, 0, n); \
-	    /*
 		PREPARE(n); \
 		PARAM1(v1); \
 		CALL;       \
 		RET;        \
-		*/ \
-	} 
+	}
 
 #define SYS_CALL_2(n, name, t1, t2) \
     int do_##name(t1, t2);  \
 	static inline int sys_##name(t1 v1, t2 v2) {\
 	    return SYS_CALL((uint64_t)v1, (uint64_t) v2, 0, 0, 0, n); \
-	    /*
 		PREPARE(n); \
 		PARAM1(v1); \
 		PARAM2(v2); \
 		CALL;       \
 		RET;        \
-		*/ \
 	}
 
 #define SYS_CALL_3(n, name, t1, t2, t3) \
     int do_##name(t1, t2, t3);  \
 	static inline int sys_##name(t1 v1, t2 v2, t3 v3) {\
 	    return SYS_CALL((uint64_t)v1, (uint64_t)v2, (uint64_t)v3, 0, 0, n); \
-	    /*
 		PREPARE(n); \
 		PARAM1(v1); \
 		PARAM2(v2); \
 		PARAM3(v3); \
 		CALL;       \
 		RET;        \
-		*/ \
 	}
 
 #define SYS_CALL_4(n, name, t1, t2, t3, t4) \
