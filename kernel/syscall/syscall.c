@@ -29,6 +29,7 @@ int do_func_register(int funnum) {
 int do_unimplemented_syscall(const char *name) {
     loge("syscall %s is not implemented yet.");
     die();
+    return 0;
 }
 
 void *syscall_tbl[256] = {
@@ -53,4 +54,3 @@ void *syscall_tbl[256] = {
         /* 18 */ (void*)do_signal_unregister,
         /* 19 */ (void*)do_unimplemented_syscall
 };
-
