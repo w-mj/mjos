@@ -80,16 +80,16 @@ void idt_init() {
 void interrupt_stub(InterruptContext *cxt) {
 	loge("interrupt %d errcode 0x%x%08x", cxt->vec, h32(cxt->errcode), l32(cxt->errcode));
 	loge("RAX=0x%-16llx RBX=0x%-16llx", cxt->rax, cxt->rbx);
-    loge("RCX=0x%-16llx RDX=0x%-16llx", cxt->rcx, cxt->rdx);
-    loge("RDI=0x%-16llx RSI=0x%-16llx", cxt->rdi, cxt->rsi);
-    loge("RBP=0x%-16llx R8 =0x%-16llx", cxt->rbp, cxt->r8);
-    loge("R9 =0x%-16llx R10=0x%-16llx", cxt->r9,  cxt->r10);
-    loge("R11=0x%-16llx R12=0x%-16llx", cxt->r11, cxt->r12);
-    loge("R13=0x%-16llx R14=0x%-16llx", cxt->r13, cxt->r14);
-    loge("R15=0x%-16llx", cxt->r15);
-    loge("RIP=0x%-16llx CS =0x%-16llx", cxt->rip, cxt->cs);
-    loge("RSP=0x%-16llx SS =0x%-16llx", cxt->rsp, cxt->ss);
-    loge("RFLAGS=0x%-16llx", cxt->rlfags);
+	loge("RCX=0x%-16llx RDX=0x%-16llx", cxt->rcx, cxt->rdx);
+	loge("RDI=0x%-16llx RSI=0x%-16llx", cxt->rdi, cxt->rsi);
+	loge("RBP=0x%-16llx R8 =0x%-16llx", cxt->rbp, cxt->r8);
+	loge("R9 =0x%-16llx R10=0x%-16llx", cxt->r9,  cxt->r10);
+	loge("R11=0x%-16llx R12=0x%-16llx", cxt->r11, cxt->r12);
+	loge("R13=0x%-16llx R14=0x%-16llx", cxt->r13, cxt->r14);
+	loge("R15=0x%-16llx", cxt->r15);
+	loge("RIP=0x%-16llx CS =0x%-16llx", cxt->rip, cxt->cs);
+	loge("RSP=0x%-16llx SS =0x%-16llx", cxt->rsp, cxt->ss);
+	loge("RFLAGS=0x%-16llx", cxt->rlfags);
 	if (cxt->vec == 14) {
 		u64 cr2 = read_cr2();
 		// _sL(cr2);
