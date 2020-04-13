@@ -90,25 +90,25 @@ static u32  loapic_tmr_hz = 0;  // how many cycles in a second
 // defined in core/tick.c
 extern void tick_proc();
 
-static void loapic_resched_proc(int vec) {
-    assert(vec == VECNUM_RESCHED);
+static void loapic_resched_proc(InterruptContext *cxt) {
+    assert(cxt->vec == VECNUM_RESCHED);
     // no need to call any function
     loapic_send_eoi();
 }
 
-static void loapic_flushmmu_proc(int vec) {
-    assert(vec == VECNUM_FLUSHMMU);
+static void loapic_flushmmu_proc(InterruptContext *cxt) {
+    assert(cxt->vec == VECNUM_FLUSHMMU);
     // TODO: clear all tlb entries
     loapic_send_eoi();
 }
 
-static void loapic_svr_proc(int vec) {
-    assert(vec == VECNUM_SPURIOUS);
+static void loapic_svr_proc(InterruptContext *cxt) {
+    assert(cxt->vec == VECNUM_SPURIOUS);
     // no need to send EOI
 }
 
-static void loapic_timer_proc(int vec) {
-    assert(vec == VECNUM_TIMER);
+static void loapic_timer_proc(InterruptContext *cxt) {
+    assert(cxt->vec == VECNUM_TIMER);
 	// logd("tick");
     // tick_proc();
     loapic_send_eoi();

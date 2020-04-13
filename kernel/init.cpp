@@ -92,6 +92,7 @@ void init_main() {
     for (auto x: root->children) {
         os::cout << x->name << os::endl;
     }
+
     // 打开基本文件
     stdout = new PIPE::PIPE_File();
     stdin  = new PIPE::PIPE_File();
