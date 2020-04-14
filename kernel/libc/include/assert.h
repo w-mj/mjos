@@ -2,7 +2,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include <delog.h>
+#include "delog.h"
 
 #ifdef __cplusplus
 }

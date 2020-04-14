@@ -31,7 +31,7 @@
  * language-specific code.  It can be used in any personality function for the
  * Itanium ABI.
  */
-#include <assert.h>
+#include "assert.h"
 
 // TODO: Factor out Itanium / ARM differences.  We probably want an itanium.h
 // and arm.h that can be included by this file depending on the target ABI.
@@ -47,7 +47,7 @@
 #	include "unwind.h"
 #endif
 
-#include <stdint.h>
+#include "stdint.h"
 
 /// Type used for pointers into DWARF data
 typedef unsigned char *dw_eh_ptr_t;

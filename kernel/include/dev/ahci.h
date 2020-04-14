@@ -3,8 +3,8 @@
 extern "C" {
 #endif
 
-#include <dev/ahci_stru.h>
-#include <types.h>
+#include "dev/ahci_stru.h"
+#include "types.h"
 
 extern HBA_PORT *sata;
 

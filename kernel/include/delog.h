@@ -4,8 +4,8 @@ extern "C" {
 #endif
 
 
-#include <types.h>
-#include <stdarg.h>
+#include "types.h"
+#include "stdarg.h"
 
 #define _POS_INFOBITS (_I)1
 #define _NPOS_INFOBITS (~_POS_INFOBITS)
@@ -60,8 +60,8 @@ void _wmj_delog(_I type, ...);
  */
 _I print_bin(_s str, _I size, _u8 *p, _I len);
 
-#include <console.h>
-#include <string.h>
+#include "console.h"
+#include "string.h"
 extern _c __log_prefix[16];
 #define logi(...) do { \
 	_u8 __c__ = console_getcolor(); \

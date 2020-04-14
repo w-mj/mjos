@@ -4,8 +4,8 @@ extern "C" {
 #endif
 
 
-#include <stdarg.h>
-#include <types.h>
+#include "stdarg.h"
+#include "types.h"
 
 struct __FILE {
     int fno;

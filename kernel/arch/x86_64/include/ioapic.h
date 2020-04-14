@@ -4,7 +4,7 @@ extern "C" {
 #endif
 
 
-#include <acpi.h>
+#include "acpi.h"
 
 typedef struct madt_ioapic       madr_ioapic_t;
 typedef struct madt_int_override madt_int_override_t;

@@ -4,7 +4,7 @@ extern "C" {
 #endif
 
 #include "types.h"
-#include <asm.h>
+#include "asm.h"
 
 i32 atomic32_get(i32 * p);
 i32 atomic32_set(i32 * p, i32 x);

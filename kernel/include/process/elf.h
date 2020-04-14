@@ -3,8 +3,8 @@
 extern "C" {
 #endif
 
-#include <types.h>
-#include <process/elf-em.h>
+#include "types.h"
+#include "process/elf-em.h"
 
 /* 64-bit ELF base types. */
 typedef u64	Elf64_Addr;

@@ -2,7 +2,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include <types.h>
+#include "types.h"
 typedef i32 pthread_key_t;
 typedef i32 pthread_mutex_t;
 typedef i32 pthread_cond_t;

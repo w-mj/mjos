@@ -22,8 +22,8 @@
 
 #ifndef __CXXABI_H_
 #define __CXXABI_H_
-#include <stddef.h>
-#include <stdint.h>
+#include "stddef.h"
+#include "stdint.h"
 #include "unwind.h"
 namespace std 
 {

@@ -3,8 +3,8 @@
 extern "C" {
 #endif
 
-#include <list.h>
-#include <memory/page.h>
+#include "list.h"
+#include "memory/page.h"
 
 typedef struct __CacheDescriptor {
 	PageList partial;

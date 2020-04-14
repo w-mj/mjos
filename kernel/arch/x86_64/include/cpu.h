@@ -6,8 +6,8 @@
 extern "C" {
 #endif
 
-#include <base.h>
-#include <types.h>
+#include "base.h"
+#include "types.h"
 
 extern int cpu_installed;
 extern int cpu_activated;
@@ -50,7 +50,7 @@ void *calc_thiscpu_addr(void * ptr);
 #define percpu_var(i, var)  (* percpu_ptr(i, var))
 #define thiscpu_var(var)    (* thiscpu_ptr(var))
 
-#include <process/process.h>
+#include "process/process.h"
 #include "arch.h"
 
 void prepare_switch(ThreadDescriptor *prev, ThreadDescriptor *next);

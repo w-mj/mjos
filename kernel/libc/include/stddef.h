@@ -4,7 +4,7 @@
 
 #ifndef OS_STDDEF_H
 #define OS_STDDEF_H
-#include <types.h>
-#include <base.h>
-#include <stdint.h>
+#include "types.h"
+#include "base.h"
+#include "stdint.h"
 #endif //OS_STDDEF_H

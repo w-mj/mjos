@@ -21,7 +21,7 @@
  */ 
 
 /* For uint32_t and uint64_t */
-#include <stdint.h>
+#include "stdint.h"
 
 /**
  * ARM-specific unwind definitions.  These are taken from the ARM EHABI

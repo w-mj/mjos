@@ -4,8 +4,8 @@ extern "C" {
 #endif
 
 
-#include <types.h>
-#include <base.h>
+#include "types.h"
+#include "base.h"
 
 typedef struct acpi_tbl {
     u32    signature;

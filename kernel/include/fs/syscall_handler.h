@@ -9,9 +9,9 @@
 extern "C" {
 #endif
 
-#include <stddef.h>
-#include <stdio.h>
-#include <sys/kstat.h>
+#include "stddef.h"
+#include "stdio.h"
+#include "sys/kstat.h"
 
 int do_open(const char *);
 int do_read(int, char *, size_t);

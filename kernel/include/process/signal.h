@@ -5,11 +5,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include <process/process.h>
+#include "process/process.h"
 
 struct __ProcessDescriptor;
 
-#include <stddef.h>
+#include "stddef.h"
 typedef enum{
      NORMAL,
      FRONT,

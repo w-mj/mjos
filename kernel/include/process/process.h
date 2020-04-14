@@ -5,13 +5,13 @@
 extern "C" {
 #endif
 
-#include <types.h>
-#include <list.h>
-#include <biosreg.h>
-#include <spin.h>
+#include "types.h"
+#include "list.h"
+#include "biosreg.h"
+#include "spin.h"
 
-#include <config.h>
-#include <process/signal.h>
+#include "config.h"
+#include "process/signal.h"
 
 typedef enum {
 	THREAD_RUNNING,

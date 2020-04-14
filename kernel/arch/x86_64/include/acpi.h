@@ -3,8 +3,8 @@
 extern "C" {
 #endif
 
-#include <acpi_structure.h>
-#include <base.h>
+#include "acpi_structure.h"
+#include "base.h"
 
 
 extern madt_t *acpi_madt; // 中断设备表

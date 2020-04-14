@@ -3,9 +3,9 @@
 extern "C" {
 #endif
 
-#include <types.h>
-#include <boot.h>
-#include <list.h>
+#include "types.h"
+#include "boot.h"
+#include "list.h"
 
 typedef enum __PageState {
 	PG_AVAILABLE,

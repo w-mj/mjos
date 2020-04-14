@@ -3,14 +3,14 @@
 extern "C" {
 #endif
 
-#include <process/process.h>
-#include <stdint.h>
-#include <sys/types.h>
-#include <process/signal.h>
-#include <asm.h>
-#include <stdio.h>
+#include "process/process.h"
+#include "stdint.h"
+#include "sys/types.h"
+#include "process/signal.h"
+#include "asm.h"
+#include "stdio.h"
 
-#include <sys/kstat.h>
+#include "sys/kstat.h"
 
 //struct stat;
 //struct tms;

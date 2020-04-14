@@ -58,7 +58,7 @@ typedef u16 pid_t;
 
 #else  // #ifdef KERNEL
 
-#include <sys/types.h>
+#include "sys/types.h"
 #define def_type(x) \
     typedef uint##x##_t u##x; \
     typedef uint##x##_t _u##x; \

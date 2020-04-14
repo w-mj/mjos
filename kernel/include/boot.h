@@ -3,12 +3,12 @@
 extern "C" {
 #endif
 
-#include <types.h>
-#include <multiboot.h>
-#include <arch.h>
-#include <process/process.h>
-#include <delog.h>
-#include <cpu.h>
+#include "types.h"
+#include "multiboot.h"
+#include "arch.h"
+#include "process/process.h"
+#include "delog.h"
+#include "cpu.h"
 
 
 #define ABSOLUTE(x) (((u64)(x) - ((u64)KERNEL_VMA)) + ((u64)KERNEL_LMA))

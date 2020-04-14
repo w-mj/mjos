@@ -3,8 +3,8 @@
 extern "C" {
 #endif
 
-#include <types.h>
-#include <list.h>
+#include "types.h"
+#include "list.h"
 typedef int (* wdog_proc_t) (void * a1, void * a2, void * a3, void * a4);
 
 typedef struct wdog {

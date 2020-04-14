@@ -1,4 +1,4 @@
 #pragma once
 
-#include <process/pthread.h>
-#include <sched.h>
+#include "process/pthread.h"
+#include "sched.h"

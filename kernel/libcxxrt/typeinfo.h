@@ -24,7 +24,7 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stddef.h>
+#include "stddef.h"
 #include "abi_namespace.h"
 
 namespace ABI_NAMESPACE

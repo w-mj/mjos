@@ -3,7 +3,7 @@
 extern "C" {
 #endif
 
-#include <process/process.h>
+#include "process/process.h"
 
 void add_thread_to_running(ThreadDescriptor *);
 void remove_thread_from_running(ThreadDescriptor *);

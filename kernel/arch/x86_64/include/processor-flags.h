@@ -2,7 +2,7 @@
 #ifndef _UAPI_ASM_X86_PROCESSOR_FLAGS_H
 #define _UAPI_ASM_X86_PROCESSOR_FLAGS_H
 /* Various flags defined: can be included from assembler. */
-#include <const.h>
+#include "const.h"
 /*
  * EFLAGS bits
  */

@@ -3,7 +3,7 @@
 extern "C" {
 #endif
 
-#include <types.h>
+#include "types.h"
 
 struct biosregs {
 	union {

@@ -3,9 +3,9 @@
 extern "C" {
 #endif
 
-#include <types.h>
-#include <base.h>
-#include <boot.h>
+#include "types.h"
+#include "base.h"
+#include "boot.h"
 
 // 与CPU相关的结构
 #define IO_BITMAP_BITS	65536

@@ -5,6 +5,6 @@
 #ifndef OS_SCHED_H
 #define OS_SCHED_H
 
-#include <process/scheduler.h>
+#include "process/scheduler.h"
 
 #endif //OS_SCHED_H
