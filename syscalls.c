@@ -1,5 +1,7 @@
 /* 这个文件不属于该项目，是newlib的一部分
  * 编译newlib时应将该文件复制到newlib/libc/sys/mjos/或建立符号链接 */
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
 
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -9,7 +11,8 @@
 #include <sys/time.h>
 #include <stdio.h>
 #include <string.h>
-#include <mjos.h>
+#include <syscall.h>
+#include <sys/kstat.h>
 //#include <stdint.h>
 //#if UINTPTR_MAX == 0xffffffff
 //#error "32"
@@ -102,3 +105,4 @@ int write(int file, char *ptr, int len) {
 int gettimeofday (struct timeval *tv, void * tz) {
 	UNIMPLEMENT;
 }
+#pragma GCC pop_options

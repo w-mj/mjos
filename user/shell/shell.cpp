@@ -13,7 +13,7 @@ int main() {
     write(1, "Hello world\n", 12);
     volatile int a = 0;
     // fork();
-    // printf("hello printf\n");
+    printf("hello printf\n");
     while(1);
     return 0;
 }
