@@ -47,6 +47,7 @@ mjos_binutils() {
 newlib() {
   make mksysroot
   cd $SRC
+  ln -sf $PROJECT_PATH/syscalls.c newlib-3.3.0/newlib/libc/sys/mjos/syscalls.c
   rm -f build-toolchain/build-newlib/x86_64-mjos/newlib/libc/sys/mjos/lib.a
   rm -f build-toolchain/build-newlib/x86_64-mjos/newlib/libc/sys/mjos/*.o
 	# rm -r build-newlib
