@@ -52,5 +52,6 @@ void *syscall_tbl[256] = {
         /* 16 */ (void*)do_exec,
         /* 17 */ (void*)do_signal_register,
         /* 18 */ (void*)do_signal_unregister,
-        /* 19 */ (void*)do_unimplemented_syscall
+        /* 19 */ (void*)do_unimplemented_syscall,
+        /* 20 */ (void*)do_fstat
 };

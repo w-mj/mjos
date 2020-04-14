@@ -74,3 +74,21 @@ void PIPE_File::close() {
         pipe = nullptr;
     }
 }
+
+void PIPE_File::stat(kStat *st) {
+    // TODO: 之后再填入文件属性
+    st->dev = 1;
+    st->ino = 4;
+    // type=fifo, privilege=777
+    st->mode = S_IFIFO | S_IRWXU | S_IRWXG| S_IRWXO;
+    st->nlink = open_cnt;
+    st->uid = 1;
+    st->gid = 1;
+    st->rdev = 1;
+    st->size = size();
+    st->blksize = 1;
+    st->blocks = 1;
+    st->atime = 100;
+    st->mtime = 110;
+    st->ctime = 111;
+}

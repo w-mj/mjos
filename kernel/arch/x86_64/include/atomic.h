@@ -3,7 +3,7 @@
 extern "C" {
 #endif
 
-#include <types.h>
+#include "types.h"
 #include <asm.h>
 
 i32 atomic32_get(i32 * p);

@@ -9,6 +9,7 @@
 #include <sys/time.h>
 #include <stdio.h>
 #include <string.h>
+#include <mjos.h>
 //#include <stdint.h>
 //#if UINTPTR_MAX == 0xffffffff
 //#error "32"
@@ -22,7 +23,6 @@
 //#endif
 
 // __asm__(".code64");
-#include <syscall.h>
 #define UNIMPLEMENT do {\
 	sys_unimplemented_syscall(__func__); \
 	while (1); \
@@ -43,7 +43,22 @@ int fork() {
 	UNIMPLEMENT;
 }
 int fstat(int file, struct stat *st) {
-	UNIMPLEMENT;
+    kStat kst;
+    sys_fstat(file, &kst);
+    st->st_dev     = kst.dev    ;
+    st->st_ino     = kst.ino    ;
+    st->st_mode    = kst.mode   ;
+    st->st_nlink   = kst.nlink  ;
+    st->st_uid     = kst.uid    ;
+    st->st_gid     = kst.gid    ;
+    st->st_rdev    = kst.rdev   ;
+    st->st_size    = kst.size   ;
+    st->st_blksize = kst.blksize;
+    st->st_blocks  = kst.blocks ;
+    st->st_atime   = kst.atime  ;
+    st->st_mtime   = kst.mtime  ;
+    st->st_ctime   = kst.ctime  ;
+    return 0;
 }
 int getpid() {
 	return sys_getpid();

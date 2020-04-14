@@ -10,6 +10,8 @@ extern "C" {
 #include <asm.h>
 #include <stdio.h>
 
+#include <sys/kstat.h>
+
 //struct stat;
 //struct tms;
 //struct timeval;
@@ -153,6 +155,7 @@ SYS_CALL_1(16, exec, const char *)
 SYS_CALL_1(17, signal_register, SignalType)
 SYS_CALL_1(18, signal_unregister, SignalType)
 SYS_CALL_1(19, unimplemented_syscall, const char *)
+SYS_CALL_2(20, fstat, int, kStat*);
 
 enum {
     SYS_FUNC_PRINTMSG = 0,

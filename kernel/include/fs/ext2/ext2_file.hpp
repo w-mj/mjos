@@ -22,5 +22,7 @@ namespace EXT2 {
         int read(char*, int size);
         int write(const char*, int size);
         void resize(_u32 new_size);
+
+        void stat(kStat *st);
     };
 }

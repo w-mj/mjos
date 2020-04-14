@@ -119,7 +119,9 @@ makecompiledatabase:
 mksysroot:
 	mkdir -p  sysroot/usr/include/mjos
 	rsync -av kernel/include/* sysroot/usr/include/mjos
+	rsync     kernel/libc/include/sys/kstat.h sysroot/usr/include/mjos/sys/
 	rsync -av kernel/arch/$(ARCH)/include/* sysroot/usr/include/mjos
+	find $(SYSROOT)/usr/include/mjos/ -name '*.h' | awk '{print "#include \""$$0"\""}' > sysroot/usr/include/mjos.h
 
 # Disable implicit rules
 .SUFFIXES:

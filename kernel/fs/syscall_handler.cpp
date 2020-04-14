@@ -14,6 +14,7 @@ extern "C" int do_read(int , char *, size_t);
 extern "C" int do_write(int , const char*, size_t);
 extern "C" int do_close(int);
 extern "C" int do_get_attr(int, FILE*);
+extern "C" int do_fstat(int fno, kStat *st);
 
 int do_open(const char *path) {
     ThreadDescriptor *thread= thiscpu_var(current);
@@ -67,5 +68,14 @@ int do_get_attr(int fd, FILE *file) {
         return -1;
     file->fno = fd;
     file->size = f->size;
+    return 0;
+}
+
+int do_fstat(int fd, kStat *st) {
+    auto f = get_file(fd);
+    f->stat(st);
+    if (fd == 0 || fd == 1 || fd == 2) {
+        st->mode |= S_IFCHR;
+    }
     return 0;
 }

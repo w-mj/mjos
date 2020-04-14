@@ -149,3 +149,19 @@ void EXT2_File::resize(_u32 new_size) {
     ext2_fs->write_gdt();
     ext2_fs->write_super();
 }
+
+void EXT2_File::stat(kStat *st) {
+    st->dev = 1234; //ext2_fs->dev
+    st->ino = ext2_inode->ino;
+    st->mode = ext2_inode->mode;
+    st->nlink = ext2_inode->nlink;
+    st->uid = ext2_inode->uid;
+    st->gid = ext2_inode->gid;
+    st->rdev = 4321;
+    st->size = size;
+    st->blksize = 5678; //ext2_inode->blkbits;
+    st->blocks = ext2_inode->blocks;
+    st->atime = ext2_inode->atime;
+    st->mtime = ext2_inode->mtime;
+    st->ctime = ext2_inode->ctime;
+}

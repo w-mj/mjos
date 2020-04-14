@@ -4,6 +4,7 @@
 #include <dev/block_dev.hpp>
 #include <list.hpp>
 #include <string.hpp>
+#include <sys/kstat.h>
 
 namespace VFS
 {
@@ -169,7 +170,7 @@ namespace VFS
         virtual int read(char*, int size)=0;
         virtual int write(const char*, int size)=0;
         virtual void close();
-
+        virtual void stat(kStat *st)=0;
         virtual ~File() {}
 
     };

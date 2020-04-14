@@ -34,6 +34,8 @@ public:
     int write(const char *, int len) override;
     void close() override;
 
+    void stat(kStat *st) override ;
+
 };
 
 }
