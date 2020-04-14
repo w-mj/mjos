@@ -73,8 +73,10 @@ typedef struct __ProcessDescriptor {
 	ListEntry mem_list;
 	void *fds[CFG_PROCESS_FDS];  // 打开的文件列表，每一个元素是一个指向VFS::File的指针
     SignalHandler signalHandler;   // 信号处理函数，必须在内核空间
-    void *linear_start;
+    void *linear_start; // 线性区起始地址，通常为0x400000
     void *linear_end;   // 线性区终止地址
+    void *heap_start;   // 堆起始地址，堆起始地址就是代码区的结束位置
+    void *heap_end;     // 堆终止地址，堆终止地址总小于等于线性区终止地址
     char *path;   // 进程路径
     ListEntry signal_ist;   // 信号队列
 } ProcessDescriptor;

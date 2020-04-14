@@ -1,8 +1,7 @@
 #include <linkage.h>
 #include <arch.h>
 
-#define save_regs               \
-	pushq   %rax;               \
+#define save_regs_expect_rax    \
     pushq   %rbx;               \
     pushq   %rcx;               \
     pushq   %rdx;               \
@@ -18,7 +17,11 @@
     pushq   %r14;               \
     pushq   %r15;
 
-#define restore_regs            \
+#define save_regs \
+    pushq   %rax; \
+    save_regs_expect_rax
+
+#define restore_regs_expect_rax \
     popq    %r15;               \
     popq    %r14;               \
     popq    %r13;               \
@@ -33,6 +36,9 @@
     popq    %rdx;               \
     popq    %rcx;               \
     popq    %rbx;               \
+
+#define restore_regs  \
+    restore_regs_expect_rax \
     popq    %rax;
 
 EXTERN_FUNC(interrupt_stub)
@@ -117,7 +123,7 @@ syscall_stub:
 	// rdx = 参数三
 	// rcx = 参数四
 	// r8  = 参数五
-	save_regs
+	save_regs_expect_rax
 	swapgs
     // pushq %rcx
 	// pushq %r11
@@ -145,7 +151,7 @@ syscall_stub:
 	// popq  %r11
 	// popq  %rcx
 	// jmp  user_return
-    restore_regs
+    restore_regs_expect_rax
    // sub $1, %rcx
     cli
     pushq   $USER_DATA_DEC

@@ -82,6 +82,10 @@ extern "C" int do_real_exec() {
     kfree_s(st_size, st);
     file->close();
 
+    // 设置堆地址
+    process->heap_start = process->linear_end;
+    process->heap_end   = process->linear_end;
+
 //    auto *signal_symbol = elf_get_symbol(elf, "on_signal");
 //    process->signalHandler = reinterpret_cast<SignalHandler>(signal_symbol->st_value);
     u64 ip = elf->e_entry;

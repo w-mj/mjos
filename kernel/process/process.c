@@ -121,6 +121,8 @@ pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main, Cr
 	pd->shared_mem_read_lock  = SPIN_INIT;
 	pd->linear_start = (void*)0x400000;  // x64 起始地址
 	pd->linear_end = pd->linear_start;
+	pd->heap_start = pd->linear_start;
+	pd->heap_end   = pd->linear_start;
 	memset(pd->fds, 0, sizeof(pd->fds));
 	raw_spin_take(&pd->shared_mem_read_lock);
 	list_init(&pd->threads);

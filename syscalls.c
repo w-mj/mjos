@@ -85,7 +85,7 @@ int read(int file, char *ptr, int len) {
 	return sys_read(file, ptr, len);
 }
 caddr_t sbrk(int incr) {
-	UNIMPLEMENT;
+	return sys_sbrk(incr);
 }
 int stat(const char *file, struct stat *st) {
 	UNIMPLEMENT;
