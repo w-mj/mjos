@@ -20,7 +20,7 @@ $(target): $(objlist)
 	yes | cp -f shell.run $(DISKDIR)
 
 %.cpp.o: %.cpp %.cpp.d
-	$(CXX) -c $(DEPGEN) -O0 -o $@ $<
+	$(CXX) $(INCFLAG) -c $(DEPGEN) -O0 -o $@ $<
 	@ mv -f $(basename $@).t $(basename $@).d
 
 $(deplist): ;

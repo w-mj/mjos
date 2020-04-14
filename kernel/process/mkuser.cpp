@@ -8,7 +8,7 @@
 
 using namespace std;
 
-vector<string> user_list = {"shell"};
+vector<string> user_list = {};
 int main(void) {
     string base_path = "../../user/";
     ofstream elfpiggy;

@@ -1,12 +1,7 @@
 
 subdirs := shell
 
-INCLIST := sys_header $(CURDIR)/../kernel/include $(CURDIR)/../kernel/arch/$(ARCH)/include \
-		   $(CURDIR)/../kernel/libc/include $(CURDIR)/../kernel/libc++/include
-
-INCFLAG := $(addprefix -I, $(INCLIST))
-
-CRT0 := $(CURDIR)/crt0.o
+INCLIST := $(SYSROOT)/usr/include/mjos
 
 CC      :=  $(TOOLCHAIN_BASE)$(ARCH)-$(NAME)-gcc
 CXX     :=  $(TOOLCHAIN_BASE)$(ARCH)-$(NAME)-g++
@@ -15,19 +10,15 @@ OBJCOPY :=  $(TOOLCHAIN_BASE)$(ARCH)-$(NAME)-objcopy
 LD      :=  $(TOOLCHAIN_BASE)$(ARCH)-$(NAME)-ld
 NM      :=  $(TOOLCHAIN_BASE)$(ARCH)-$(NAME)-nm
 
-export CC CXX AR OBJCOPY LD NM CFLAGS TEMPLATEFILE ARCH CXXFLAGS TESTINC DISKDIR NAME
+export CC CXX AR OBJCOPY LD NM CFLAGS TEMPLATEFILE ARCH CXXFLAGS TESTINC DISKDIR NAME INCLIST
 
 build: $(subdirs)
 
 test:  $(subdirs)
 
 clean: $(subdirs)
-	rm -f crt0.o
 
-$(subdirs): $(CRT0) FORCE
+$(subdirs): FORCE
 	$(MAKE) -C $@ $(MAKECMDGOALS)
-
-$(CRT0): crt0.c
-	$(CC) $(CFLAGS) $(INCFLAG) crt0.c -o crt0.o
 
 FORCE:

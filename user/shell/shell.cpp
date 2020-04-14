@@ -10,11 +10,10 @@ int main() {
     char buf[214];
     sprintf(buf, "hello %s %d", "?", 123);
     sys_write(1, buf, strlen(buf));
-//    write(1, "Hello world\n", 12);
+    write(1, "Hello world\n", 12);
     volatile int a = 0;
     // fork();
-    if (a > 0)
-     printf("hello printf\n");
+    // printf("hello printf\n");
     while(1);
     return 0;
 }

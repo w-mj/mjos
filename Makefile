@@ -5,7 +5,8 @@ NAME = mjos
 
 OUTDIR  :=  $(CURDIR)
 ISODIR  :=  $(OUTDIR)/iso
-DISKDIR  :=  $(CURDIR)/disk
+DISKDIR :=  $(CURDIR)/disk
+SYSROOT :=  $(CURDIR)/sysroot
 
 TOOLCHAIN_BASE := $(CURDIR)/opt/bin/# To make clion happy
 
@@ -37,7 +38,7 @@ endif
 
 TEMPLATEFILE := $(CURDIR)/Makefile.template
 
-export CC CXX AR OBJCOPY LD NM CFLAGS TEMPLATEFILE ARCH CXXFLAGS TESTINC DISKDIR NAME TOOLCHAIN_BASE
+export CC CXX AR OBJCOPY LD NM CFLAGS TEMPLATEFILE ARCH CXXFLAGS TESTINC DISKDIR NAME TOOLCHAIN_BASE SYSROOT
 
 all: build
 
@@ -116,8 +117,9 @@ makecompiledatabase:
 	compiledb -n  make test
 
 mksysroot:
-	rsync -av kernel/include/* sysroot/usr/include/
-	rsync -av kernel/arch/$(ARCH)/include/* sysroot/usr/include/
+	mkdir -p  sysroot/usr/include/mjos
+	rsync -av kernel/include/* sysroot/usr/include/mjos
+	rsync -av kernel/arch/$(ARCH)/include/* sysroot/usr/include/mjos
 
 # Disable implicit rules
 .SUFFIXES:

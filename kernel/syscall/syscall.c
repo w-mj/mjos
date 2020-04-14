@@ -27,7 +27,7 @@ int do_func_register(int funnum) {
 }
 
 int do_unimplemented_syscall(const char *name) {
-    loge("syscall %s is not implemented yet.");
+    loge("syscall %s is not implemented yet.", name);
     die();
     return 0;
 }
