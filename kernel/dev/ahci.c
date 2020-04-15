@@ -188,7 +188,7 @@ int find_cmdslot(HBA_PORT *port)
     _sL(fis->sdbfis);} \
     _ss("=======FIS END=========="); \
 } while(0)
-bool sata_read(HBA_PORT *port, u32 startl, u32 starth, u32 count, u64 buf)
+int sata_read(HBA_PORT *port, u32 startl, u32 starth, u32 count, u64 buf)
 {
     assert(port != NULL);
     // print_port(port);
@@ -198,7 +198,7 @@ bool sata_read(HBA_PORT *port, u32 startl, u32 starth, u32 count, u64 buf)
     int spin = 0; // Spin lock timeout counter
     int slot = find_cmdslot(port);
     if (slot < 0)
-        return false;
+        return -1;
 
     HBA_CMD_HEADER *cmdheader = (HBA_CMD_HEADER*)(u64)port->clb;
     cmdheader += slot;
@@ -224,7 +224,7 @@ bool sata_read(HBA_PORT *port, u32 startl, u32 starth, u32 count, u64 buf)
         cmdtbl->prdt_entry[i].dba = (u32) buf;
         cmdtbl->prdt_entry[i].dbc = 8*1024-1;	// 8K bytes (this value should always be set to 1 less than the actual value)
         cmdtbl->prdt_entry[i].i = 1;
-        buf += 8*1024;	// 4K words
+        buf += 4*1024;	// 4K words
         count -= 16;	// 16 sectors
     }
     // Last entry
@@ -291,6 +291,104 @@ bool sata_read(HBA_PORT *port, u32 startl, u32 starth, u32 count, u64 buf)
     // print_fis(port->fb, port->fbu);
     // print_port(port);
 
-    return true;
+    return 0;
 }
 
+int sata_write(HBA_PORT *port, u32 startl, u32 starth, u32 count, u64 buf){
+    assert(port != NULL);
+    port->is = (u32)-1;		// Clear pending interrupt bits
+    int spin = 0; // Spin lock timeout counter
+    int slot = find_cmdslot(port);
+    if (slot == -1)
+        return -1;
+
+
+    HBA_CMD_HEADER *cmdheader = (HBA_CMD_HEADER*)(u64)port->clb;
+    cmdheader += slot;
+    cmdheader->cfl = sizeof(FIS_REG_H2D)/sizeof(u32);	// Command FIS size
+    cmdheader->w = 1;		// write to device
+    cmdheader->prdtl = (u16)((count-1)>>4) + 1;	// PRDT entries count
+
+    if (cmdheader->ctba == 0) {
+        pfn_t ctba = kernel_page_alloc(PG_KERNEL);
+        cmdheader->ctba = ctba << PAGEOFFSET;
+        cmdheader->ctbau = 0;
+    }
+
+
+    HBA_CMD_TBL *cmdtbl = (HBA_CMD_TBL*)phys_to_virt(cmdheader->ctba);
+
+    memset(cmdtbl, 0, sizeof(HBA_CMD_TBL) + (cmdheader->prdtl-1)*sizeof(HBA_PRDT_ENTRY));
+
+    // 8K bytes (16 sectors) per PRDT
+    int i;
+    for (i=0; i<cmdheader->prdtl-1; i++)
+    {
+        cmdtbl->prdt_entry[i].dba = (u32)buf;
+        cmdtbl->prdt_entry[i].dbc = 8*1024 -1;	// 8K bytes
+        cmdtbl->prdt_entry[i].i = 0;
+        buf += 4*1024;	// 4K words
+        count -= 16;	// 16 sectors
+    }
+    // Last entry
+    cmdtbl->prdt_entry[i].dba = (u32)buf;
+    cmdtbl->prdt_entry[i].dbc = ((count<<9) -1);	// 512 bytes per sector
+    cmdtbl->prdt_entry[i].i = 0;
+
+    // Setup command
+    FIS_REG_H2D *cmdfis = (FIS_REG_H2D*)(&cmdtbl->cfis);
+
+    cmdfis->fis_type = FIS_TYPE_REG_H2D;
+    cmdfis->c = 1;	// Command
+    cmdfis->command = 0x35; //ATA_CMD_WRITE_DMA_EX
+
+    cmdfis->lba0 = (u8)startl;
+    cmdfis->lba1 = (u8)(startl>>8);
+    cmdfis->lba2 = (u8)(startl>>16);
+    cmdfis->device = 1<<6;	// LBA mode
+
+    cmdfis->lba3 = (u8)(startl>>24);
+    cmdfis->lba4 = (u8)starth;
+    cmdfis->lba5 = (u8)(starth>>8);
+
+    cmdfis->countl = count & 0xFF;
+    cmdfis->counth = (count >> 8) & 0xFF;
+
+
+    // The below loop waits until the port is no longer busy before issuing a new command
+    while ((port->tfd & (ATA_DEV_BUSY | ATA_DEV_DRQ)) && spin < 1000000)
+    {
+        spin++;
+    }
+    if (spin == 1000000)
+    {
+        logd("Port is hung\n");
+        return -1;
+    }
+
+    port->ci = 1<<slot;	// Issue command
+
+    // Wait for completion
+    while (1)
+    {
+        // In some longer duration reads, it may be helpful to spin on the DPS bit
+        // in the PxIS port field as well (1 << 5)
+        if ((port->ci & (1<<slot)) == 0)
+            break;
+        if (port->is & HBA_PxIS_TFES)	// Task file error
+        {
+            logd("Read disk error\n");
+            return -1;
+        }
+        //printf("Deepa here");
+    }
+
+    // Check again
+    if (port->is & HBA_PxIS_TFES)
+    {
+        logd("Read disk error\n");
+        return -1;
+    }
+
+    return 0;
+}
