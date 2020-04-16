@@ -55,6 +55,6 @@ bool schedule() {
 	return true;
 }
 
-void before_schedule_in() {
-    signalCheck();
+void before_schedule_in(SwitchContext *context) {
+    signalCheck(context);
 }

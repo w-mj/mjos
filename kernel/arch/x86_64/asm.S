@@ -292,7 +292,7 @@ thread_switch:
     pushq   %rax                    // rflags
     pushq   %r8                     // cs
     pushq   %r9                     // rip
-    pushq   $0                      // error code
+    // pushq   $0                      // error code
     save_regs                       // 备份寄存器
     movq    %rsp, (%rsi)            // 备份当前的rsp
 
@@ -309,9 +309,9 @@ load_tid_next:
     movq    0x98(%rsp), %rdi        // rdi = rsp
 1:
 */
-
+    movq    %rsp, %rdi   // 参数
     call    before_schedule_in
-    testl   $3, 0x88(%rsp)          // (15 + 3 - 1)* 8 = 0x88
+    testl   $3, 0x80(%rsp)          // (15 + 3 - 1)* 8 = 0x88
     jz      3f
     swapgs
     // movw    $USER_DATA_DEC, %ax
@@ -321,7 +321,7 @@ load_tid_next:
     // movw    %ax, %gs
 3:
     restore_regs                    // 恢复寄存器
-	addq    $8, %rsp                // 跳过errcode
+	// addq    $8, %rsp                // 跳过errcode
     iretq
 
 
@@ -339,7 +339,7 @@ init_thread_stack:
 	pushfq        // rflags
 	pushq  %rdx   // cs
 	pushq  %rsi   // ip = main
-	pushq  $0     // errcode
+	// pushq  $0     // errcode
 	save_regs     // regs
 	movq  %rsp, %rax  // 当前栈指针作为返回值
 
@@ -365,7 +365,7 @@ init_user_thread_stack:
     pushfq
     pushq $USER_CODE_DEC
     pushq %rsi
-    pushq $0
+    // pushq $0
     save_regs
     movq  %rsp, %rax
     movq  %r10, %cr3

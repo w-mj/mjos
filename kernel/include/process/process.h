@@ -38,7 +38,7 @@ typedef struct __MemList {
 	ListEntry next;
 } MemList;
 
-typedef struct {
+typedef struct __ThreadDescriptor{
 	void *rsp;
 	void *rsp0;
 	// 同一个进程的所有线程的cr3都相同

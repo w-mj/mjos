@@ -150,7 +150,7 @@ extern "C" int do_signal_unregister(SignalType type) {
 }
 
 // 在进程调入之前检查并处理信号
-extern "C" void signalCheck() {
+extern "C" void signalCheck(SwitchContext *context) {
     auto *process = thiscpu_var(current)->process;
     while (!list_empty(&process->signal_ist)) {
         auto wrapper_entry = list_pop_head(&process->signal_ist);

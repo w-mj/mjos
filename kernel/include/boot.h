@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _OS_BOOT_H
+#define _OS_BOOT_H
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -66,4 +67,6 @@ static inline pfn_t virt_to_pfn(void *addr) {
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

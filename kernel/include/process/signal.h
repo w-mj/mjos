@@ -2,6 +2,9 @@
 #define OS_SIGNAL_H
 
 
+#include <cpu.h>
+typedef struct __SwitchContext SwitchContext;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -36,7 +39,7 @@ int do_signal_register(SignalType);
 int do_signal_unregister(SignalType);
 void signalRegister(SignalType, struct __ProcessDescriptor*, SignalRegisterType);
 void signalUnregister(SignalType , struct __ProcessDescriptor *);
-void signalCheck();
+void signalCheck(SwitchContext *context);
 void signal_init();
 
 

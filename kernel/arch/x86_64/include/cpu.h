@@ -1,13 +1,14 @@
-#pragma once
-
+#ifndef _OS_CPU_H
+#define _OS_CPU_H
 #include "asm.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#include <process/process.h>
 #include "base.h"
 #include "types.h"
+#include "arch.h"
 
 extern int cpu_installed;
 extern int cpu_activated;
@@ -38,7 +39,31 @@ typedef struct {
     u64 rlfags;
     u64 rsp;
     u64 ss;
-}InterruptContext;
+} InterruptContext;
+
+
+typedef struct __SwitchContext{
+    u64 r15;
+    u64 r14;
+    u64 r13;
+    u64 r12;
+    u64 r11;
+    u64 r10;
+    u64 r9;
+    u64 r8;
+    u64 rbp;
+    u64 rsi;
+    u64 rdi;
+    u64 rdx;
+    u64 rcx;
+    u64 rbx;
+    u64 rax;
+    u64 rip;
+    u64 cs;
+    u64 rlfags;
+    u64 rsp;
+    u64 ss;
+} SwitchContext;
 
 int    cpu_count();
 int    cpu_index();
@@ -50,9 +75,7 @@ void *calc_thiscpu_addr(void * ptr);
 #define percpu_var(i, var)  (* percpu_ptr(i, var))
 #define thiscpu_var(var)    (* thiscpu_ptr(var))
 
-#include "process/process.h"
-#include "arch.h"
-
+typedef struct __ThreadDescriptor ThreadDescriptor;
 void prepare_switch(ThreadDescriptor *prev, ThreadDescriptor *next);
 // 初始化线程栈，传入栈地址和线程的入口地址
 void *init_thread_stack(void *sp, void *main, u32 cs, u32 ss);
@@ -82,4 +105,6 @@ static inline void* get_sp() {
 int do_kernel_return(void *rip, void *rsp);
 #ifdef __cplusplus
 }
+#endif
+
 #endif
