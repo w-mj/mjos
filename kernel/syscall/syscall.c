@@ -55,5 +55,8 @@ void *syscall_tbl[256] = {
         /* 18 */ (void*)do_signal_unregister,
         /* 19 */ (void*)do_unimplemented_syscall,
         /* 20 */ (void*)do_fstat,
-        /* 21 */ (void*)do_sbrk
+        /* 21 */ (void*)do_sbrk,
+        /* 22 */ (void*)do_link,
+        /* 23 */ (void*)do_unlink,
+        /* 24 */ (void*)do_lseek
 };

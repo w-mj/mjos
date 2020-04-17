@@ -6,6 +6,7 @@
 #include <cpu.h>
 #include <fs/vfs.hpp>
 #include <stdio.h>
+#include <cwalk.h>
 
 VFS::FS *root_fs = nullptr;
 
@@ -15,6 +16,9 @@ extern "C" int do_write(int , const char*, size_t);
 extern "C" int do_close(int);
 extern "C" int do_get_attr(int, FILE*);
 extern "C" int do_fstat(int fno, kStat *st);
+extern "C" int do_link(const char *, const char *);
+extern "C" int do_unlink(const char *);
+extern "C" int do_lseek(int, int, int);
 
 int do_open(const char *path) {
     ThreadDescriptor *thread= thiscpu_var(current);
@@ -77,5 +81,36 @@ int do_fstat(int fd, kStat *st) {
     if (fd == 0 || fd == 1 || fd == 2) {
         st->mode |= S_IFCHR;
     }
+    return 0;
+}
+
+int do_link(const char *old_path, const char *new_path) {
+    auto *old = root_fs->root->get_path(old_path);
+    size_t dir_len = strlen(new_path);
+    if (new_path[dir_len - 1] != '/') {
+        cwk_path_get_dirname(new_path, &dir_len);
+        auto *new_dir = root_fs->root->get_path(os::string(new_path, dir_len).c_str());
+        if (new_dir == nullptr)
+            return -1;
+        old->link(new_dir, new_path + dir_len);
+    } else {
+        auto *new_dir = root_fs->root->get_path(new_path);
+        if (new_dir == nullptr)
+            return -1;
+        old->link(new_dir);
+    }
+    return 0;
+}
+
+int do_unlink(const char *path) {
+    auto *file = root_fs->root->get_child(path);
+    if (file == nullptr)
+        return -1;
+    file->unlink();
+}
+
+int do_lseek(int fd, int ptr, int dir) {
+    auto *file = get_file(fd);
+    file->seek(ptr, dir);
     return 0;
 }

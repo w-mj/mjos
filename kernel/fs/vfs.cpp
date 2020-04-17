@@ -7,6 +7,7 @@
 //#include <stack>
 #include <string.hpp>
 #include <list.hpp>
+#include <cwalk.h>
 
 using namespace VFS;
 
@@ -34,6 +35,22 @@ DEntry *DEntry::get_child(const NameI *namei, DEntry **path) {
         namei = namei->next;
     }
     _pos();
+    return ans;
+}
+
+
+DEntry *DEntry::get_path(const char *path) {
+    size_t len = strlen(path);
+    char normalized_path[len];
+    cwk_path_normalize(path, normalized_path, strlen(path));
+    cwk_segment segment{};
+    DEntry *ans = this;
+    if (!cwk_path_get_first_segment(path, &segment)) {
+        return nullptr;
+    }
+    do {
+        ans = ans->get_child(os::string(segment.begin, segment.size));
+    } while (cwk_path_get_next_segment(&segment));
     return ans;
 }
 

@@ -136,6 +136,9 @@ SYS_CALL_1(18,int, signal_unregister, SignalType)
 SYS_CALL_1(19,int, unimplemented_syscall, const char *)
 SYS_CALL_2(20,int, fstat, int, kStat*)
 SYS_CALL_1(21, void*, sbrk, int)
+SYS_CALL_2(22, int,link, const char *, const char *)
+SYS_CALL_1(23, int, unlink, const char *)
+SYS_CALL_3(24, int, lseek, int, int, int)
 
 enum {
     SYS_FUNC_PRINTMSG = 0,

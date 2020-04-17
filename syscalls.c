@@ -67,16 +67,17 @@ int getpid() {
 	return sys_getpid();
 }
 int isatty(int file) {
-	UNIMPLEMENT;
+	return (file == 0 || file  == 1 || file == 2);
 }
+
 int kill(int pid, int sig) {
 	return sys_signal(sig, 0, pid);
 }
 int link(char *old, char *new) {
-	UNIMPLEMENT;
+	return sys_link(old, new);
 }
 int lseek(int file, int ptr, int dir) {
-	UNIMPLEMENT;
+	return sys_lseek(file, ptr, dir);
 }
 int open(const char *name, int flags, ...) {
 	return sys_open(name);
@@ -94,7 +95,7 @@ clock_t times(struct tms *buf) {
 	UNIMPLEMENT;
 }
 int unlink(char *name) {
-	UNIMPLEMENT;
+	return sys_unlink(name);
 }
 int wait(int *status) {
 	UNIMPLEMENT;

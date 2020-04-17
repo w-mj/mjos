@@ -22,8 +22,8 @@ namespace VFS
 
     enum SEEK {
         SET=0,
-        CUR,
-        END
+        CUR=1,
+        END=2
     };
 
     class Inode;
@@ -95,7 +95,7 @@ namespace VFS
         DEntry* get_child(const os::string& name);
         DEntry* get_child(const NameI *namei, DEntry **path=nullptr);
         DEntry *get_path(const NameI *namei, os::string* fname=nullptr);
-
+        DEntry *get_path(const char *path);
         os::string printed_path();
 
 
