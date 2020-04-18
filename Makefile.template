@@ -7,7 +7,13 @@ INCFLAG := $(addprefix -I, $(INCLIST))
 
 DEPGEN   =  -MT $@ -MMD -MP -MF $(basename $@).t
 
-target := $(notdir $(shell pwd)).obj
+target_obj := $(notdir $(shell pwd)).obj
+target_run := $(notdir $(shell pwd)).run
+ifeq ($(BIN), 1)
+	target := $(target_run)
+else
+	target := $(target_obj)
+endif
 
 testsrc := $(shell find . -maxdepth 1 -name 'test*.cpp')
 testrun := $(addsuffix .run, $(testsrc))
@@ -23,30 +29,30 @@ clean: $(subdirs)
 
 build: $(subdirs) $(target)
 
-$(target): $(objlist) $(subobjs)
+$(target_obj): $(objlist) $(subobjs)
 	$(LD) -relocatable $^ -o $@
 
 $(subobjs): $(subdirs)
 
 %.c.o: %.c %.c.d
-	$(CC) $(CFLAGS) $(INCFLAG) $(DEPGEN) -o $@ $<
+	$(CC) $(CFLAGS) $(INCFLAG) $(DEPGEN) -c -o $@ $<
 	@ mv -f $(basename $@).t $(basename $@).d
 
 %.S.o: %.S %.S.d
-	$(CC) $(CFLAGS) $(INCFLAG) $(DEPGEN) -o $@ $<
+	$(CC) $(CFLAGS) $(INCFLAG) $(DEPGEN) -c -o $@ $<
 	@ mv -f $(basename $@).t $(basename $@).d
 
 %.cpp.o: %.cpp %.cpp.d
-	$(CXX) $(CXXFLAGS) $(INCFLAG) $(DEPGEN) -o $@ $<
+	$(CXX) $(CXXFLAGS) $(INCFLAG) $(DEPGEN) -c -o $@ $<
 	@ mv -f $(basename $@).t $(basename $@).d
 
 %.cc.o: %.cc %.cc.d
-	$(CXX) $(CXXFLAGS) $(INCFLAG) $(DEPGEN) -o $@ $<
+	$(CXX) $(CXXFLAGS) $(INCFLAG) $(DEPGEN) -c -o $@ $<
 	@ mv -f $(basename $@).t $(basename $@).d
 
-%.cpp.run: %.cpp %.cpp.d
-	g++  $(DEPGEN) $(TESTINC) -o $@ $<
-	@mv -f $(basename $@).t $(basename $@).d
+$(target_run): $(objlist) $(subobjs)
+	$(CXX)  $^ -o $@
+	yes | cp -f $@ $(SYSROOT)/usr/bin/
 
 test: $(testrun)
 	$(testrunlist)

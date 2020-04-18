@@ -29,7 +29,12 @@ INCLIST := $(CURDIR)/include $(CURDIR)/arch/$(ARCH)/include \
 LFLAGS  := -nostdlib -lgcc -T arch/$(ARCH)/linker.ld -Wl,-Map=$(mapfile)
 INCFLAG := $(addprefix -I, $(INCLIST))
 
-TESTINC += -I$(CURDIR)/libc++/include
+
+CFLAGS  +=  -std=c11 -DKERNEL -DARCH=$(ARCH)
+CFLAGS  +=  -Wall -Wextra -Werror=implicit
+CFLAGS  +=  -ffreestanding -ffunction-sections -fdata-sections
+CXXFLAGS+=  -std=c++17 -ffreestanding -fno-exceptions -DKERNEL #-fno-rtti
+TESTINC +=  -I$(CURDIR)/libc++/include
 
 include arch/$(ARCH)/Makefile.config
 
@@ -55,21 +60,21 @@ $(subdirs): FORCE
 $(subobjs): $(subdirs)
 
 $(crti_obj): $(crti_src)
-	$(CC) $(CFLAGS) $< -o $@
+	$(CC) $(CFLAGS) $< -c -o $@
 
 $(crtn_obj): $(crtn_src)
-	$(CC) $(CFLAGS) $< -o $@
+	$(CC) $(CFLAGS) $< -c -o $@
 
 %.c.o: %.c %.c.d
-	$(CC) $(CFLAGS) $(INCFLAG) $(DEPGEN) -o $@ $<
+	$(CC) $(CFLAGS) $(INCFLAG) $(DEPGEN) -c -o $@ $<
 	@ mv -f $(basename $@).t $(basename $@).d
 
 %.S.o: %.S %.S.d
-	$(CC) $(CFLAGS) $(INCFLAG) $(DEPGEN) -o $@ $<
+	$(CC) $(CFLAGS) $(INCFLAG) $(DEPGEN) -c -o $@ $<
 	@ mv -f $(basename $@).t $(basename $@).d
 
 %.cpp.o: %.cpp %.cpp.d
-	$(CXX) $(CXXFLAGS) $(INCFLAG) $(DEPGEN) -o $@ $<
+	$(CXX) $(CXXFLAGS) $(INCFLAG) $(DEPGEN) -c -o $@ $<
 	@ mv -f $(basename $@).t $(basename $@).d
 
 $(binfile): $(elffile)

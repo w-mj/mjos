@@ -4,28 +4,26 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <fcntl.h>
+#include <fs/ext2/ext2_disk_stru.hpp>
 
 int main() {
     sys_signal_register(SignalType::SIG_KEY);
-    char buf[214];
+    char buf[512];
     sprintf(buf, "hello %s %d", "?", 123);
     sys_write(1, buf, strlen(buf));
     write(1, "Hello world\n", 12);
-    volatile int a = 0;
     // fork();
     printf("hello printf\n");
-//    DIR *dir;
-//    struct dirent *ent;
-//    if ((dir = opendir ("c:\\src\\")) != NULL) {
-//      /* print all the files and directories within directory */
-//      while ((ent = readdir (dir)) != NULL) {
-//        printf ("%s\n", ent->d_name);
-//      }
-//      closedir (dir);
-//    } else {
-//      /* could not open directory */
-//      perror ("");
-//    }
+    int fd = open("/", O_RDONLY);
+    read(fd, buf, 512);
+    char *ptr = buf;
+    while (ptr < buf + 512) {
+        auto *entry = (EXT2::DirEntry*)ptr;
+        printf("%s\n", entry->name);
+        ptr += entry->rec_len;
+    }
+    close(fd);
     while(1);
     return 0;
 }

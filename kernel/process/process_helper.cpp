@@ -28,7 +28,7 @@ static inline char *read_file(VFS::File *file, size_t offset, size_t len) {
 extern "C" int do_real_exec() {
     ThreadDescriptor  *thread = thiscpu_var(current);
     ProcessDescriptor *process = thread->process;
-    auto file = root_fs->root->open(process->path);
+    auto file = root_fs->root->get_path(process->path)->open();
     auto elf = (Elf64_Ehdr*)kmalloc_s(sizeof(Elf64_Ehdr));
     file->read((char *)elf, sizeof(Elf64_Ehdr));  // 读入elf头
     assert(*(u32*)elf->e_ident == 0x464c457f);

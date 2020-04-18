@@ -53,7 +53,7 @@ newlib() {
 	# rm -r build-newlib
 	mkdir -p build-newlib
 	cd build-newlib
-	../newlib-3.3.0/configure --prefix=/usr --target=$TARGET CFLAGS="-m64"
+	../newlib-3.3.0/configure --prefix=/usr --target=$TARGET CFLAGS="-m64" --enable-DHAVE_POSIX_DIR
 	make all
 	make DESTDIR=${SYSROOT} install
 	cp -ar $SYSROOT/usr/x86_64-mjos/* $SYSROOT/usr/

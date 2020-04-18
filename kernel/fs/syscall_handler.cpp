@@ -31,7 +31,7 @@ int do_open(const char *path) {
     }
     if (fd == CFG_PROCESS_FDS)
         return -1;
-    process->fds[fd] = root_fs->root->open(os::string(path));
+    process->fds[fd] = root_fs->root->get_path(path)->open();
     return fd;
 }
 
@@ -107,10 +107,9 @@ int do_unlink(const char *path) {
     if (file == nullptr)
         return -1;
     file->unlink();
+    return 0;
 }
 
 int do_lseek(int fd, int ptr, int dir) {
-    auto *file = get_file(fd);
-    file->seek(ptr, dir);
-    return 0;
+    return get_file(fd)->seek(ptr, dir);
 }

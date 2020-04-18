@@ -5,7 +5,6 @@ NAME = mjos
 
 OUTDIR  :=  $(CURDIR)
 ISODIR  :=  $(OUTDIR)/iso
-DISKDIR :=  $(CURDIR)/disk
 SYSROOT :=  $(CURDIR)/sysroot
 
 TOOLCHAIN_BASE := $(CURDIR)/opt/bin/# To make clion happy
@@ -19,10 +18,8 @@ NM      :=  $(TOOLCHAIN_BASE)$(ARCH)-elf-nm
 BINFILE :=  kernel/kernel.bin  # must be same with kernel/Makefile
 ISOFILE :=  $(OUTDIR)/$(NAME).iso
 
-CFLAGS  :=  -c -std=c11 -DKERNEL -DARCH=$(ARCH)
-CFLAGS  +=  -Wall -Wextra -Werror=implicit 
-CFLAGS  +=  -ffreestanding -ffunction-sections -fdata-sections
-CXXFLAGS:=  -c -std=c++17 -ffreestanding -fno-exceptions -DKERNEL #-fno-rtti
+CFLAGS :=
+CXXFLAGS :=
 
 TESTINC := -I$(CURDIR)/tools/UnitTest -I/usr/include
 
@@ -58,13 +55,15 @@ clean-kernel: FORCE
 	$(MAKE) -C kernel clean
 
 build-user: mksysroot FORCE
-	mkdir -p $(DISKDIR)
+	mkdir -p $(SYSROOT)/usr/bin
+	mkdir -p mnt
 	$(MAKE) -C user build
 	- ps aux | grep $(QEMU) | sed -n "1, 1p" | awk '{print $$2}' | xargs -I {} kill -9 {}
 	- guestunmount mnt
 	guestmount -a disk.img -m /dev/sda mnt
-	cp -r disk/* mnt/
+	rsync -a $(SYSROOT)/* mnt
 	guestunmount mnt
+	rm -rf mnt
 
 test-user: FORCE
 	$(MAKE) -C user test
@@ -118,9 +117,9 @@ makecompiledatabase:
 
 mksysroot:
 	mkdir -p  sysroot/usr/include/mjos
-	rsync -av kernel/include/* sysroot/usr/include/
+	rsync -a  kernel/include/* sysroot/usr/include/
 	cp        kernel/libc/include/sys/kstat.h sysroot/usr/include/sys/kstat.h
-	rsync -av kernel/arch/$(ARCH)/include/* sysroot/usr/include/
+	rsync -a  kernel/arch/$(ARCH)/include/* sysroot/usr/include/
 	# find $(SYSROOT)/usr/include/mjos/ -name '*.h' | awk '{print "#include \""$$0"\""}' > sysroot/usr/include/mjos.h
 
 # Disable implicit rules

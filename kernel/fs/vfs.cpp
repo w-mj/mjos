@@ -45,12 +45,11 @@ DEntry *DEntry::get_path(const char *path) {
     cwk_path_normalize(path, normalized_path, strlen(path));
     cwk_segment segment{};
     DEntry *ans = this;
-    if (!cwk_path_get_first_segment(path, &segment)) {
-        return nullptr;
+    if (cwk_path_get_first_segment(path, &segment)) {
+        do {
+            ans = ans->get_child(os::string(segment.begin, segment.size));
+        } while (cwk_path_get_next_segment(&segment));
     }
-    do {
-        ans = ans->get_child(os::string(segment.begin, segment.size));
-    } while (cwk_path_get_next_segment(&segment));
     return ans;
 }
 
