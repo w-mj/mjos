@@ -10,7 +10,6 @@
 #include <process/scheduler.h>
 #include <fs/pipe/pipe.hpp>
 #include <process/signal.h>
-#include <time.h>
 
 extern "C" void init_main();
 
@@ -105,7 +104,6 @@ void init_main() {
 
     // 注册信号
     // signalRegister(SignalType::SIG_KEY, init_signal_handler, SignalRegisterType::NORMAL);
-    do_signal_register(SignalType::SIG_KEY);
 
     ASM("sti");
     // sys_print_msg("lalala");

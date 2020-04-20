@@ -24,5 +24,6 @@ namespace EXT2 {
         void resize(_u32 new_size);
 
         void stat(kStat *st);
+        int getdent(char *buff, int count);
     };
 }

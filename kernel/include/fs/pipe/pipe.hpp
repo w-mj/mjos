@@ -35,6 +35,7 @@ public:
     void close() override;
 
     void stat(kStat *st) override ;
+    int getdent(char *, int) override;
 
 };
 

@@ -48,7 +48,7 @@ DEntry *DEntry::get_path(const char *path) {
     if (cwk_path_get_first_segment(path, &segment)) {
         do {
             ans = ans->get_child(os::string(segment.begin, segment.size));
-        } while (cwk_path_get_next_segment(&segment));
+        } while (ans != nullptr && cwk_path_get_next_segment(&segment));
     }
     return ans;
 }

@@ -7,6 +7,7 @@
 #include <fs/vfs.hpp>
 #include <stdio.h>
 #include <cwalk.h>
+#include <sys/dirent.h>
 
 VFS::FS *root_fs = nullptr;
 
@@ -19,6 +20,7 @@ extern "C" int do_fstat(int fno, kStat *st);
 extern "C" int do_link(const char *, const char *);
 extern "C" int do_unlink(const char *);
 extern "C" int do_lseek(int, int, int);
+extern "C" int do_getdent(int, char*, int);
 
 int do_open(const char *path) {
     ThreadDescriptor *thread= thiscpu_var(current);
@@ -112,4 +114,8 @@ int do_unlink(const char *path) {
 
 int do_lseek(int fd, int ptr, int dir) {
     return get_file(fd)->seek(ptr, dir);
+}
+
+int do_getdent(int fd, char *buff, int count) {
+    return get_file(fd)->getdent(buff, count);
 }

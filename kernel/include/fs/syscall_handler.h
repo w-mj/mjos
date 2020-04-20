@@ -22,6 +22,7 @@ int do_fstat(int, kStat *);
 int do_link(const char *, const char *);
 int do_unlink(const char *);
 int do_lseek(int, int, int);
+int do_getdent(int, char *, int);
 
 #ifdef __cplusplus
 };

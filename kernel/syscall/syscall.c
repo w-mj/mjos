@@ -58,5 +58,6 @@ void *syscall_tbl[256] = {
         /* 21 */ (void*)do_sbrk,
         /* 22 */ (void*)do_link,
         /* 23 */ (void*)do_unlink,
-        /* 24 */ (void*)do_lseek
+        /* 24 */ (void*)do_lseek,
+        /* 25 */ (void*)do_getdent
 };

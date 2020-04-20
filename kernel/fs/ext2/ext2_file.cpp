@@ -3,6 +3,7 @@
 #include <string.h>
 #include <delog.h>
 #include <algorithm.hpp>
+#include <errno.h>
 using namespace EXT2;
 
 
@@ -55,6 +56,8 @@ int EXT2_File::seek(int pos, int whence) {
 
 int EXT2_File::read(char *buf, int len) {
     len = os::min(len, size - pos);
+    if (len == 0)
+        return 0;
     logd("read start %d, size %d, size %d", pos, len, size);
     _u32 read_len = 0, this_read_len;
     _u32 block_size = ext2_fs->block_size;  // 块大小
@@ -164,4 +167,20 @@ void EXT2_File::stat(kStat *st) {
     st->atime = ext2_inode->atime;
     st->mtime = ext2_inode->mtime;
     st->ctime = ext2_inode->ctime;
+}
+
+int EXT2_File::getdent(char *buff, int count) {
+    if ((type & S_IFDIR) == 0)
+        return -1;
+    EXT2::DirEntry temp{};
+    int t = read((char *)&temp, (int)(u64)(&((EXT2::DirEntry*)nullptr)->name));
+    if (t == 0)
+        return 0;
+    if (count < temp.name_len + 1) {
+        seek(-(int)(u64)(&((EXT2::DirEntry*)nullptr)->name), VFS::SEEK::CUR);
+        return -1;
+    }
+    read(buff, temp.name_len);
+    buff[temp.name_len] = 0;
+    return 1;
 }

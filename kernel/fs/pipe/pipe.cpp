@@ -5,6 +5,7 @@
 #include <fs/pipe/pipe.hpp>
 #include <memory/kmalloc.h>
 #include <algorithm.hpp>
+#include <errno.h>
 
 using namespace PIPE;
 
@@ -91,4 +92,8 @@ void PIPE_File::stat(kStat *st) {
     st->atime = 100;
     st->mtime = 110;
     st->ctime = 111;
+}
+
+int PIPE_File::getdent(char *, int) {
+    return -1;
 }

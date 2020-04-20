@@ -139,6 +139,7 @@ SYS_CALL_1(21, void*, sbrk, int)
 SYS_CALL_2(22, int,link, const char *, const char *)
 SYS_CALL_1(23, int, unlink, const char *)
 SYS_CALL_3(24, int, lseek, int, int, int)
+SYS_CALL_3(25, int, getdent, int, char *, int)
 
 enum {
     SYS_FUNC_PRINTMSG = 0,

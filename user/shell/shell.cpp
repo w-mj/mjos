@@ -16,12 +16,8 @@ int main() {
     // fork();
     printf("hello printf\n");
     int fd = open("/", O_RDONLY);
-    read(fd, buf, 512);
-    char *ptr = buf;
-    while (ptr < buf + 512) {
-        auto *entry = (EXT2::DirEntry*)ptr;
-        printf("%s\n", entry->name);
-        ptr += entry->rec_len;
+    while (sys_getdent(fd, buf, 512)) {
+        puts(buf);
     }
     close(fd);
     while(1);
