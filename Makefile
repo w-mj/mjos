@@ -92,15 +92,15 @@ QEMUFLAGS := -m 16385 -smp 4 -cdrom $(ISOFILE) -vga vmware -serial stdio -boot o
 
 run: iso disk
 	- ps aux | grep $(QEMU) | sed -n "1, 1p" | awk '{print $$2}' | xargs -I {} kill -9 {}
-	$(QEMU) $(QEMUFLAGS)
+	$(QEMU) $(QEMUFLAGS) | tee log.txt
 
 debug: iso disk
 	- ps aux | grep $(QEMU) | sed -n "1, 1p" | awk '{print $$2}' | xargs -I {} kill -9 {}
-	$(QEMU) -S -gdb tcp::4444 $(QEMUFLAGS)
+	$(QEMU) -S -gdb tcp::4444 $(QEMUFLAGS) | tee log.txt
 
 debugbackground: iso disk
 	- ps aux | grep $(QEMU) | sed -n "1, 1p" | awk '{print $$2}' | xargs -I {} kill -9 {}
-	$(QEMU) -S -gdb tcp::4444 $(QEMUFLAGS) &
+	$(QEMU) -S -gdb tcp::4444 $(QEMUFLAGS) > log.txt 2>&1 &
 
 dump: build-kernel
 	objdump -S -d kernel/kernel.elf > dump.txt

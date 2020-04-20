@@ -36,3 +36,6 @@ build-toolchain/binutils-*
 build-toolchain/newlib-*
 sysroot
 opt
+log.txt
+*.log
+dump*.txt

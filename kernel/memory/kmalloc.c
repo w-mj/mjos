@@ -52,13 +52,15 @@ void *kmalloc_s(size_t size) {
 		loge("kmalloc too large %d", size);
 		die();
 	}
-	return cache_obj_alloc(cache);
+	void *ret = cache_obj_alloc(cache);
+	logd("kmalloc %d %llx", size, ret);
+	return ret;
 }
 
 void kfree_s(size_t size, void *addr) {
-//	logd("kfree %d %llx", size, addr);
 	if (addr == NULL)
 		return;
+    logd("kfree %d %llx", size, addr);
 	CacheDescriptor *cache = get_kmalloc_cache(size);
 	if (cache == NULL) {
 		loge("kmalloc too large %d", size);
