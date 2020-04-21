@@ -7,13 +7,16 @@
 
 using namespace os;
 
+// 将目标字符串复制给自己
+// str: 目标字符串
+// len: 不含\0的字符串长度
 void string::copy_str(const char *str, size_t len){
     if (str == nullptr)
         return;
     delete[] data;
     if (len == -1)
-        len = strlen(str) + 1;
-    data = new char[len];
+        len = strlen(str);
+    data = new char[len + 1];
     memcpy(data, str, len);
     data[len] = 0;
     this->len = len;
@@ -29,7 +32,7 @@ string::string(const char *s, size_t cnt) {
 }
 
 string::string(const string& ano) {
-    copy_str(ano.data);
+    copy_str(ano.data, ano.size());
 }
 
 

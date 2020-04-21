@@ -71,7 +71,11 @@ extern _c __log_prefix[16];
 	console_setcolor(__c__); \
 } while(0)
 
+#ifdef DEBUG
 #define logd logi
+#else
+#define logd(...) do {}while (0)
+#endif
 
 #define logw(...) do { \
 	_u8 __c__ = console_getcolor(); \

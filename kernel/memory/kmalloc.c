@@ -1,3 +1,5 @@
+#undef DEBUG
+
 #include <delog.h>
 #include <list.h>
 #include <base.h>
@@ -5,6 +7,7 @@
 #include <string.h>
 #include <memory/slab.h>
 #include <asm.h>
+
 
 typedef struct kmalloc_info_struct {
 	char *name;
@@ -47,25 +50,25 @@ void kmalloc_init() {
 void *kmalloc_s(size_t size) {
 //	logd("kmalloc %d", size);
 	CacheDescriptor *cache = get_kmalloc_cache(size);
-	assert (strncmp(cache->name, "kmalloc", 7) == 0);
+	// assert (strncmp(cache->name, "kmalloc", 7) == 0);
 	if (cache == NULL) {
 		loge("kmalloc too large %d", size);
 		die();
 	}
 	void *ret = cache_obj_alloc(cache);
-	logd("kmalloc %d %llx", size, ret);
+	logd("kmalloc %d %llx",cache->obj_size, ret);
 	return ret;
 }
 
 void kfree_s(size_t size, void *addr) {
 	if (addr == NULL)
 		return;
-    logd("kfree %d %llx", size, addr);
 	CacheDescriptor *cache = get_kmalloc_cache(size);
 	if (cache == NULL) {
 		loge("kmalloc too large %d", size);
 		die();
 	}
+    logd("kfree %d %llx", cache->obj_size, addr);
 	cache_obj_release(cache, addr);
 }
 

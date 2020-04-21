@@ -14,35 +14,35 @@ static u8 inited = 0, available=0;
 
 void early_kmalloc_init(u64 kernel_end) {
 	if (inited) {
-		loge("early kmalloc is already inited.");
+		loge("early_kmalloc is already inited.");
 		return;
 	}
 	heap_ptr = heap_end = kernel_end;
 	heap_end = ROUND_UP(heap_end, PAGESIZE);
-	logi("init early kmelloc heap_ptr: %llx heap_end: %llx", heap_ptr, heap_end);
+	logi("init early_kmalloc heap_ptr: %llx heap_end: %llx", heap_ptr, heap_end);
 	inited = 1;
 	available = 1;
 }
 
 void early_kmalloc_depercated() {
-	logd("early kmalloc depercated");
+	logd("early_kmalloc depercated");
 	available = 0;
 }
 
 void *early_kmalloc(size_t size) {
 	if (!inited) {
-		loge("early kmalloc not inited");
+		loge("early_kmalloc not inited");
 		return NULL;
 	}
 	if (!available) {
-		loge("early kmalloc can not be used anymode.");
+		loge("early_kmalloc can not be used anymode.");
 		return NULL;
 	}
 	void *ptr = (void*)heap_ptr;
 	heap_ptr += size;
 	while (heap_ptr >= heap_end)
 		heap_end += PAGESIZE;
-	logi("early kmelloc %d, start: %llx heap_ptr: %llx heap_end: %llx",
+	logi("early_kmalloc %d, start: %llx heap_ptr: %llx heap_end: %llx",
 			size, ptr, heap_ptr, heap_end);
 	return ptr;
 }
