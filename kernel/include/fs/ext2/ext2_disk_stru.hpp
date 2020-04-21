@@ -139,6 +139,17 @@ struct Inode {
  */
 constexpr int NAME_LEN = 255;
 
+enum Type {
+    Unknown = 0,
+    Regular,
+    Directory,
+    Character,
+    Block,
+    Pipe,
+    Socket,
+    Symbol
+};
+
 struct DirEntry {
 	_u32 inode;  // 目标的索引节点号
 	_u16 rec_len;  // 目录项长度  当前项起始位置+目录项长度=下一个目录项位置

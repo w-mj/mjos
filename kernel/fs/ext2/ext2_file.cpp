@@ -170,17 +170,23 @@ void EXT2_File::stat(kStat *st) {
 }
 
 int EXT2_File::getdent(char *buff, int count) {
-    if ((type & S_IFDIR) == 0)
+    const int beforeNameLen = (int)(u64)(&((EXT2::DirEntry*)nullptr)->name);
+    if (type != EXT2::Type::Directory)
         return -1;
     EXT2::DirEntry temp{};
-    int t = read((char *)&temp, (int)(u64)(&((EXT2::DirEntry*)nullptr)->name));
+    int t = read((char *)&temp, beforeNameLen);
     if (t == 0)
         return 0;
     if (count < temp.name_len + 1) {
-        seek(-(int)(u64)(&((EXT2::DirEntry*)nullptr)->name), VFS::SEEK::CUR);
+        // buff太小，无法装入文件名，把文件指针回退到读取之前的状态
+        seek(-beforeNameLen, VFS::SEEK::CUR);
         return -1;
     }
     read(buff, temp.name_len);
     buff[temp.name_len] = 0;
+    if (temp.rec_len > beforeNameLen + temp.name_len) {
+        // 移动文件指针到这个记录末尾
+        seek(temp.rec_len - (beforeNameLen + temp.name_len), VFS::SEEK::CUR);
+    }
     return 1;
 }
