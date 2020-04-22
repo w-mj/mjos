@@ -23,6 +23,7 @@ int do_link(const char *, const char *);
 int do_unlink(const char *);
 int do_lseek(int, int, int);
 int do_getdent(int, char *, int);
+int do_chdir(const char *);
 
 #ifdef __cplusplus
 };

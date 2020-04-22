@@ -1,5 +1,4 @@
 #undef DEBUG
-
 #include <delog.h>
 #include <list.h>
 #include <base.h>

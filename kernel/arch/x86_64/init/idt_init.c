@@ -99,6 +99,7 @@ void interrupt_stub(InterruptContext *cxt) {
 		ASM("movq %%r11, %0": "=rm"(code));
 		loge("code=%llx", code);
 	}
+	ASM("int3");
 	// _sa((void*)rsp, 256);
 	while (1);
 	die();

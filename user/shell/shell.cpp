@@ -15,7 +15,8 @@ int main() {
     write(1, "Hello world\n", 12);
     // fork();
     printf("hello printf\n");
-    int fd = open("/", O_RDONLY);
+    sys_chdir("/usr/");
+    int fd = open(".", O_RDONLY);
     while (sys_getdent(fd, buf, 512)) {
         puts(buf);
     }

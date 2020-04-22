@@ -72,6 +72,7 @@ typedef struct __ProcessDescriptor {
 	Spin shared_mem_write_lock;
 	ListEntry mem_list;
 	void *fds[CFG_PROCESS_FDS];  // 打开的文件列表，每一个元素是一个指向VFS::File的指针
+	void *cwd;  // 当前的目录，类型为指向VFS::DEntry的指针
     SignalHandler signalHandler;   // 信号处理函数，必须在内核空间
     void *linear_start; // 线性区起始地址，通常为0x400000
     void *linear_end;   // 线性区终止地址

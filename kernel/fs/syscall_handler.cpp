@@ -7,7 +7,7 @@
 #include <fs/vfs.hpp>
 #include <stdio.h>
 #include <cwalk.h>
-#include <sys/dirent.h>
+#include <delog.h>
 
 VFS::FS *root_fs = nullptr;
 
@@ -21,6 +21,26 @@ extern "C" int do_link(const char *, const char *);
 extern "C" int do_unlink(const char *);
 extern "C" int do_lseek(int, int, int);
 extern "C" int do_getdent(int, char*, int);
+extern "C" int do_chdir(const char*);
+
+VFS::File *get_file(int fd) {
+    ThreadDescriptor *thread= thiscpu_var(current);
+    ProcessDescriptor *process = thread->process;
+    if (process->fds[fd] == NULL) {
+        return nullptr;
+    }
+    return static_cast<VFS::File*>(process->fds[fd]);
+}
+
+static inline VFS::DEntry *get_cwd() {
+    auto *process = thiscpu_var(current)->process;
+    auto *ret = static_cast<VFS::DEntry*>(process->cwd);
+    return ret;
+}
+
+static inline void set_cwd(VFS::DEntry *cwd) {
+    thiscpu_var(current)->process->cwd = cwd;
+}
 
 int do_open(const char *path) {
     ThreadDescriptor *thread= thiscpu_var(current);
@@ -33,17 +53,8 @@ int do_open(const char *path) {
     }
     if (fd == CFG_PROCESS_FDS)
         return -1;
-    process->fds[fd] = root_fs->root->get_path(path)->open();
+    process->fds[fd] = get_cwd()->get_path(path)->open();
     return fd;
-}
-
-VFS::File *get_file(int fd) {
-    ThreadDescriptor *thread= thiscpu_var(current);
-    ProcessDescriptor *process = thread->process;
-    if (process->fds[fd] == NULL) {
-        return nullptr;
-    }
-    return static_cast<VFS::File*>(process->fds[fd]);
 }
 
 int do_read(int fd, char *buf, size_t size) {
@@ -87,16 +98,16 @@ int do_fstat(int fd, kStat *st) {
 }
 
 int do_link(const char *old_path, const char *new_path) {
-    auto *old = root_fs->root->get_path(old_path);
+    auto *old = get_cwd()->get_path(old_path);
     size_t dir_len = strlen(new_path);
     if (new_path[dir_len - 1] != '/') {
         cwk_path_get_dirname(new_path, &dir_len);
-        auto *new_dir = root_fs->root->get_path(os::string(new_path, dir_len).c_str());
+        auto *new_dir = get_cwd()->get_path(os::string(new_path, dir_len).c_str());
         if (new_dir == nullptr)
             return -1;
         old->link(new_dir, new_path + dir_len);
     } else {
-        auto *new_dir = root_fs->root->get_path(new_path);
+        auto *new_dir = get_cwd()->get_path(new_path);
         if (new_dir == nullptr)
             return -1;
         old->link(new_dir);
@@ -105,7 +116,7 @@ int do_link(const char *old_path, const char *new_path) {
 }
 
 int do_unlink(const char *path) {
-    auto *file = root_fs->root->get_child(path);
+    auto *file = get_cwd()->get_child(path);
     if (file == nullptr)
         return -1;
     file->unlink();
@@ -118,4 +129,12 @@ int do_lseek(int fd, int ptr, int dir) {
 
 int do_getdent(int fd, char *buff, int count) {
     return get_file(fd)->getdent(buff, count);
+}
+
+int do_chdir(const char *path) {
+    auto *dir = get_cwd()->get_path(path);
+    if (dir == nullptr)
+        return -1;
+    set_cwd(dir);
+    return 1;
 }

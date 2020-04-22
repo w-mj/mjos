@@ -86,7 +86,7 @@ iso: build
 
 QEMU := qemu-system-x86_64
 QEMUFLAGS := -m 16385 -smp 4 -cdrom $(ISOFILE) -vga vmware -serial stdio -boot order=d \
- 			 -drive id=disk,file=disk.img,if=none \
+ 			 -drive id=disk,file=disk.img,if=none,format=raw \
  			 -device ahci,id=ahci \
  			 -device ide-drive,drive=disk,bus=ahci.0
 

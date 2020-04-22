@@ -146,6 +146,8 @@ pid_t create_process(ProcessDescriptor *parent, ProcessType type, void *main, Cr
 		pd->cr3 = read_cr3();
 	}
 
+	create_process_cxx(pd);
+
 	if (from == CREATE_PROCESS_FROM_FILE) {
 	    // 从文件创建进程
 	    size_t size = strlen((char *)main) + 1;

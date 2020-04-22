@@ -42,9 +42,12 @@ DEntry *DEntry::get_child(const NameI *namei, DEntry **path) {
 DEntry *DEntry::get_path(const char *path) {
     size_t len = strlen(path);
     char normalized_path[len];
-    cwk_path_normalize(path, normalized_path, strlen(path));
+    cwk_path_normalize(path, normalized_path, strlen(path) + 1);
     cwk_segment segment{};
     DEntry *ans = this;
+    if (normalized_path[0] == '/') {
+        ans = root_fs->root;
+    }
     if (cwk_path_get_first_segment(path, &segment)) {
         do {
             ans = ans->get_child(os::string(segment.begin, segment.size));
