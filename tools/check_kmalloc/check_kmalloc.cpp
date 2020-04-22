@@ -1,3 +1,6 @@
+/**
+ * 用于检查malloc和free的内存块是否有重复或不合法等问题
+ **/
 #include <iostream>
 #include <vector>
 #include <fstream>
@@ -44,7 +47,7 @@ void insert(vector<Element> &list, const Element &target) {
     }
     if (target.first < frontEnd || (backStart != 0 && targetEnd > backStart)) {
         // 重叠错误
-        cout << "ERROR ! insert " << hex << target.first << " " << dec << target.second << endl;
+        cout << "ERROR ! malloc " << hex << target.first << " " << dec << target.second << endl;
         printList(list);
         exit(-1);
     }
@@ -89,7 +92,7 @@ void remove(vector<Element> &list, const Element &target) {
     backStart = list[i].first;
     if (targetEnd > frontEnd && target.first < backStart) {
         // 不存在
-        cout << "ERROR ! remove" << target.first << " " << target.second << endl;
+        cout << "ERROR ! free " << target.first << " " << target.second << endl;
         exit(-1);
     }
     if (target.first == backStart) {
@@ -97,6 +100,7 @@ void remove(vector<Element> &list, const Element &target) {
        if (target.second == list[i].second) {
            list.erase(list.begin() + i);
        } else {
+           list[i].first = targetEnd;
            list[i].second -= target.second;
        }
     } else {
@@ -131,5 +135,6 @@ int main() {
             printList(mallocList);
         }
     }
+    cout << "check finish." << endl;
     return 0;
 }
