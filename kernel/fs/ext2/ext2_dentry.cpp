@@ -63,8 +63,8 @@ void EXT2_DEntry::load_children() {
             // } else if (temp_str->inode == inode_n) {
             //     children.push_back(this);
             // } else {
-                EXT2_DEntry *sub = new EXT2_DEntry(ext2_fs, this, 
-                        temp_str->inode, temp_str->file_type, 
+                EXT2_DEntry *sub = new EXT2_DEntry(ext2_fs, this,
+                        temp_str->inode, temp_str->file_type,
                         os::string((char*)temp_str->name, temp_str->name_len));
                 // if (temp_str->inode == parent->inode_n) {
                 //     sub->inode = parent->inode; 
