@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <cwalk.h>
 #include <delog.h>
+#include <algorithm.hpp>
 
 VFS::FS *root_fs = nullptr;
 
@@ -22,6 +23,7 @@ extern "C" int do_unlink(const char *);
 extern "C" int do_lseek(int, int, int);
 extern "C" int do_getdent(int, char*, int);
 extern "C" int do_chdir(const char*);
+extern "C" int do_getcwd(char *, int);
 
 VFS::File *get_file(int fd) {
     ThreadDescriptor *thread= thiscpu_var(current);
@@ -137,4 +139,27 @@ int do_chdir(const char *path) {
         return -1;
     set_cwd(dir);
     return 1;
+}
+
+int do_getcwd(char *buf, int size) {
+    auto *cwd = get_cwd();
+    os::vector<VFS::DEntry *> st;
+    do {
+        st.push_back(cwd);
+        cwd = cwd->parent;
+    } while (cwd != cwd->parent);
+    
+    while (!st.empty()) {
+        cwd = st.pop_back();
+        if (size == 0)
+            return -1;
+        *buf++ = '/';
+        size--;
+        if (size < cwd->name.size())
+            return -1;
+        strcpy(buf, cwd->name.c_str());
+        buf += cwd->name.size();
+        size -= cwd->name.size();
+    }
+    return 0;
 }

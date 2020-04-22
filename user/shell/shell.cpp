@@ -16,6 +16,8 @@ int main() {
     // fork();
     printf("hello printf\n");
     sys_chdir("/usr/include");
+    sys_getcwd(buf, 512);
+    printf("cwd : %s\n", buf);
     sys_chdir("../");
     int fd = open(".", O_RDONLY);
     while (sys_getdent(fd, buf, 512)) {

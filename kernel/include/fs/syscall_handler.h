@@ -24,6 +24,7 @@ int do_unlink(const char *);
 int do_lseek(int, int, int);
 int do_getdent(int, char *, int);
 int do_chdir(const char *);
+int do_getcwd(char *, int);
 
 #ifdef __cplusplus
 };

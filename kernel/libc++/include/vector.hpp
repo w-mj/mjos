@@ -52,6 +52,12 @@ namespace os {
             data[item_size] = item;
             item_size++;
         }
+
+        T pop_back() {
+            item_size--;
+            return data[item_size];
+        }
+
         T& operator[](int i) {
             return data[i];
         }
@@ -60,6 +66,9 @@ namespace os {
         }
         size_t size() const {
             return item_size;
+        }
+        bool empty() const {
+            return size() == 0;
         }
         T& front() {
             return this->operator[](0);
