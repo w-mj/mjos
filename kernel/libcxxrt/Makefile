@@ -13,6 +13,6 @@ srclist:= dynamic_cast.cc \
 subdir :=
 
 CFLAGS += -D_GNU_SOURCE
-CXXFLAGS += -D_GNU_SOURCE
+CXXFLAGS += -D_GNU_SOURCE -fno-check-new
 
 include $(TEMPLATEFILE)

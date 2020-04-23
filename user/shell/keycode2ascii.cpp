@@ -18,6 +18,8 @@ static char shiftedAsciiTable[ASCII_KEY_COUNT] = {
         '/','*','-','+','\n','.'
 };
 
+static char *table[2] = {asciiTable, shiftedAsciiTable};
+
 char keycode2ascii(keycode_t keycode) {
     static bool shift = false;
     bool down = (keycode & RELEASE) == 0;
@@ -26,11 +28,7 @@ char keycode2ascii(keycode_t keycode) {
         shift = down;
     }
     if (down && keycode < ASCII_KEY_COUNT) {
-        if (shift) {
-            return shiftedAsciiTable[keycode];
-        } else {
-            return asciiTable[keycode];
-        }
+        return table[shift][keycode];
     }
     return 0;
 }

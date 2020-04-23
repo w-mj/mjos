@@ -5,9 +5,12 @@
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <fs/ext2/ext2_disk_stru.hpp>
 
-int main() {
+int main(int argc, char **argv) {
+    for (int i = 0; i < argc; i++ ) {
+        printf("argv[%d]=%s\n", i, argv[i]);
+    }
+
     sys_signal_register(SignalType::SIG_KEY);
     char buf[512];
     sprintf(buf, "hello %s %d", "?", 123);

@@ -17,6 +17,8 @@ void create_process_cxx(ProcessDescriptor *process);
 int do_exec(const char *);
 int do_real_exec();
 
+int do_build_args(int *argc, char ***argv);
+
 #ifdef __cplusplus
 };
 #endif

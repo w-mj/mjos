@@ -7,6 +7,7 @@
 #include <asm.h>
 #include <memory/page.h>
 #include <process/elf.h>
+#include <memory/sbrk.h>
 
 extern "C" void copy_file(ProcessDescriptor *to, ProcessDescriptor *from) {
     for (int i = 0; i < CFG_PROCESS_FDS; i++) {
@@ -33,6 +34,9 @@ static inline char *read_file(VFS::File *file, size_t offset, size_t len) {
 extern "C" int do_real_exec() {
     ThreadDescriptor  *thread = thiscpu_var(current);
     ProcessDescriptor *process = thread->process;
+    char *path_end = strchr(process->path, ' ');
+    if (path_end != NULL)
+        *path_end = 0;   // 第一个空格之前是程序的路径
     auto file = root_fs->root->get_path(process->path)->open();
     auto elf = (Elf64_Ehdr*)kmalloc_s(sizeof(Elf64_Ehdr));
     file->read((char *)elf, sizeof(Elf64_Ehdr));  // 读入elf头
@@ -91,6 +95,11 @@ extern "C" int do_real_exec() {
     process->heap_start = process->linear_end;
     process->heap_end   = process->linear_end;
 
+    if (path_end != NULL) {
+        // 程序有参数，恢复路径
+        *path_end = ' ';
+    }
+
 //    auto *signal_symbol = elf_get_symbol(elf, "on_signal");
 //    process->signalHandler = reinterpret_cast<SignalHandler>(signal_symbol->st_value);
     u64 ip = elf->e_entry;
@@ -110,4 +119,42 @@ extern "C" int do_exec(const char *path) {
     process->path = (char *)kmalloc_s(size);
     memcpy(process->path, path, size);
     return do_real_exec();
+}
+
+extern "C" int do_build_args(int *argc, char ***argv) {
+    *argc = 0;
+    *argv = nullptr;
+    ProcessDescriptor *process = thiscpu_var(current)->process;
+    if (process->path == nullptr) {
+        return 0;
+    }
+    size_t path_len = strlen(process->path);
+    char *argvs = (char *)do_sbrk(path_len);
+    memcpy(argvs, process->path, path_len);    // 复制路径到堆空间
+
+
+    while (*argvs != '\0') {
+        // 找到一个参数
+        if (*argv == nullptr)
+            (*argv) = (char **)do_sbrk(sizeof(char *));  // 为argv表分配空间
+        else
+            do_sbrk(sizeof(char *));
+        (*argv)[*argc] = argvs;   // 参数地址
+        (*argc)++;
+
+        while (*argvs != '\0' && *argvs != ' ') {
+            if (*argvs == '"') {
+                do {
+                    argvs++;  // 跳过双引号内的内容
+                } while (*argvs != '"');
+            }
+            argvs++;
+        }
+        while (*argvs == ' ') {
+            // 发现空格，把连续的若干个空格都设置为\0
+            *argvs = '\0';
+            argvs++;
+        }
+    }
+    return 0;
 }

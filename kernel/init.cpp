@@ -109,7 +109,7 @@ void init_main() {
     // sys_print_msg("lalala");
 //    do_create_process(PROCESS_USER, (void*)user_process);
 //    do_create_process(PROCESS_USER, (void*)uses_process2);
-    do_create_process_from_file("/usr/bin/shell.run");
+    do_create_process_from_file("/usr/bin/shell.run param1 param2 param3");
     do_create_process(PROCESS_KERNEL, (void*)process_print_message);
     while (true);
 }

@@ -61,5 +61,6 @@ void *syscall_tbl[256] = {
         /* 24 */ (void*)do_lseek,
         /* 25 */ (void*)do_getdent,
         /* 26 */ (void*)do_chdir,
-        /* 27 */ (void*)do_getcwd
+        /* 27 */ (void*)do_getcwd,
+        /* 28 */ (void*)do_build_args,
 };
