@@ -60,7 +60,11 @@ static void scroll() {
 }
 
 void console_putchar(char c) {
-	if (c == '\r') {
+    if (c == '\b') {
+        console_column -= 1;
+        console_putchar(' ');
+        console_column -= 1;
+    } else if (c == '\r') {
 		console_column = 0;
 	} else if (c == '\n') {
 		console_row += 1;

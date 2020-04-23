@@ -82,15 +82,15 @@ void init_main() {
     root_fs = fs;
     fs->mount();
     auto root = fs->root;
-    root->load_children();
-    _si(root->children.size());
-    os::cout << root->name << os::endl;
+//    root->load_children();
+//    _si(root->children.size());
+//    os::cout << root->name << os::endl;
 //    for (auto x = root->children.begin(); x != root->children.end(); x++) {
 //        os::cout << (*x)->name << os::endl;
 //    }
-    for (auto x: root->children) {
-        os::cout << x->name << os::endl;
-    }
+//    for (auto x: root->children) {
+//        os::cout << x->name << os::endl;
+//    }
 
     // 打开基本文件
     stdout = new PIPE::PIPE_File();
@@ -101,6 +101,7 @@ void init_main() {
     processDescriptor->fds[FD_STDOUT] = stdout;
     processDescriptor->fds[FD_STDOUT] = stderr;
     processDescriptor->signalHandler = init_signal_handler;
+    processDescriptor->cwd = root;
 
     // 注册信号
     // signalRegister(SignalType::SIG_KEY, init_signal_handler, SignalRegisterType::NORMAL);

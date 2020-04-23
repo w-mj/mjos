@@ -6,27 +6,17 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-int main(int argc, char **argv) {
-    for (int i = 0; i < argc; i++ ) {
-        printf("argv[%d]=%s\n", i, argv[i]);
-    }
+char buf[1024];
 
+void promote() {
+    sys_getcwd(buf, 1024);
+    printf("shell %s> ", buf);
+    fflush(stdout);
+}
+int main(int argc, char **argv) {
+    printf("=======MJOS START=======\n");
     sys_signal_register(SignalType::SIG_KEY);
-    char buf[512];
-    sprintf(buf, "hello %s %d", "?", 123);
-    sys_write(1, buf, strlen(buf));
-    write(1, "Hello world\n", 12);
-    // fork();
-    printf("hello printf\n");
-    sys_chdir("/usr/include");
-    sys_getcwd(buf, 512);
-    printf("cwd : %s\n", buf);
-    sys_chdir("../");
-    int fd = open(".", O_RDONLY);
-    while (sys_getdent(fd, buf, 512)) {
-        puts(buf);
-    }
-    close(fd);
+    promote();
     while(1);
     return 0;
 }
@@ -38,6 +28,9 @@ bool on_signal(const Signal *signal) {
         if (c) {
             msg[0] = c;
             sys_write(1, msg, 1);
+            if (c == '\n') {
+                promote();
+            }
         }
     }
     return true;

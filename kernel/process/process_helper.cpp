@@ -20,7 +20,7 @@ extern "C" void copy_file(ProcessDescriptor *to, ProcessDescriptor *from) {
 
 extern "C" void create_process_cxx(ProcessDescriptor *process) {
     if (process->parent != nullptr)
-        process->cwd = root_fs->root;
+        process->cwd = process->parent->cwd;
 }
 
 static inline char *read_file(VFS::File *file, size_t offset, size_t len) {

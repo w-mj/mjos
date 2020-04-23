@@ -55,7 +55,12 @@ int do_open(const char *path) {
     }
     if (fd == CFG_PROCESS_FDS)
         return -1;
-    process->fds[fd] = get_cwd()->get_path(path)->open();
+    auto *p = get_cwd()->get_path(path);
+    if (p == nullptr)
+        return -1;
+    process->fds[fd] = p->open();
+    if (process->fds[fd] == nullptr)
+        return -1;
     return fd;
 }
 
