@@ -13,6 +13,7 @@ void promote() {
     printf("shell %s> ", buf);
     fflush(stdout);
 }
+
 int main(int argc, char **argv) {
     printf("=======MJOS START=======\n");
     sys_signal_register(SignalType::SIG_KEY);
@@ -29,6 +30,8 @@ bool on_signal(const Signal *signal) {
             msg[0] = c;
             sys_write(1, msg, 1);
             if (c == '\n') {
+                int pid = sys_create_process_from_file("/usr/bin/ls.run");
+                sys_waitpid(pid);
                 promote();
             }
         }

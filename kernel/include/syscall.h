@@ -143,6 +143,7 @@ SYS_CALL_3(25, int, getdent, int, char *, int)
 SYS_CALL_1(26, int, chdir, const char *)
 SYS_CALL_2(27, int, getcwd, char *, int)
 SYS_CALL_2(28, int, build_args, int *, char ***)
+SYS_CALL_1(29, int, waitpid, pid_t);
 
 enum {
     SYS_FUNC_PRINTMSG = 0,

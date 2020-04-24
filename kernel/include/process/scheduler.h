@@ -14,7 +14,8 @@ void scheduler_init();
 bool schedule();
 
 #define sched_yield() schedule()
-
+void thread_wait(enum ThreadWaitType type, u64 value);
+void thread_resume(enum ThreadWaitType type, u64 value);
 #ifdef __cplusplus
 }
 #endif

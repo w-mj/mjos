@@ -153,9 +153,9 @@ Elf64_Shdr *elf_get_section(Elf64_Shdr *st, size_t st_size, char *shstrtab, cons
 }
 
 Elf64_Sym *elf_get_symbol(Elf64_Sym *symtab, size_t symtab_size, char *strtab, const char *name) {
-   Elf64_Sym *end = symtab + symtab_size;
+   Elf64_Sym *end = (u8*)symtab + symtab_size;
    while (symtab != end) {
-       if (strcmp(&strtab[symtab->st_name], name) == 0) {
+       if (symtab->st_name && strcmp(&strtab[symtab->st_name], name) == 0) {
            return symtab;
        }
        symtab++;

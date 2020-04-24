@@ -99,6 +99,8 @@ ThreadDescriptor *create_thread(ProcessDescriptor *process, void *main) {
 	list_init(&thread->next);
 	list_init(&thread->sibling);
 	list_add(&thread->sibling, &process->threads);
+	thread->waitType = ThreadRunning;
+	thread->waitValue = 0;
 	add_thread_to_running(thread);
 	return thread;
 }
@@ -212,8 +214,10 @@ void destroy_process(ProcessDescriptor *process) {
     forrange(i, 0, SIG_CNT) {
     	signalUnregister(i, process);
     }
-    kfree_s(sizeof(ProcessDescriptor), process);
 
+    thread_resume(ThreadWaitPid, process->pid);
+
+    kfree_s(sizeof(ProcessDescriptor), process);
 }
 
 void destroy_thread(ThreadDescriptor *thread) {
@@ -261,4 +265,9 @@ int do_quit_thread() {
 int do_getpid() {
     ThreadDescriptor *thread = thiscpu_var(current);
     return thread->process->pid;
+}
+
+int do_waitpid(pid_t pid) {
+    thread_wait(ThreadWaitPid, pid);
+    return 0;
 }

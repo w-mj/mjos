@@ -1,4 +1,6 @@
 #pragma once
+#ifndef OS_CONFIG_H
+#define OS_CONFIG_H
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -28,4 +30,6 @@ extern "C" {
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

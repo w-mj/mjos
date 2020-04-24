@@ -1,3 +1,4 @@
+
 #ifndef OS_PROCESS_H
 #define OS_PROCESS_H
 
@@ -15,8 +16,7 @@ extern "C" {
 
 typedef enum {
 	THREAD_RUNNING,
-	THREAD_INTERRUPTIBLE,
-	THREAD_UNINTERRUPTIBLE,
+	THREAD_BLOCKED,
 	THREAD_STOPPED,
 } ThreadState;
 
@@ -38,6 +38,13 @@ typedef struct __MemList {
 	ListEntry next;
 } MemList;
 
+enum ThreadWaitType {
+    ThreadRunning,
+    ThreadWaitPid,
+    ThreadWaitDMA,
+    ThreadWaitMutex
+};
+
 typedef struct __ThreadDescriptor{
 	void *rsp;
 	void *rsp0;
@@ -54,6 +61,9 @@ typedef struct __ThreadDescriptor{
 	ListEntry sibling;  // 兄弟线程
 	int tid;
 	int stack_length;  // 栈长度(单位：页）
+
+	enum ThreadWaitType waitType;
+	u64 waitValue;
 } ThreadDescriptor;
 
 
@@ -80,6 +90,7 @@ typedef struct __ProcessDescriptor {
     void *heap_end;     // 堆终止地址，堆终止地址总小于等于线性区终止地址
     char *path;   // 进程路径
     ListEntry signal_ist;   // 信号队列
+
 } ProcessDescriptor;
 
 extern ThreadDescriptor *current;
@@ -99,9 +110,11 @@ void remove_from_mem_list(ProcessDescriptor *process, pfn_t pfn);
 
 int do_getpid();
 int do_create_process_from_file(const char *);
+int do_waitpid(pid_t);
 
 #ifdef __cplusplus
 };
 #endif
 
 #endif
+

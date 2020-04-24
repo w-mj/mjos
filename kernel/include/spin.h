@@ -1,4 +1,8 @@
 #pragma once
+
+#ifndef OS_SPIN_H
+#define OS_SPIN_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -19,5 +23,7 @@ void irq_spin_give(Spin *lock, u32 key);
 #define SPIN_INIT ((Spin) {0, 0})
 
 #ifdef __cplusplus
-}
+};
+#endif
+
 #endif

@@ -82,7 +82,8 @@ extern "C" int do_real_exec() {
     char *strtab = read_file(file, strtab_head->sh_offset, strtab_head->sh_size);
     Elf64_Sym *on_signal = elf_get_symbol(symtab, symtab_head->sh_size, strtab, "on_signal");
 
-    process->signalHandler = reinterpret_cast<SignalHandler>(on_signal->st_value);
+    if (on_signal)
+        process->signalHandler = reinterpret_cast<SignalHandler>(on_signal->st_value);
 
     kfree_s(symtab_head->sh_size, symtab);
     kfree_s(strtab_head->sh_size, strtab);

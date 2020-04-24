@@ -1,13 +1,15 @@
+
 #ifndef OS_SIGNAL_H
 #define OS_SIGNAL_H
 
 
-#include <cpu.h>
-typedef struct __SwitchContext SwitchContext;
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+
+#include <cpu.h>
+typedef struct __SwitchContext SwitchContext;
 #include "process/process.h"
 
 struct __ProcessDescriptor;

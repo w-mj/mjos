@@ -83,6 +83,7 @@ int do_close(int fd) {
     if (file == nullptr)
         return -1;
     file->close();
+    thiscpu_var(current)->process->fds[fd] = NULL;
     return 0;
 }
 

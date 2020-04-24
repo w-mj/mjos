@@ -5,9 +5,11 @@
 
 __PERCPU ThreadDescriptor *current = NULL;
 static ListEntry running_threads;
+static ListEntry blocked_threads;
 
 void scheduler_init() {
 	list_init(&running_threads);
+	list_init(&blocked_threads);
 }
 
 void add_thread_to_running(ThreadDescriptor *thread) {
@@ -16,7 +18,7 @@ void add_thread_to_running(ThreadDescriptor *thread) {
 }
 
 void remove_thread_from_running(ThreadDescriptor *thread) {
-	thread->state = THREAD_STOPPED;
+	thread->state = THREAD_BLOCKED;
 	list_remove(&thread->next);
 }
 
@@ -36,6 +38,7 @@ bool schedule() {
 	assert(to_run != NULL);
 	// assert(list_empty(&running_threads));
 	ThreadDescriptor *next = list_entry(to_run, ThreadDescriptor, next);
+    list_add_tail(&next->next, &running_threads);
 	if (thiscpu_var(current) == NULL) {
 		thiscpu_var(current) = next;
 		prepare_switch(NULL, next);
@@ -45,7 +48,6 @@ bool schedule() {
 		// _sL(&thiscpu_var(current)->next);
 		// _sL(thiscpu_var(current)->next.prev);
 		// _sL(thiscpu_var(current)->next.next);
-		list_add_tail(&next->next, &running_threads);
 		//plist
 		prepare_switch(thiscpu_var(current), next);
 		thiscpu_var(current) = next;
@@ -57,4 +59,37 @@ bool schedule() {
 
 void before_schedule_in(SwitchContext *context) {
     signalCheck(context);
+}
+
+void thread_wait(enum ThreadWaitType type, u64 value) {
+    ThreadDescriptor *thread = thiscpu_var(current);
+    thread->waitType = type;
+    thread->waitValue = value;
+    remove_thread_from_running(thread);
+    list_add(&thread->next, &blocked_threads);
+    schedule();
+}
+
+void thread_resume(enum ThreadWaitType type, u64 value) {
+    ListEntry *c = blocked_threads.next;
+    while (c != &blocked_threads) {
+        ThreadDescriptor *thread = list_entry(c, ThreadDescriptor, next);
+        switch (type) {
+            case ThreadWaitDMA:
+            case ThreadWaitPid:
+                if (thread->waitValue != value)
+                    break;
+                thread->waitType = ThreadRunning;
+                c = c->next;
+                list_remove(&thread->next);
+                add_thread_to_running(thread);
+                continue;
+            case ThreadWaitMutex:
+                break;
+            case ThreadRunning:
+                loge("you should not be here");
+                break;
+        }
+        c = c->next;
+    }
 }
