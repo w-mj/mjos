@@ -6,6 +6,7 @@ extern "C" {
 #include "types.h"
 #include "asm.h"
 
+// 对一个变量进行原子操作并返回操作前的值
 i32 atomic32_get(i32 * p);
 i32 atomic32_set(i32 * p, i32 x);
 i32 atomic32_inc(i32 * p);

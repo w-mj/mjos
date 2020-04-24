@@ -6,6 +6,7 @@
 #include <fs/syscall_handler.h>
 #include <process/process_helper.hpp>
 #include <memory/sbrk.h>
+#include <spin.h>
 
 
 pid_t sysfunc_tbl[256] = {};
@@ -64,4 +65,6 @@ void *syscall_tbl[256] = {
         /* 27 */ (void*)do_getcwd,
         /* 28 */ (void*)do_build_args,
         /* 29 */ (void*)do_waitpid,
+        /* 30 */ (void*)do_passeren,
+        /* 31 */ (void*)do_verhoog,
 };

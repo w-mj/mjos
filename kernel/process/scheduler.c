@@ -70,6 +70,12 @@ void thread_wait(enum ThreadWaitType type, u64 value) {
     schedule();
 }
 
+static inline void resume(ThreadDescriptor *thread) {
+    thread->waitType = ThreadRunning;
+    list_remove(&thread->next);
+    add_thread_to_running(thread);
+}
+
 void thread_resume(enum ThreadWaitType type, u64 value) {
     ListEntry *c = blocked_threads.next;
     while (c != &blocked_threads) {
@@ -79,13 +85,14 @@ void thread_resume(enum ThreadWaitType type, u64 value) {
             case ThreadWaitPid:
                 if (thread->waitValue != value)
                     break;
-                thread->waitType = ThreadRunning;
                 c = c->next;
-                list_remove(&thread->next);
-                add_thread_to_running(thread);
+                resume(thread);
                 continue;
             case ThreadWaitMutex:
-                break;
+                if (thread->waitValue == value) {
+                    resume(thread);
+                    return ;   // V原语一次只唤醒一个线程
+                }
             case ThreadRunning:
                 loge("you should not be here");
                 break;

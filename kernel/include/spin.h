@@ -14,6 +14,11 @@ typedef struct __Spin {
 	i32 svc;
 } Spin;
 
+typedef i32 Semaphore;
+
+int do_passeren(Semaphore*);
+int do_verhoog(Semaphore*);
+
 
 void raw_spin_take(Spin *lock);
 void raw_spin_give(Spin *lock);
