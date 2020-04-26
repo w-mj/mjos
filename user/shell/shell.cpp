@@ -3,8 +3,8 @@
 #include "keycode2ascii.h"
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
 #include <fcntl.h>
+#include "functions.h"
 
 char buf[1024];
 char command[1024];
@@ -22,6 +22,14 @@ void parse_cmd() {
     if (argument) {
         *argument = '\0';
     }
+    // shell内部功能
+    for (int i = 0; functionList[i].name != nullptr ;i++) {
+        if (strcmp(functionList[i].name, command) == 0) {
+            functionList[i].func(argument? argument + 1: nullptr);
+            return;
+        }
+    }
+    // 调用外部程序
     sprintf(buf, "/usr/bin/%s.run", command);
     struct stat st{};
     if (stat(buf, &st) == -1) {
@@ -29,7 +37,8 @@ void parse_cmd() {
         return;
     }
     if (argument) {
-        strcat(buf, argument + 1);
+        *argument = ' ';
+        strcat(buf, argument);
         // sprintf(buf, "/usr/bin/%s.run %s", command, argument + 1);
     }
     pid_t pid = sys_create_process_from_file(buf);

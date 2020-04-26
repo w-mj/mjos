@@ -50,7 +50,9 @@ DEntry *DEntry::get_path(const char *path) {
     }
     if (cwk_path_get_first_segment(path, &segment)) {
         do {
-            if (segment.begin[0] == '.' && segment.begin[1] == '.' && segment.size == 2) {
+            if (segment.begin[0] == '.' && segment.size == 1) {
+                ;
+            } else if (segment.begin[0] == '.' && segment.begin[1] == '.' && segment.size == 2) {
                 ans = ans->parent;
             } else {
                 ans = ans->get_child(os::string(segment.begin, segment.size));
