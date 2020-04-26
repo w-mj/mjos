@@ -26,7 +26,7 @@ public:
 
     bool empty();
     bool full();
-    int size();  // 管道内有效数据长度
+    int cal_size();  // 管道内有效数据长度
 
     int tell() override;
     int seek(int pos, int whence) override;

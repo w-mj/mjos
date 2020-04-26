@@ -216,7 +216,7 @@ void destroy_process(ProcessDescriptor *process) {
     }
 
     thread_resume(ThreadWaitPid, process->pid);
-
+    clr_bitmap(pid_bitmap, process->pid);
     kfree_s(sizeof(ProcessDescriptor), process);
 }
 

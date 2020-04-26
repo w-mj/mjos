@@ -89,11 +89,13 @@ void thread_resume(enum ThreadWaitType type, u64 value) {
                 resume(thread);
                 continue;
             case ThreadWaitMutex:
+            case ThreadWaitFile:
                 if (thread->waitValue == value) {
                     resume(thread);
                     return ;   // V原语一次只唤醒一个线程
                 }
-            case ThreadRunning:
+                break;
+            default:
                 loge("you should not be here");
                 break;
         }

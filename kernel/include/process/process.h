@@ -42,6 +42,7 @@ enum ThreadWaitType {
     ThreadRunning,
     ThreadWaitPid,
     ThreadWaitDMA,
+    ThreadWaitFile,
     ThreadWaitMutex
 };
 

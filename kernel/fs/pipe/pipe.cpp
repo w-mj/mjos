@@ -13,10 +13,11 @@ PIPE_File::PIPE_File(int size): pipe_size(size) {
     pipe = static_cast<char *>(kmalloc_s(size));
     wpos = 0;
     rpos = 0;
+    this->size = size;
 };
 
 int PIPE_File::tell() {
-    return 0;
+    return size - cal_size();
 }
 
 int PIPE_File::seek(int pos, int whence) {
@@ -34,7 +35,7 @@ int PIPE_File::read(char *buf, int len) {
         return 0;
     raw_spin_take(&spin);
     // 读取的数据长度
-    int read_size = os::min(len, pipe_size - rpos, size());
+    int read_size = os::min(len, pipe_size - rpos, cal_size());
     memcpy(buf, pipe + rpos, read_size);
     rpos = round(rpos + read_size);
     raw_spin_give(&spin);
@@ -53,7 +54,7 @@ bool PIPE_File::full() {
     return round(wpos + 1) == rpos;
 }
 
-int PIPE_File::size() {
+int PIPE_File::cal_size() {
     return round(wpos - rpos);
 }
 
@@ -61,7 +62,7 @@ int PIPE_File::write(const char *data, int len) {
     if (full() || len == 0)
         return 0;
     raw_spin_take(&spin);
-    int write_size = os::min(len, pipe_size - wpos, pipe_size - size() - 1);
+    int write_size = os::min(len, pipe_size - wpos, pipe_size - cal_size() - 1);
     memcpy(pipe + wpos, data, write_size);
     wpos = round(wpos + write_size);
     raw_spin_give(&spin);
@@ -86,7 +87,7 @@ void PIPE_File::stat(kStat *st) {
     st->uid = 1;
     st->gid = 1;
     st->rdev = 1;
-    st->size = size();
+    st->size = cal_size();
     st->blksize = 1;
     st->blocks = 1;
     st->atime = 100;

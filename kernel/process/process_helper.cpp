@@ -37,7 +37,10 @@ extern "C" int do_real_exec() {
     char *path_end = strchr(process->path, ' ');
     if (path_end != NULL)
         *path_end = 0;   // 第一个空格之前是程序的路径
-    auto file = root_fs->root->get_path(process->path)->open();
+    auto path = root_fs->root->get_path(process->path);
+    if (path == nullptr)
+        do_quit_thread();
+    auto file = path->open();
     auto elf = (Elf64_Ehdr*)kmalloc_s(sizeof(Elf64_Ehdr));
     file->read((char *)elf, sizeof(Elf64_Ehdr));  // 读入elf头
     assert(*(u32*)elf->e_ident == 0x464c457f);

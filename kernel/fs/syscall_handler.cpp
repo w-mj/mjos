@@ -3,6 +3,7 @@
 //
 #include <fs/syscall_handler.h>
 #include <process/process.h>
+#include <process/scheduler.h>
 #include <cpu.h>
 #include <fs/vfs.hpp>
 #include <stdio.h>
@@ -68,6 +69,10 @@ int do_read(int fd, char *buf, size_t size) {
     auto file = get_file(fd);
     if (file == nullptr)
         return -1;
+    if (file->tell() == file->size) {
+        // 挂自己
+        // thread_wait(ThreadWaitFile, (u64)file);
+    }
     return file->read(buf, size);
 }
 
@@ -75,7 +80,9 @@ int do_write(int fd, const char *data, size_t size) {
     auto file = get_file(fd);
     if (file == nullptr)
         return -1;
-    return file->write(data, size);
+    auto ret = file->write(data, size);
+    // thread_resume(ThreadWaitFile, (u64)file);
+    return ret;
 }
 
 int do_close(int fd) {
@@ -163,9 +170,12 @@ int do_getcwd(char *buf, int size) {
         size--;
         if (size < cwd->name.size())
             return -1;
-        strcpy(buf, cwd->name.c_str());
-        buf += cwd->name.size();
-        size -= cwd->name.size();
+        if (cwd->name[0] != '/') {
+            strcpy(buf, cwd->name.c_str());
+            buf += cwd->name.size();
+            size -= cwd->name.size();
+        }
     }
+    *buf = 0;
     return 0;
 }
