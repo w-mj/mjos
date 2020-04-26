@@ -45,23 +45,27 @@ int execve(char *name, char **argv, char **env) {
 int fork() {
 	UNIMPLEMENT;
 }
+
+void copy_st(struct stat *st, kStat *kst) {
+    st->st_dev     = kst->dev    ;
+    st->st_ino     = kst->ino    ;
+    st->st_mode    = kst->mode   ;
+    st->st_nlink   = kst->nlink  ;
+    st->st_uid     = kst->uid    ;
+    st->st_gid     = kst->gid    ;
+    st->st_rdev    = kst->rdev   ;
+    st->st_size    = kst->size   ;
+    st->st_blksize = kst->blksize;
+    st->st_blocks  = kst->blocks ;
+    st->st_atime   = kst->atime  ;
+    st->st_mtime   = kst->mtime  ;
+    st->st_ctime   = kst->ctime  ;
+}
 int fstat(int file, struct stat *st) {
     kStat kst;
-    sys_fstat(file, &kst);
-    st->st_dev     = kst.dev    ;
-    st->st_ino     = kst.ino    ;
-    st->st_mode    = kst.mode   ;
-    st->st_nlink   = kst.nlink  ;
-    st->st_uid     = kst.uid    ;
-    st->st_gid     = kst.gid    ;
-    st->st_rdev    = kst.rdev   ;
-    st->st_size    = kst.size   ;
-    st->st_blksize = kst.blksize;
-    st->st_blocks  = kst.blocks ;
-    st->st_atime   = kst.atime  ;
-    st->st_mtime   = kst.mtime  ;
-    st->st_ctime   = kst.ctime  ;
-    return 0;
+    int r = sys_fstat(file, &kst);
+    copy_st(st, &kst);
+    return r;
 }
 int getpid() {
 	return sys_getpid();
@@ -89,7 +93,10 @@ caddr_t sbrk(int incr) {
 	return sys_sbrk(incr);
 }
 int stat(const char *file, struct stat *st) {
-	UNIMPLEMENT;
+    kStat kst;
+    int r = sys_stat(file, &kst);
+    copy_st(st, &kst);
+    return r;
 }
 clock_t times(struct tms *buf) {
 	UNIMPLEMENT;

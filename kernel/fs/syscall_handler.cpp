@@ -179,3 +179,14 @@ int do_getcwd(char *buf, int size) {
     *buf = 0;
     return 0;
 }
+
+int do_stat(const char *path, kStat *st) {
+    auto *file = get_cwd()->get_path(path);
+    if (file == nullptr)
+        return -1;
+    if (st != nullptr) {
+        auto *opened = file->open();
+        opened->close();
+    }
+    return 0;
+}

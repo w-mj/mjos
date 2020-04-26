@@ -18,12 +18,19 @@ void promote() {
 
 void parse_cmd() {
     command[cmd_cur] = '\0';
-    char *space = strchr(command, ' ');
-    if (space) {
-        *space = '\0';
-        sprintf(buf, "/usr/bin/%s.run %s", command, space + 1);
-    } else {
-        sprintf(buf, "/usr/bin/%s.run", command);
+    char *argument= strchr(command, ' ');
+    if (argument) {
+        *argument = '\0';
+    }
+    sprintf(buf, "/usr/bin/%s.run", command);
+    struct stat st{};
+    if (stat(buf, &st) == -1) {
+        printf("no such file or directory %s\n", buf);
+        return;
+    }
+    if (argument) {
+        strcat(buf, argument + 1);
+        // sprintf(buf, "/usr/bin/%s.run %s", command, argument + 1);
     }
     pid_t pid = sys_create_process_from_file(buf);
     sys_waitpid(pid);

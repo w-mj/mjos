@@ -67,4 +67,5 @@ void *syscall_tbl[256] = {
         /* 29 */ (void*)do_waitpid,
         /* 30 */ (void*)do_passeren,
         /* 31 */ (void*)do_verhoog,
+        /* 32 */ (void*)do_stat
 };

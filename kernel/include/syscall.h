@@ -146,6 +146,7 @@ SYS_CALL_2(28, int, build_args, int *, char ***)
 SYS_CALL_1(29, int, waitpid, pid_t)
 SYS_CALL_1(30, int, passeren, Semaphore*)
 SYS_CALL_1(31, int, verhoog, Semaphore*)
+SYS_CALL_2(32, int, stat, const char *, kStat *)
 
 enum {
     SYS_FUNC_PRINTMSG = 0,
