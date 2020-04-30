@@ -5,7 +5,7 @@ KERNEL_VMA = 0xffffffff81000000;  /* 到全F共有2G内核空间 */
 
 PHDRS {
     boot        PT_LOAD;
-/*    trampoline  PT_LOAD; */
+/*  trampoline  PT_LOAD; */
     init        PT_LOAD;
     kernel      PT_LOAD;
 }

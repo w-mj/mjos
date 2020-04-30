@@ -110,7 +110,7 @@ static void loapic_svr_proc(InterruptContext *cxt) {
 static void loapic_timer_proc(InterruptContext *cxt) {
     assert(cxt->vec == VECNUM_TIMER);
 	// logd("tick");
-    // tick_proc();
+    tick_proc();
     loapic_send_eoi();
 	schedule();
 }

@@ -21,6 +21,7 @@
 #include <dev/pci.h>
 #include <fs/ext2/ext2_stru.hpp>
 #include <dev/ahci.h>
+#include <tick.h>
 
 #define TESTTYPE(x) assert((x) / 8 == sizeof(u##x))
 void test_types(void) {
@@ -135,6 +136,22 @@ static __INIT void parse_madt(madt_t * tbl) {
     }
 }
 
+void wakeup_aps() {
+        for (int i = 1; i < cpu_count(); ++i) {
+        loapic_emit_init(i);                            // send INIT
+        tick_delay(MAX(CFG_SYS_CLOCK_RATE/100, 1));     // wait for 10ms
+        loapic_emit_sipi(i, 0x7c);                      // send SIPI
+        tick_delay(MAX(CFG_SYS_CLOCK_RATE/1000, 1));    // wait for 1ms
+        loapic_emit_sipi(i, 0x7c);                      // send SIPI again
+        tick_delay(MAX(CFG_SYS_CLOCK_RATE/1000, 1));    // wait for 1ms
+
+        // same boot stack is used, have to start cpus one-by-one
+        while (percpu_var(i, current) == NULL) {
+            tick_delay(10);
+        }
+    }
+}
+
 void init_main();
 void __libc_start_main();
 void _init();
@@ -218,3 +235,28 @@ __INIT __NORETURN void kernel_main(u64 rax, u64 rbx) {
 }
 
 
+__INIT __NORETURN void ap_main() {
+    // prepare essential cpu features
+    cpu_init();
+    gdt_init();
+    idt_init();
+
+    // thiscpu and tss
+    per_cpu_init();
+    // write_gsbase(percpu_base + cpu_activated * percpu_size);
+    tss_init();
+
+    // interrupt controller
+    loapic_dev_init();
+
+    thiscpu_var(current) = NULL;
+
+    // start idle task
+    logd("[smp] cpu %02d started.\n", cpu_activated++);
+    while (1) {
+        sched_yield();
+    }
+
+    loge("YOU SHALL NOT SEE THIS LINE!\n");
+    while (1) {}
+}

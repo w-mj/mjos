@@ -9,6 +9,7 @@
 #include <linkage.h>
 GLOBAL_FUNC(_start)
 EXTERN_FUNC(kernel_main)  // 六十四位内核程序入口
+EXTERN_FUNC(ap_main)  // ap程序入口
 EXTERN_FUNC(init16)  // 十六位实模式C语言程序入口
 #define PAGE_2M
 //------------------------------------------------------------------------------
@@ -149,7 +150,11 @@ higher_half:
 	xorq     %rsi, %rsi
     movl    (mb_eax), %edi
     movl    (mb_ebx), %esi
-	jmp kernel_main
+	// jmp kernel_main
+	cmpl    $0x2badb002, %edi
+    je      kernel_main
+    cmpl    $0xdeadbeef, %edi
+    je      ap_main
 
 die64_high:
     hlt

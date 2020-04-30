@@ -101,7 +101,7 @@ void tick_proc() {
 
         irq_spin_give(&tick_q.spin, key);
     }
-	loge("not implement");
+	// loge("not implement");
     // sched_tick();
 }
 
