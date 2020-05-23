@@ -1,5 +1,5 @@
 
-subdirs := shell ls
+subdirs := shell ls print
 
 INCLIST := $(SYSROOT)/usr/include/mjos
 
