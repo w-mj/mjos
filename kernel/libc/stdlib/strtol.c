@@ -6,7 +6,9 @@
 /*
  * Convert a string to a long integer.
  */
+#ifndef _BITS_TYPES_LOCALE_T_H
 typedef int locale_t;
+#endif
 static inline int __get_current_locale() {return 0;}
 
 long strtol ( const char *__restrict nptr, char **__restrict endptr, int base)

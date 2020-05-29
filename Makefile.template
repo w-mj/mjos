@@ -57,6 +57,11 @@ $(target_run): $(objlist) $(subobjs)
 test: $(testrun)
 	$(testrunlist)
 
+$(testrun): $(testsrc)
+
+$(testsrc): FORCE
+	g++ $@ $(TESTINC) -DTEST -o $@.run
+
 $(subdirs): FORCE
 	$(MAKE) -C $@ $(MAKECMDGOALS)
 

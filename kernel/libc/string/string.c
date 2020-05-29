@@ -1,14 +1,21 @@
 #include <string.h>
 
+#ifndef TNAME
+#ifdef TEST
+#define TNAME(x) test_##x
+#else
+#define TNAME(x) x
+#endif
+#endif
 
-size_t strlen(const char *s) {
+size_t TNAME(strlen)(const char *s) {
 	const char *a = s;
 	while (*a != '\0')
 		a++;
 	return a - s;
 }
 
-int strncmp(const char *s1, const char *s2, size_t n) {
+int TNAME(strncmp)(const char *s1, const char *s2, size_t n) {
 	while (n > 0 && (*s1) == (*s2)) {
 		s1++;
 		s2++;
@@ -19,7 +26,7 @@ int strncmp(const char *s1, const char *s2, size_t n) {
 	return *s1 - *s2;
 }
 
-char *strcpy(char *dst, const char *src) {
+char *TNAME(strcpy)(char *dst, const char *src) {
     char *t = dst;
     while (*src) {
         *dst = *src;

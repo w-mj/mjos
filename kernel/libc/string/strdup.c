@@ -2,9 +2,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-char *strdup(const char *str) {
+
+#ifndef TNAME
+#ifdef TEST
+#define TNAME(x) test_##x
+#else
+#define TNAME(x) x
+#endif
+#endif
+
+char *TNAME(strdup)(const char *str) {
     size_t size = strlen(str);
-    char *ans = malloc(size + 1);
+    char *ans = (char*)malloc(size + 1);
     memcpy(ans, str, size + 1);
     return ans;
 }

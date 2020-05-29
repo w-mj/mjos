@@ -1,8 +1,15 @@
 
 #include <string.h>
 
+#ifndef TNAME
+#ifdef TEST
+#define TNAME(x) test_##x
+#else
+#define TNAME(x) x
+#endif
+#endif
 // Function to implement strstr() function using KMP algorithm
-char* strstr(const char* X, const char* Y)
+char* TNAME(strstr)(const char* X, const char* Y)
 {
     int m = strlen(X);
     int n = strlen(Y);
